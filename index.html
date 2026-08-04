@@ -572,7 +572,7 @@ function showLoadError(e){
   });
 }
 
-/* ================= RENDUS (isolés : un panneau qui plante n'efface plus le reste) ================= */
+/* ================= RENDUS (isolés) ================= */
 const safe=(name,f)=>{ try{ f(); }catch(err){ console.error('Erreur de rendu ['+name+'] :',err); } };
 function renderAll(){
   const fc=state.fc, c=fc.current, day=fc.daily, isDay=c.is_day===1, code=c.weather_code;
@@ -757,13 +757,13 @@ function renderMarine(){
   note.textContent='Point d\u2019eau le plus proche · modèle océanique Open-Meteo';
 }
 
-/* ================= CARTE LEAFLET + RAINVIEWER ================= */
+/* ================= CARTE LEAFLET + RAINVIEWER (zoom amélioré) ================= */
 function initMap(){
   if(state.mapInited)return; state.mapInited=true;
-  const map=L.map('map',{zoomControl:false}).setView([state.loc.lat,state.loc.lon],6);
+  const map=L.map('map',{zoomControl:false,maxZoom:20}).setView([state.loc.lat,state.loc.lon],6);
   L.control.zoom({position:'bottomright'}).addTo(map);
-  state.bases.sat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Tiles © Esri — Esri, Maxar, Earthstar Geographics'});
-  state.bases.plan=L.tileLayer('https://{s}.basemap.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:19,attribution:'© OpenStreetMap © CARTO'});
+  state.bases.sat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:20,maxNativeZoom:19,attribution:'Tiles © Esri — Esri, Maxar, Earthstar Geographics'});
+  state.bases.plan=L.tileLayer('https://{s}.basemap.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:20,maxNativeZoom:20,attribution:'© OpenStreetMap © CARTO'});
   state.bases.sat.addTo(map);
   state.marker=L.circleMarker([state.loc.lat,state.loc.lon],{radius:7,color:'#fff',weight:2,fillColor:'#ffd166',fillOpacity:.95}).addTo(map);
   state.map=map;
@@ -785,14 +785,16 @@ async function loadRadarFrames(){
 const curFrames=()=>state.radar.mode==='radar'?state.radar.frames:state.radar.sat;
 function tileURL(f){
   const sch=state.radar.mode==='radar'?'2/1_1':'0/0';
-  return `${state.radar.host}${f.path}/256/{z}/{x}/{y}/${sch}.png`;
+  return `${state.radar.host}${f.path}/512/{z}/{x}/{y}/${sch}.png`;
 }
 function setFrame(i){
   const R=state.radar, frames=curFrames(); if(!frames.length)return;
   R.idx=(i+frames.length)%frames.length;
   const f=frames[R.idx];
   if(state.overlay&&state.map){ state.map.removeLayer(state.overlay); state.overlay=null; }
-  if(state.map){ state.overlay=L.tileLayer(tileURL(f),{opacity:R.op[R.mode],tileSize:256}); state.overlay.addTo(state.map); }
+  /* Tuiles radar 512 px, zoom natif max 7 (limite du flux gratuit) :
+     Leaflet agrandit en douceur au-delà au lieu d'afficher des tuiles d'erreur. */
+  if(state.map){ state.overlay=L.tileLayer(tileURL(f),{opacity:R.op[R.mode],tileSize:512,zoomOffset:-1,maxNativeZoom:7,maxZoom:20}); state.overlay.addTo(state.map); }
   $('#frameRange').value=R.idx; $('#frameRange').max=frames.length-1;
   const t=new Date(f.time*1000).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
   $('#mapTime').innerHTML = state.radar.mode==='radar' ? t+(f.prev?'<span class="prev">PRÉVISION</span>':'') : t+' · IR';
@@ -804,7 +806,7 @@ function togglePlay(){
   if(R.playing) R.timer=setInterval(()=>setFrame(R.idx+1),550);
 }
 function refreshMapFocus(){
-  if(state.map){ state.map.setView([state.loc.lat,state.loc.lon],Math.max(state.map.getZoom(),5)); state.marker.setLatLng([state.loc.lat,state.loc.lon]); }
+  if(state.map){ state.map.setView([state.loc.lat,state.loc.lon],Math.max(state.map.getZoom(),8)); state.marker.setLatLng([state.loc.lat,state.loc.lon]); }
 }
 new IntersectionObserver((es,ob)=>{ if(es[0].isIntersecting){ initMap(); ob.disconnect(); } },{rootMargin:'200px'}).observe($('#mapSec'));
 
