@@ -691,6 +691,13 @@ const CARD=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSO','SO','OSO','O','
 const cardOf=d=>CARD[Math.round(((d%360)/22.5))%16];
 const mins=s=>{const p=s.slice(11,16).split(':');return +p[0]*60+ +p[1]};
 const hm=s=>s.slice(11,16);
+/* Durée lisible : « ~45 min », « ~1 h », « ~1 h 45 » */
+const fmtDur=min=>{
+  const h=Math.floor(min/60), mm=min%60;
+  if(h<=0) return `~${mm} min`;
+  if(mm===0) return `~${h} h`;
+  return `~${h} h ${String(mm).padStart(2,'0')}`;
+};
 
 /* ================= POSITION SOLAIRE ================= */
 const RAD=Math.PI/180, DAYMS=86400000, J2000=2451545;
@@ -783,7 +790,6 @@ async function fetchData(){
   let fc;
   try{ fc=await fetchJSON(fcBase+'&forecast_days=16'); }
   catch(e1){ console.warn('16 jours refusé, repli sur 7 jours :',e1); fc=await fetchJSON(fcBase+'&forecast_days=7'); }
-  /* Air & pollen : succès → cache local ; échec → dernières valeurs connues (24 h max) */
   const aq=await fetchJSON(aqURL(lat,lon))
     .then(d=>{ store.set('pc_aq_cache',{t:Date.now(),aq:d}); state.aqStale=false; return d; })
     .catch(e=>{
@@ -801,7 +807,6 @@ async function fetchData(){
   scheduleAqRetry();
 }
 
-/* ---- Réessaie tout seul si le service « air » est en panne ---- */
 let aqRetryTimer=null, aqTryN=0;
 function scheduleAqRetry(){
   clearTimeout(aqRetryTimer);
@@ -977,7 +982,7 @@ setInterval(()=>{ if(state.fc) checkThunderAlert(); }, 10*60*1000);
 
 /* ================= FENÊTRES « À PROPOS » ================= */
 const INFO={
- rain:{t:'Pluie dans les prochaines heures',x:'Basé sur la prévision de pluie pas à pas (toutes les 15 min).<br>· Le <b>texte</b> annonce quand la pluie commence ou s\'arrête.<br>· La <b>jauge</b> représente les 3 prochaines heures : chaque segment = 15 min ; plus le bleu est intense, plus il pleut.'},
+ rain:{t:'Pluie dans les prochaines heures',x:'Basé sur la prévision de pluie pas à pas (toutes les 15 min), sur un horizon de <b>3 heures</b>.<br>· Le <b>texte</b> annonce quand la pluie commence ou s\'arrête.<br>· La <b>jauge</b> représente les 3 prochaines heures : chaque segment = 15 min ; plus le bleu est intense, plus il pleut.'},
  outfit:{t:'Que porter aujourd\'hui',x:'Conseil calculé avec la <b>température ressentie</b>, le vent, la pluie attendue et l\'indice UV.<br>Les pastilles listent les accessoires utiles du moment : parapluie, crème solaire, bonnet…'},
  activities:{t:'Activités du jour',x:'Chaque activité est notée de <b>0 à 5 points</b> selon la météo (température, vent, pluie, UV).<br>5 points = conditions idéales ; 0-1 point = à éviter ou à reporter.'},
  stats:{t:'Indicateurs actuels',x:'· <b>Vent</b> : la flèche indique la direction d\'où vient le vent.<br>· <b>Point de rosée</b> : au-dessus de 18 °C, l\'air paraît lourd.<br>· <b>Pression</b> : &gt; 1020 hPa = temps stable, &lt; 1005 hPa = temps perturbé.<br>· <b>UV</b> : le curseur place l\'indice sur l\'échelle de 0 à 11+.<br>· <b>Visibilité</b> et <b>nébulosité</b> : part de ciel couvert.'},
@@ -1048,28 +1053,33 @@ function renderAll(){
   document.title=`${fmtT(c.temperature_2m)}${unitT()} ${WMO[code]} · ${state.loc.name} — Plein Ciel`;
 }
 
+/* ---- Pluie pas à pas : horizon limité à 3 h (12 pas de 15 min) ---- */
 function renderRainNow(){
   const fc=state.fc, m=fc.minutely_15, card=$('#rainNowCard');
   if(!m||!m.time||!m.precipitation){ card.style.display='none'; return; }
-  const times=m.time, P=m.precipitation, cur=fc.current.time;
-  let i0=times.findIndex(t=>t.slice(0,16)===cur.slice(0,16));
-  if(i0<0){ i0=times.findIndex(t=>t>=cur.slice(0,16)); if(i0<0)i0=0; }
+  const times=m.time, P=m.precipitation, cur=fc.current.time.slice(0,16);
+  let i0=times.findIndex(t=>t.slice(0,16)===cur);
+  if(i0<0) i0=times.findIndex(t=>t.slice(0,16)>=cur);
+  if(i0<0) i0=0;
   const eps=0.05;
+  const end=Math.min(i0+13, P.length); /* créneau actuel + 3 h */
   const rainingNow=(P[i0]||0)>eps;
   let msg='';
   if(rainingNow){
     let stop=-1;
-    for(let i=i0;i<P.length;i++){ if((P[i]||0)<=eps){ stop=i; break; } }
-    if(stop<0) msg=`Pluie en cours, elle devrait continuer au moins jusqu'à ${hm(times[P.length-1])}.`;
+    for(let i=i0+1;i<end;i++){ if((P[i]||0)<=eps){ stop=i; break; } }
+    if(stop<0) msg=`Pluie en cours — elle devrait continuer encore au moins 3 h.`;
     else if(stop<=i0+1) msg=`Pluie en cours, elle s'arrête très bientôt (vers ${hm(times[stop])}).`;
-    else msg=`Pluie en cours, fin dans ~${(stop-i0)*15} min (vers ${hm(times[stop])}).`;
+    else msg=`Pluie en cours, fin ${fmtDur((stop-i0)*15)} (vers ${hm(times[stop])}).`;
   }else{
     let start=-1;
-    for(let i=i0;i<P.length;i++){ if((P[i]||0)>eps){ start=i; break; } }
+    for(let i=i0+1;i<end;i++){ if((P[i]||0)>eps){ start=i; break; } }
     if(start<0) msg=`Pas de pluie prévue dans les 3 prochaines heures.`;
     else{
       const min=(start-i0)*15;
-      msg=`Pas de pluie pour l'instant — elle arrive dans ~${min} min (vers ${hm(times[start])}). Prenez le parapluie !`;
+      msg = min<=15
+        ? `La pluie arrive d'ici ~15 min (vers ${hm(times[start])}). Prenez le parapluie !`
+        : `Pas de pluie pour l'instant — elle arrive ${fmtDur(min)} (vers ${hm(times[start])}). Prenez le parapluie !`;
     }
   }
   card.style.display='';
