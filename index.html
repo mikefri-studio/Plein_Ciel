@@ -11,7 +11,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;700;800&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
-/* ---------- Variables animables (thèmes météo) ---------- */
 @property --sky-top { syntax:'<color>'; inherits:true; initial-value:#1470c8; }
 @property --sky-mid { syntax:'<color>'; inherits:true; initial-value:#4aa3e0; }
 @property --sky-low { syntax:'<color>'; inherits:true; initial-value:#a8d8f2; }
@@ -41,7 +40,6 @@ body{
 a{color:inherit}
 button{font-family:inherit}
 
-/* ---------- Fond vivant ---------- */
 #fx{position:fixed;inset:0;z-index:0;pointer-events:none}
 .clouds{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
 .clouds i{position:absolute;background:radial-gradient(ellipse at center,rgba(255,255,255,var(--cloud-op)),transparent 70%);filter:blur(3px);animation:drift linear infinite alternate}
@@ -62,7 +60,6 @@ body.thunder #skyflash{animation:skyflash 8s infinite}
 header,main,footer{position:relative;z-index:2}
 .wrap{max-width:1180px;margin:0 auto;padding:0 22px}
 
-/* ---------- Header ---------- */
 header{position:sticky;top:0;z-index:50;padding:12px 22px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
   background:color-mix(in srgb, var(--sky-top) 55%, transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .brand{display:flex;align-items:center;gap:9px;font-family:'Big Shoulders Display';font-weight:800;font-size:26px;letter-spacing:1.5px}
@@ -90,7 +87,6 @@ header{position:sticky;top:0;z-index:50;padding:12px 22px;display:flex;align-ite
 .seg button{border:0;background:none;color:var(--ink-soft);padding:6px 13px;border-radius:999px;cursor:pointer;font-weight:700;font-size:13.5px;transition:.25s}
 .seg button.on{background:var(--accent);color:var(--accent-ink)}
 
-/* ---------- Hero ---------- */
 .hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);align-items:center;gap:30px;padding-top:34px;padding-bottom:8px}
 .overline{font-size:12.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-soft);font-weight:600}
 .hero h1{font-family:'Big Shoulders Display';font-weight:800;font-size:clamp(44px,6.4vw,76px);line-height:.95;letter-spacing:.5px;text-transform:uppercase;margin-top:10px}
@@ -112,7 +108,6 @@ header{position:sticky;top:0;z-index:50;padding:12px 22px;display:flex;align-ite
 @keyframes bob{50%{transform:translateY(-12px)}}
 .updated{font-size:12.5px;color:var(--ink-soft);letter-spacing:.06em}
 
-/* ---------- Cartes génériques ---------- */
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px 22px;backdrop-filter:blur(6px);
   transition:transform .3s, border-color .3s, box-shadow .3s}
 .card:hover{border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
@@ -122,7 +117,6 @@ header{position:sticky;top:0;z-index:50;padding:12px 22px;display:flex;align-ite
 .lbl{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft);font-weight:700}
 .sub{color:var(--ink-soft);font-size:12.5px}
 
-/* ---------- Bandeau stats ---------- */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);
   border-radius:18px;overflow:hidden;margin-top:30px}
 .stat{background:var(--card);padding:16px 18px;display:flex;flex-direction:column;gap:9px;backdrop-filter:blur(6px);transition:background .3s}
@@ -136,7 +130,6 @@ header{position:sticky;top:0;z-index:50;padding:12px 22px;display:flex;align-ite
 .uvbar{height:6px;border-radius:99px;background:linear-gradient(90deg,#35c26b,#ffd23f,#ff9f43,#ff6b6b,#d63cff);position:relative;margin-top:2px}
 .uvbar i{position:absolute;top:-3px;width:3px;height:12px;border-radius:2px;background:#fff;box-shadow:0 0 0 2px rgba(0,0,0,.35);transition:left 1s}
 
-/* ---------- Horaires ---------- */
 .hours-card{padding:18px 0 4px;overflow:hidden}
 .hours-scroll{display:flex;overflow-x:auto;position:relative;padding:14px 10px 16px;scroll-snap-type:x proximity}
 .hours-scroll::-webkit-scrollbar{height:8px}
@@ -151,7 +144,6 @@ header{position:sticky;top:0;z-index:50;padding:12px 22px;display:flex;align-ite
 .hour .hp{display:flex;align-items:center;gap:3px;font-size:11px;color:var(--dropc);font-weight:700;min-height:14px}
 .hour .hp svg{width:9px;height:12px;fill:var(--dropc)}
 
-/* ---------- Colonnes jours + cartes latérales ---------- */
 .cols{display:grid;grid-template-columns:1.55fr .9fr;gap:20px;align-items:start}
 .day{display:grid;grid-template-columns:86px 40px 52px 44px 1fr 44px;gap:10px;align-items:center;
   padding:11px 8px;border-bottom:1px dashed var(--line);border-radius:10px;transition:background .25s, transform .25s}
@@ -182,7 +174,6 @@ header{position:sticky;top:0;z-index:50;padding:12px 22px;display:flex;align-ite
 .badge{padding:5px 12px;border-radius:999px;font-weight:700;font-size:13px;color:#082033}
 .pm{margin-top:10px;font-size:13px;color:var(--ink-soft)}
 
-/* ---------- Pollen ---------- */
 .pol{display:grid;grid-template-columns:86px 1fr 74px;gap:10px;align-items:center;padding:7px 0}
 .pol .pn{font-weight:600;font-size:13.5px}
 .pbar{height:6px;border-radius:99px;background:var(--line);overflow:hidden}
@@ -190,14 +181,12 @@ header{position:sticky;top:0;z-index:50;padding:12px 22px;display:flex;align-ite
 .pol .pv{text-align:right;font-weight:700;font-size:13.5px}
 .pol .pv em{display:block;font-style:normal;font-weight:600;font-size:11px;color:var(--ink-soft)}
 
-/* ---------- Marine ---------- */
 .marine-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .mcell{display:flex;flex-direction:column;gap:5px;padding:12px 14px;border-radius:14px;background:color-mix(in srgb,var(--card) 60%,transparent);border:1px solid var(--line)}
 .mcell .mv{font-family:'Big Shoulders Display';font-size:26px;font-weight:700;letter-spacing:.5px}
 .mnote{margin-top:12px;font-size:12px;color:var(--ink-soft);display:flex;align-items:center;gap:7px}
 .warr{width:16px;height:16px;fill:var(--accent);transition:transform 1s}
 
-/* ---------- Carte radar / satellite ---------- */
 .map-card{padding:18px}
 .map-top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:14px}
 .map-top .grow{flex:1}
@@ -217,7 +206,6 @@ header{position:sticky;top:0;z-index:50;padding:12px 22px;display:flex;align-ite
 .map-attr{font-size:11.5px;color:var(--ink-soft);margin-top:10px}
 .map-attr a{color:inherit}
 
-/* ---------- Icônes météo SVG ---------- */
 .wxi{display:block;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;color:var(--ink)}
 .wxi .cl{fill:var(--cloudfill);stroke:var(--cloudline)}
 .wxi .sun-c{fill:var(--accent);stroke:var(--accent)}
@@ -240,7 +228,6 @@ header{position:sticky;top:0;z-index:50;padding:12px 22px;display:flex;align-ite
 @keyframes fogx{to{transform:translateX(6px)}}
 @keyframes tw{50%{opacity:.15}}
 
-/* ---------- Divers ---------- */
 .reveal{opacity:0;transform:translateY(22px);transition:opacity .8s ease, transform .8s ease}
 .reveal.in{opacity:1;transform:none}
 footer{margin:60px 0 30px;text-align:center;color:var(--ink-soft);font-size:13px;line-height:1.9}
@@ -250,7 +237,7 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
 #toast.show{transform:translate(-50%,0)}
 #load{position:fixed;inset:0;z-index:80;display:grid;place-items:center;background:linear-gradient(180deg,#1470c8,#4aa3e0 45%,#a8d8f2);transition:opacity .5s}
 #load.off{opacity:0;pointer-events:none}
-#load .box{text-align:center;color:#fff}
+#load .box{text-align:center;color:#fff;max-width:560px;padding:0 20px}
 #load .wxi{width:74px;height:74px;margin:0 auto 12px;color:#fff}
 #load p{letter-spacing:.2em;text-transform:uppercase;font-size:12px;font-weight:700;opacity:.85}
 
@@ -305,7 +292,6 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
 </header>
 
 <main>
-  <!-- ============ MAINTENANT ============ -->
   <section class="wrap">
     <div class="hero">
       <div>
@@ -327,17 +313,14 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
         <div class="updated" id="updated"></div>
       </div>
     </div>
-
     <div class="stats" id="stats"></div>
   </section>
 
-  <!-- ============ 24 HEURES ============ -->
   <section class="wrap reveal">
     <div class="sec-head"><h2>Les prochaines 24 heures</h2><span class="note">Températures heure par heure — faites défiler →</span></div>
     <div class="card hours-card"><div class="hours-scroll" id="hours"></div></div>
   </section>
 
-  <!-- ============ 16 JOURS + PANNEAUX LATÉRAUX ============ -->
   <section class="wrap reveal">
     <div class="sec-head"><h2>Sur les 16 prochains jours</h2><span class="note">Prévisions étendues · pollen · mer</span></div>
     <div class="cols">
@@ -384,7 +367,6 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
     </div>
   </section>
 
-  <!-- ============ CARTE RADAR / SATELLITE ============ -->
   <section class="wrap reveal" id="mapSec">
     <div class="sec-head"><h2>Carte radar &amp; satellite</h2><span class="note">Précipitations en direct et imagerie infrarouge</span></div>
     <div class="card map-card">
@@ -427,17 +409,21 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
 "use strict";
 const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
 const store={get:k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set:(k,v)=>localStorage.setItem(k,JSON.stringify(v))};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 /* ================= ÉTAT ================= */
+let savedLoc=store.get('pc_loc');
+if(!savedLoc||!isFinite(savedLoc.lat)||!isFinite(savedLoc.lon))
+  savedLoc={lat:48.8566, lon:2.3522, name:'Paris', sub:'Île-de-France · France'};
 const state={
-  loc: store.get('pc_loc') || {lat:48.8566, lon:2.3522, name:'Paris', sub:'Île-de-France · France'},
+  loc:savedLoc,
   units: store.get('pc_units') || 'C',
   fc:null, aq:null, marine:null, fx:'none',
   radar:{host:'',frames:[],sat:[],pastCount:0,idx:0,mode:'radar',playing:false,timer:null,op:{radar:.75,sat:.85}},
   map:null, bases:{}, overlay:null, marker:null, mapInited:false
 };
 
-/* ================= THEMES ================= */
+/* ================= THÈMES ================= */
 const THEMES={
  'clear-day':{t:'#1470c8',m:'#4aa3e0',l:'#a8d8f2',ink:'#ffffff',soft:'rgba(255,255,255,.8)',acc:'#ffd166',aink:'#0b2239',card:'rgba(9,35,66,.28)',line:'rgba(255,255,255,.24)',panel:'#0e2138',cf:'#ffffff',cl2:'rgba(20,60,100,.55)',drop:'#2f86c9',glow:'rgba(255,209,102,.5)',cop:.85,pc:'rgba(200,230,255,.45)',fx:'none'},
  'clear-night':{t:'#050a1c',m:'#0d1734',l:'#20335f',ink:'#f2f6ff',soft:'rgba(220,232,255,.72)',acc:'#dfe8ff',aink:'#0b1c33',card:'rgba(8,14,32,.42)',line:'rgba(255,255,255,.16)',panel:'#0a1226',cf:'rgba(255,255,255,.12)',cl2:'rgba(255,255,255,.7)',drop:'#7fb2ff',glow:'rgba(170,200,255,.22)',cop:.12,pc:'rgba(200,230,255,.45)',fx:'stars'},
@@ -517,45 +503,77 @@ const cardOf=d=>CARD[Math.round(((d%360)/22.5))%16];
 const mins=s=>{const p=s.slice(11,16).split(':');return +p[0]*60+ +p[1]};
 const hm=s=>s.slice(11,16);
 
-/* ================= DONNÉES ================= */
+/* ================= DONNÉES (ROBUSTE) ================= */
+async function fetchJSON(url){
+  const r=await fetch(url,{cache:'no-store'});
+  if(!r.ok) throw new Error('HTTP '+r.status+' — '+url.split('?')[0]);
+  return r.json();
+}
 async function fetchMarine(lat,lon){
   const base=`https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}&current=`;
   try{
-    const r=await fetch(base+'wave_height,wave_direction,wave_period,swell_wave_height,swell_wave_direction,swell_wave_period,sea_surface_temperature');
-    if(r.ok)return await r.json();
-  }catch(e){}
-  try{ /* repli si une variable n'est pas acceptée */
-    const r=await fetch(base+'wave_height,wave_direction,wave_period');
-    if(r.ok)return await r.json();
-  }catch(e){}
-  return null;
+    return await fetchJSON(base+'wave_height,wave_direction,wave_period,swell_wave_height,swell_wave_direction,swell_wave_period,sea_surface_temperature');
+  }catch(e){
+    try{ return await fetchJSON(base+'wave_height,wave_direction,wave_period'); }
+    catch(e2){ console.warn('Marine indisponible :',e2); return null; }
+  }
 }
 async function fetchData(){
   const {lat,lon}=state.loc;
-  const fcU=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}`
+  const fcBase=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}`
     +`&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,cloud_cover,pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m`
     +`&hourly=temperature_2m,precipitation_probability,weather_code,is_day,visibility,dew_point_2m`
     +`&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max,uv_index_max`
-    +`&forecast_days=16&timezone=auto`;
+    +`&timezone=auto`;
+  let fc;
+  try{ fc=await fetchJSON(fcBase+'&forecast_days=16'); }
+  catch(e1){ console.warn('16 jours refusé, repli sur 7 jours :',e1); fc=await fetchJSON(fcBase+'&forecast_days=7'); }
   const aqU=`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}`
     +`&current=european_aqi,pm2_5,pm10&daily=alder_pollen,birch_pollen,grass_pollen,mugwort_pollen,olive_pollen,ragweed_pollen`
     +`&forecast_days=1&timezone=auto`;
-  const [fc,aq,marine]=await Promise.all([
-    fetch(fcU).then(r=>{if(!r.ok)throw 0;return r.json()}),
-    fetch(aqU).then(r=>r.ok?r.json():null).catch(()=>null),
+  const [aq,marine]=await Promise.all([
+    fetchJSON(aqU).catch(e=>{console.warn('Air/pollen indisponible :',e);return null;}),
     fetchMarine(lat,lon)
   ]);
   state.fc=fc; state.aq=aq; state.marine=marine;
 }
+
+let loadTry=0;
 async function load(){
   try{
     await fetchData();
+    loadTry=0;
     renderAll();
-  }catch(e){ toast('Impossible de charger la météo — vérifiez votre connexion.'); }
-  $('#load').classList.add('off');
+    $('#load').classList.add('off');
+  }catch(e){
+    console.error('Plein Ciel — erreur de chargement :',e);
+    loadTry++;
+    if(loadTry<=2){ toast('Nouvelle tentative… ('+loadTry+'/2)'); setTimeout(load,1500*loadTry); }
+    else showLoadError(e);
+  }
+}
+function showLoadError(e){
+  const msg=(e&&e.message)?e.message:String(e);
+  $('#load').classList.remove('off');
+  $('#load .box').innerHTML=`
+    <div style="font-size:46px;margin-bottom:12px">📡</div>
+    <p style="max-width:480px;line-height:1.7;letter-spacing:.02em;text-transform:none;font-size:14px;font-weight:500">
+      Le site est bien en ligne, mais je n'arrive pas à joindre le service météo
+      <b>api.open-meteo.com</b>.<br>
+      Causes possibles : bloqueur de publicités, pare-feu/proxy qui filtre cette adresse,
+      ou service momentanément indisponible.<br>
+      <span style="opacity:.7">Détail technique : ${esc(msg)}</span>
+    </p>
+    <button id="retryBtn" style="margin-top:18px;padding:12px 28px;border:0;border-radius:999px;background:#ffd166;color:#0b2239;font-weight:700;cursor:pointer;font-size:15px">Réessayer</button>`;
+  $('#retryBtn').addEventListener('click',()=>{
+    loadTry=0;
+    $('#load .box').innerHTML='<div id="loadIco">'+icon(2,true)+'</div><p>Chargement du ciel…</p>';
+    load();
+  });
 }
 
-/* ================= RENDUS ================= */
+/* ================= RENDUS (isolés : un panneau qui plante n'efface plus le reste) ================= */
+const safe=(name,f)=>{ try{ f(); }catch(err){ console.error('Erreur de rendu ['+name+'] :',err); } };
 function renderAll(){
   const fc=state.fc, c=fc.current, day=fc.daily, isDay=c.is_day===1, code=c.weather_code;
   const grp=condGroup(code);
@@ -585,8 +603,9 @@ function renderAll(){
     ['☁',c.cloud_cover+' %','nuages']
   ].map(x=>`<span class="chip">${x[0]} <b>${x[1]}</b> ${x[2]}</span>`).join('');
 
-  renderStats(); renderHours(); renderDays(); renderSunMoon(); renderAir(); renderPollen(); renderMarine();
-  refreshMapFocus();
+  safe('stats',renderStats); safe('hours',renderHours); safe('days',renderDays);
+  safe('sunmoon',renderSunMoon); safe('air',renderAir); safe('pollen',renderPollen);
+  safe('marine',renderMarine); safe('map',refreshMapFocus);
   document.title=`${fmtT(c.temperature_2m)}${unitT()} ${WMO[code]} · ${state.loc.name} — Plein Ciel`;
 }
 
@@ -596,7 +615,8 @@ function renderStats(){
   const vis=h.visibility?h.visibility[hi]:null;
   const dp=h.dew_point_2m?h.dew_point_2m[hi]:null;
   const dpLab=dp==null?'—':dp<10?'air sec':dp<16?'confortable':dp<18?'un peu lourd':dp<21?'temps lourd':'oppressant';
-  const uv=d.uv_index_max[0], uvLab=uv<3?'Faible':uv<6?'Modéré':uv<8?'Élevé':uv<11?'Très élevé':'Extrême';
+  const uv=d.uv_index_max!=null?d.uv_index_max[0]:null;
+  const uvLab=uv==null?'—':uv<3?'Faible':uv<6?'Modéré':uv<8?'Élevé':uv<11?'Très élevé':'Extrême';
   const cc=c.cloud_cover, ccLab=cc<=25?'ciel dégagé':cc<=60?'partiellement nuageux':'ciel couvert';
   $('#stats').innerHTML=`
     <div class="stat"><span class="lbl">Vent</span>
@@ -618,7 +638,7 @@ function renderHours(){
   const W=78, H=120;
   let items='';
   idx.forEach((i,k)=>{
-    const pop=h.precipitation_probability[i];
+    const pop=h.precipitation_probability?h.precipitation_probability[i]:null;
     items+=`<div class="hour"><span class="ht">${k===0?'Maint.':hm(h.time[i])}</span>${icon(h.weather_code[i],h.is_day[i]===1)}
       <span class="htemp">${fmtT(h.temperature_2m[i])}°</span>
       <span class="hp">${pop>=5?`<svg viewBox="0 0 24 24"><path d="M12 3c3 4.5 6 7.6 6 11a6 6 0 1 1-12 0c0-3.4 3-6.5 6-11z"/></svg>${pop}%`:''}</span></div>`;
@@ -649,7 +669,7 @@ function renderDays(){
     const name=i===0?'Aujourd\u2019hui':cap(date.toLocaleDateString('fr-FR',{weekday:'long'}));
     const sub=date.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
     const left=(d.temperature_2m_min[i]-wmin)/span*100, width=Math.max(5,(d.temperature_2m_max[i]-d.temperature_2m_min[i])/span*100);
-    const pop=d.precipitation_probability_max[i];
+    const pop=d.precipitation_probability_max?d.precipitation_probability_max[i]:null;
     html+=`<div class="day"><span class="dn">${name}<small>${sub}</small></span>${icon(d.weather_code[i],true)}
       <span class="dp">${pop>=5?'💧 '+pop+'%':''}</span>
       <span class="dmin">${fmtT(d.temperature_2m_min[i])}°</span>
@@ -691,7 +711,6 @@ function renderAir(){
   $('#pmTxt').innerHTML=`Indice européen · PM2,5 : <b>${pm25!=null?pm25.toFixed(1):'—'}</b> µg/m³ · PM10 : <b>${pm10!=null?pm10.toFixed(1):'—'}</b> µg/m³`;
 }
 
-/* ---- Pollen ---- */
 const polInfo=v=> v<=0?['Nul','#9aa7b3']:v<15?['Faible','#35c26b']:v<50?['Modéré','#ffd23f']:v<100?['Élevé','#ff9f43']:['Très élevé','#ff6b6b'];
 function renderPollen(){
   const d=state.aq&&state.aq.daily?state.aq.daily:null;
@@ -712,7 +731,6 @@ function renderPollen(){
   badge.textContent = max>0 ? 'Risque '+lab.toLowerCase() : 'Nul';
 }
 
-/* ---- Marine ---- */
 const seaState=h=>h<0.5?'mer calme':h<1.25?'mer peu agitée':h<2.5?'mer assez agitée':h<4?'mer agitée':'mer forte';
 function renderMarine(){
   const box=$('#marineBox'), arr=$('#waveArr'), note=$('#marineNote');
@@ -733,9 +751,7 @@ function renderMarine(){
     html+=cell('Vagues', c.wave_height.toFixed(1)+' m', seaState(c.wave_height)+(c.wave_direction!=null?` · venant de ${cardOf(c.wave_direction)}`:''));
     if(c.wave_direction!=null){ arr.style.display='block'; arr.style.transform=`rotate(${Math.round(c.wave_direction+180)}deg)`; }
   }
-  if(c.swell_wave_height!=null){
-    html+=cell('Houle', c.swell_wave_height.toFixed(1)+' m', c.swell_wave_direction!=null?`venant de ${cardOf(c.swell_wave_direction)}`:'');
-  }
+  if(c.swell_wave_height!=null) html+=cell('Houle', c.swell_wave_height.toFixed(1)+' m', c.swell_wave_direction!=null?`venant de ${cardOf(c.swell_wave_direction)}`:'');
   if(c.wave_period!=null) html+=cell('Période', Math.round(c.wave_period)+' s', 'entre deux vagues');
   box.innerHTML=html;
   note.textContent='Point d\u2019eau le plus proche · modèle océanique Open-Meteo';
@@ -764,7 +780,7 @@ async function loadRadarFrames(){
     R.idx=Math.max(0,R.pastCount-1);
     $('#frameRange').max=curFrames().length-1;
     setFrame(R.idx);
-  }catch(e){ toast('Flux radar indisponible pour le moment.'); }
+  }catch(e){ console.warn('Radar indisponible :',e); }
 }
 const curFrames=()=>state.radar.mode==='radar'?state.radar.frames:state.radar.sat;
 function tileURL(f){
@@ -848,7 +864,9 @@ function pickCity(r){
 }
 function setLoc(loc){
   state.loc=loc; store.set('pc_loc',loc);
+  loadTry=0;
   $('#load').classList.remove('off');
+  $('#load .box').innerHTML='<div id="loadIco">'+icon(2,true)+'</div><p>Chargement du ciel…</p>';
   load();
 }
 $('#geoBtn').addEventListener('click',()=>{
@@ -893,7 +911,7 @@ $$('#baseSeg button').forEach(b=>b.addEventListener('click',()=>{
   state.map.removeLayer(other); want.addTo(state.map); if(state.overlay)state.overlay.bringToFront();
 }));
 
-/* ================= FX CANVAS (pluie, neige, étoiles) ================= */
+/* ================= FX CANVAS ================= */
 const cv=$('#fx'), ctx=cv.getContext('2d');
 let stars=[],parts=[];
 function sizeFX(){ cv.width=innerWidth; cv.height=innerHeight;
