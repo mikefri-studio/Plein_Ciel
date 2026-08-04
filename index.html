@@ -10,6 +10,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;700;800&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<!-- ===== PWA ===== -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1470c8">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Plein Ciel">
+<link rel="apple-touch-icon" href="icon.svg">
 <style>
 @property --sky-top { syntax:'<color>'; inherits:true; initial-value:#1470c8; }
 @property --sky-mid { syntax:'<color>'; inherits:true; initial-value:#4aa3e0; }
@@ -136,7 +144,6 @@ body.has-alert .alert-bar{top:0}
 @keyframes bob{50%{transform:translateY(-12px)}}
 .updated{font-size:12.5px;color:var(--ink-soft);letter-spacing:.06em}
 
-/* ---- Pluie prochaines heures ---- */
 .rainnow{margin-top:26px}
 .rn-txt{font-size:16px;font-weight:600;margin-bottom:14px}
 .rn-bar{display:flex;gap:3px}
@@ -352,6 +359,9 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
     <div id="qlist"></div>
   </div>
   <div class="hbtns">
+    <button class="ibtn" id="installBtn" title="Installer l'application" aria-label="Installer" style="display:none">
+      <svg viewBox="0 0 24 24"><path d="M12 3v10m0 0l-4-4m4 4l4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+    </button>
     <button class="ibtn" id="favBtn" title="Ajouter aux favoris" aria-label="Favori">
       <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.9L22 10l-5.5 4.8L18 22l-6-3.5L6 22l1.5-7.2L2 10l7.1-1.1z"/></svg>
     </button>
@@ -391,7 +401,6 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
       </div>
     </div>
 
-    <!-- NOUVEAU : pluie minute par minute -->
     <div class="card rainnow" id="rainNowCard" style="display:none">
       <h3>🌧️ Pluie dans les prochaines heures</h3>
       <div class="rn-txt" id="rainNowTxt"></div>
@@ -440,13 +449,11 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
             <div style="text-align:right">Coucher<br><b id="setT">—</b></div>
           </div>
         </div>
-        <!-- NOUVEAU : comparaison il y a 1 an -->
         <div class="card">
           <h3>📅 Il y a 1 an</h3>
           <div class="aqirow"><span class="n" id="climDiff">—</span><span class="badge" id="climBadge" style="background:#35c26b">…</span></div>
           <div class="pm" id="climTxt"></div>
         </div>
-        <!-- NOUVEAU : heures dorées / bleues -->
         <div class="card">
           <h3>📷 Lumière photo</h3>
           <div id="photoBox"></div>
@@ -511,7 +518,7 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
   <footer class="wrap">
     <div class="disp">PLEIN CIEL</div>
     Données météo, pollen &amp; marine : <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a> · Radar : RainViewer · Cartes : Leaflet<br>
-    Site statique — aucune clé API requise · <span id="year"></span>
+    Appli installable (PWA) — site statique, aucune clé API requise · <span id="year"></span>
   </footer>
 </main>
 
@@ -581,6 +588,7 @@ function applyTheme(key){
   r.setProperty('--cloudfill',t.cf); r.setProperty('--cloudline',t.cl2); r.setProperty('--dropc',t.drop);
   r.setProperty('--glow',t.glow); r.setProperty('--cloud-op',t.cop); r.setProperty('--pc',t.pc);
   state.fx=t.fx; document.body.classList.toggle('thunder', key==='thunder');
+  const metaTheme=document.querySelector('meta[name="theme-color"]'); if(metaTheme)metaTheme.setAttribute('content',t.t);
 }
 function condGroup(code){
   if(code<=1)return'clear'; if(code===2)return'partly'; if(code===3)return'cloud';
@@ -637,7 +645,7 @@ const cardOf=d=>CARD[Math.round(((d%360)/22.5))%16];
 const mins=s=>{const p=s.slice(11,16).split(':');return +p[0]*60+ +p[1]};
 const hm=s=>s.slice(11,16);
 
-/* ================= POSITION SOLAIRE (style suncalc, simplifié) ================= */
+/* ================= POSITION SOLAIRE ================= */
 const RAD=Math.PI/180, DAYMS=86400000, J2000=2451545;
 function sunAltitude(ms,lat,lng){
   const d=ms/DAYMS - 0.5 + 2440588 - J2000;
@@ -651,7 +659,6 @@ function sunAltitude(ms,lat,lng){
   const H=RAD*(280.16+360.9856235*d)-ra-lw;
   return Math.asin(Math.sin(phi)*Math.sin(dec)+Math.cos(phi)*Math.cos(dec)*Math.cos(H))/RAD;
 }
-/* Événements du jour (en minutes locales) : lever/coucher, heures dorées & bleues */
 function computeSunEvents(lat,lng,offSec){
   const nowLocal=new Date(Date.now()+offSec*1000);
   const Y=nowLocal.getUTCFullYear(),Mo=nowLocal.getUTCMonth(),D=nowLocal.getUTCDate();
@@ -704,7 +711,6 @@ async function fetchWindGrid(lat,lon){
   }catch(e){ console.warn('Wind grid indisponible :',e); }
   return null;
 }
-/* NOUVEAU : même jour l'an passé (API archive) */
 async function fetchClimate(lat,lon){
   const now=new Date();
   const y=now.getFullYear()-1;
@@ -818,9 +824,7 @@ function playAlertSound(){
 function sendBrowserNotification(title,body){
   if(!('Notification' in window)) return;
   if(Notification.permission==='granted'){
-    try{
-      new Notification(title,{body,tag:'pleinciel-thunder'});
-    }catch(e){}
+    try{ new Notification(title,{body,tag:'pleinciel-thunder'}); }catch(e){}
   }
 }
 function updateAlertBar(info){
@@ -935,7 +939,6 @@ function renderAll(){
   document.title=`${fmtT(c.temperature_2m)}${unitT()} ${WMO[code]} · ${state.loc.name} — Plein Ciel`;
 }
 
-/* --- NOUVEAU : pluie minute par minute --- */
 function renderRainNow(){
   const fc=state.fc, m=fc.minutely_15, card=$('#rainNowCard');
   if(!m||!m.time||!m.precipitation){ card.style.display='none'; return; }
@@ -972,7 +975,6 @@ function renderRainNow(){
   }).join('');
 }
 
-/* --- NOUVEAU : comparaison il y a 1 an --- */
 function renderClimate(){
   const cl=state.climate, d=state.fc.daily;
   if(!cl||!cl.daily||cl.daily.temperature_2m_max==null||cl.daily.temperature_2m_max[0]==null){
@@ -991,7 +993,6 @@ function renderClimate(){
   $('#climTxt').innerHTML=`Même date l'an dernier : <b>${fmtT(oldMax)}${unitT()}</b> max / <b>${fmtT(oldMin)}${unitT()}</b> min<br>Aujourd'hui : <b>${fmtT(todayMax)}${unitT()}</b> max / <b>${fmtT(todayMin)}${unitT()}</b> min`;
 }
 
-/* --- NOUVEAU : heures dorées & bleues --- */
 function renderPhoto(){
   const fc=state.fc;
   const off=fc.utc_offset_seconds!=null?fc.utc_offset_seconds:0;
@@ -1592,6 +1593,34 @@ $('#loadIco').innerHTML=icon(2,true);
 $('#year').textContent=new Date().getFullYear();
 writeURL(state.loc);
 load();
+
+/* ================= PWA : installation + hors-ligne ================= */
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js').catch(e=>console.warn('Service worker non enregistré :',e));
+  });
+}
+let deferredPrompt=null;
+const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault(); deferredPrompt=e; $('#installBtn').style.display='grid';
+});
+if(isIOS && !window.matchMedia('(display-mode: standalone)').matches) $('#installBtn').style.display='grid';
+$('#installBtn').addEventListener('click',async()=>{
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    const choice=await deferredPrompt.userChoice;
+    if(choice.outcome==='accepted'){ toast('Appli installée 🎉'); $('#installBtn').style.display='none'; }
+    deferredPrompt=null;
+  }else if(isIOS){
+    toast("Sur iPhone/iPad : bouton Partager puis « Sur l'écran d'accueil »");
+  }else{
+    toast("Menu du navigateur → « Installer l'application »");
+  }
+});
+window.addEventListener('appinstalled',()=>toast('Plein Ciel ajouté à votre appareil 🎉'));
+window.addEventListener('offline',()=>toast('📴 Hors ligne — dernières données affichées'));
+window.addEventListener('online',()=>toast('📶 De retour en ligne'));
 </script>
 </body>
 </html>
