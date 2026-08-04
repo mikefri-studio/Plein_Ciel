@@ -257,6 +257,7 @@ body.has-alert .alert-bar{top:0}
 .badge{padding:5px 12px;border-radius:999px;font-weight:700;font-size:13px;color:#082033}
 .pm{margin-top:10px;font-size:13px;color:var(--ink-soft)}
 .pm b{color:var(--ink)}
+.pm i{opacity:.85}
 
 .pol{display:grid;grid-template-columns:86px 1fr 74px;gap:10px;align-items:center;padding:7px 0}
 .pol .pn{font-weight:600;font-size:13.5px}
@@ -560,7 +561,6 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
   </footer>
 </main>
 
-<!-- Fenêtre « À propos » des widgets -->
 <div id="infoModal" role="dialog" aria-modal="true">
   <div class="im-box">
     <button id="imClose" aria-label="Fermer">✕</button>
@@ -592,7 +592,7 @@ if(!savedLoc||!isFinite(savedLoc.lat)||!isFinite(savedLoc.lon))
 const state={
   loc: locFromURL() || savedLoc,
   units: store.get('pc_units') || 'C',
-  fc:null, aq:null, marine:null, wind:null, climate:null, fx:'none',
+  fc:null, aq:null, marine:null, wind:null, climate:null, fx:'none', aqStale:false,
   radar:{host:'',frames:[],sat:[],pastCount:0,idx:0,mode:'radar',playing:false,timer:null,op:{radar:.75,sat:.85}},
   map:null, bases:{}, overlay:null, marker:null, mapInited:false,
   windLayer:null, windOn:true,
@@ -732,6 +732,11 @@ async function fetchJSON(url){
   if(!r.ok) throw new Error('HTTP '+r.status+' — '+url.split('?')[0]);
   return r.json();
 }
+function aqURL(lat,lon){
+  return `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}`
+    +`&current=european_aqi,pm2_5,pm10&daily=alder_pollen,birch_pollen,grass_pollen,mugwort_pollen,olive_pollen,ragweed_pollen`
+    +`&forecast_days=1&timezone=auto`;
+}
 async function fetchMarine(lat,lon){
   const base=`https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}&current=`;
   try{
@@ -778,16 +783,42 @@ async function fetchData(){
   let fc;
   try{ fc=await fetchJSON(fcBase+'&forecast_days=16'); }
   catch(e1){ console.warn('16 jours refusé, repli sur 7 jours :',e1); fc=await fetchJSON(fcBase+'&forecast_days=7'); }
-  const aqU=`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}`
-    +`&current=european_aqi,pm2_5,pm10&daily=alder_pollen,birch_pollen,grass_pollen,mugwort_pollen,olive_pollen,ragweed_pollen`
-    +`&forecast_days=1&timezone=auto`;
-  const [aq,marine,wind,climate]=await Promise.all([
-    fetchJSON(aqU).catch(e=>{console.warn('Air/pollen indisponible :',e);return null;}),
+  /* Air & pollen : succès → cache local ; échec → dernières valeurs connues (24 h max) */
+  const aq=await fetchJSON(aqURL(lat,lon))
+    .then(d=>{ store.set('pc_aq_cache',{t:Date.now(),aq:d}); state.aqStale=false; return d; })
+    .catch(e=>{
+      console.warn('Air/pollen indisponible :',e);
+      const c=store.get('pc_aq_cache');
+      if(c&&c.aq&&Date.now()-c.t<24*3600*1000){ state.aqStale=true; return c.aq; }
+      state.aqStale=false; return null;
+    });
+  const [marine,wind,climate]=await Promise.all([
     fetchMarine(lat,lon),
     fetchWindGrid(lat,lon),
     fetchClimate(lat,lon)
   ]);
   state.fc=fc; state.aq=aq; state.marine=marine; state.wind=wind; state.climate=climate;
+  scheduleAqRetry();
+}
+
+/* ---- Réessaie tout seul si le service « air » est en panne ---- */
+let aqRetryTimer=null, aqTryN=0;
+function scheduleAqRetry(){
+  clearTimeout(aqRetryTimer);
+  if(state.aq&&!state.aqStale){ aqTryN=0; return; }
+  const delays=[30,120,600,600,600,600];
+  const d=delays[Math.min(aqTryN,delays.length-1)]*1000;
+  aqTryN++;
+  aqRetryTimer=setTimeout(async()=>{
+    try{
+      const {lat,lon}=state.loc;
+      const d=await fetchJSON(aqURL(lat,lon));
+      store.set('pc_aq_cache',{t:Date.now(),aq:d});
+      state.aq=d; state.aqStale=false; aqTryN=0;
+      safe('air',renderAir); safe('pollen',renderPollen);
+      toast('✅ Qualité de l\'air & pollen : données rétablies');
+    }catch(e){ scheduleAqRetry(); }
+  },d);
 }
 
 let loadTry=0;
@@ -944,7 +975,7 @@ $('#alertCloseBtn').addEventListener('click',()=>{
 $('#alertMuteBtn').textContent=state.alert.muted?'🔇 Son coupé':'🔊 Son';
 setInterval(()=>{ if(state.fc) checkThunderAlert(); }, 10*60*1000);
 
-/* ================= FENÊTRES « À PROPOS » DES WIDGETS ================= */
+/* ================= FENÊTRES « À PROPOS » ================= */
 const INFO={
  rain:{t:'Pluie dans les prochaines heures',x:'Basé sur la prévision de pluie pas à pas (toutes les 15 min).<br>· Le <b>texte</b> annonce quand la pluie commence ou s\'arrête.<br>· La <b>jauge</b> représente les 3 prochaines heures : chaque segment = 15 min ; plus le bleu est intense, plus il pleut.'},
  outfit:{t:'Que porter aujourd\'hui',x:'Conseil calculé avec la <b>température ressentie</b>, le vent, la pluie attendue et l\'indice UV.<br>Les pastilles listent les accessoires utiles du moment : parapluie, crème solaire, bonnet…'},
@@ -956,7 +987,7 @@ const INFO={
  climate:{t:'Il y a 1 an',x:'Compare la température maximale d\'aujourd\'hui avec celle du <b>même jour l\'an dernier</b> (données réanalysées ERA5).<br>Le badge indique si c\'est nettement plus chaud, plus frais ou équivalent.'},
  photo:{t:'Lumière photo',x:'Horaires calculés par astronomie pour votre position exacte.<br>· <b>Heure dorée</b> : lumière chaude et rasante, soleil entre 0 et 6°.<br>· <b>Heure bleue</b> : ciel bleu profond juste avant le lever / après le coucher.<br>La ligne surlignée d\'or = créneau en cours.'},
  moon:{t:'Lune',x:'Le dessin montre la partie éclairée de la Lune visible ce soir.<br>Le pourcentage = fraction du disque illuminée ; le texte donne la phase (croissant, quartier, pleine lune…).'},
- air:{t:'Qualité de l\'air',x:'<b>Indice européen</b> de 0 (très bon) à plus de 100 (exécrable).<br>PM2,5 / PM10 = particules fines en µg/m³ : plus la valeur est basse, mieux c\'est.'},
+ air:{t:'Qualité de l\'air',x:'<b>Indice européen</b> de 0 (très bon) à plus de 100 (exécrable).<br>PM2,5 / PM10 = particules fines en µg/m³ : plus la valeur est basse, mieux c\'est.<br>Si le service est en panne, les dernières valeurs connues sont affichées et le site réessaie tout seul.'},
  pollen:{t:'Pollen & allergies',x:'Concentration estimée de chaque pollen dans l\'air.<br>La <b>barre</b> et le label donnent le niveau de risque d\'allergie : nul, faible, modéré, élevé, très élevé.'},
  marine:{t:'Conditions marines',x:'Données du point de mer le plus proche.<br>· <b>Eau</b> : température de la mer.<br>· <b>Vagues / houle</b> : hauteur en mètres et direction d\'origine.<br>· <b>Période</b> : temps entre deux vagues ; plus elle est longue, plus la houle est établie.'},
  map:{t:'Carte radar, satellite & vent',x:'· <b>Radar</b> : pluies des 2 dernières heures + courte prévision, en différé d\'environ 20-30 min (temps de traitement).<br>· <b>Satellite IR</b> : couverture nuageuse (blanc = nuages épais).<br>· <b>Vent</b> : particules animées (direction et force).<br>▶ anime la frise, le curseur déplace l\'heure, « Opacité » règle le calque météo.'}
@@ -1235,12 +1266,17 @@ function renderSunMoon(){
 }
 
 function renderAir(){
-  if(!state.aq||!state.aq.current){ $('#aqiN').textContent='—'; $('#aqiLbl').textContent='indisponible'; $('#pmTxt').textContent=''; return; }
+  if(!state.aq||!state.aq.current){
+    $('#aqiN').textContent='—'; $('#aqiLbl').textContent='indisponible';
+    $('#pmTxt').innerHTML='<i>Service « air » d\'Open-Meteo injoignable — nouvel essai automatique en cours…</i>';
+    return;
+  }
   const a=Math.round(state.aq.current.european_aqi);
   const [lbl,col]=a<=20?['Très bon','#35c26b']:a<=40?['Bon','#8fd14f']:a<=60?['Moyen','#ffd23f']:a<=80?['Médiocre','#ff9f43']:a<=100?['Très médiocre','#ff6b6b']:['Exécrable','#d63cff'];
   $('#aqiN').textContent=a; const b=$('#aqiLbl'); b.textContent=lbl; b.style.background=col;
   const pm25=state.aq.current.pm2_5, pm10=state.aq.current.pm10;
-  $('#pmTxt').innerHTML=`Indice européen · PM2,5 : <b>${pm25!=null?pm25.toFixed(1):'—'}</b> µg/m³ · PM10 : <b>${pm10!=null?pm10.toFixed(1):'—'}</b> µg/m³`;
+  $('#pmTxt').innerHTML=`Indice européen · PM2,5 : <b>${pm25!=null?pm25.toFixed(1):'—'}</b> µg/m³ · PM10 : <b>${pm10!=null?pm10.toFixed(1):'—'}</b> µg/m³`
+    + (state.aqStale?'<br><i>Service momentanément injoignable — dernières valeurs connues (mise à jour auto dès son retour).</i>':'');
 }
 
 const polInfo=v=> v<=0?['Nul','#9aa7b3']:v<15?['Faible','#35c26b']:v<50?['Modéré','#ffd23f']:v<100?['Élevé','#ff9f43']:['Très élevé','#ff6b6b'];
@@ -1257,7 +1293,8 @@ function renderPollen(){
     rows+=`<div class="pol"><span class="pn">${n}</span><span class="pbar"><i style="width:${v>0?Math.max(7,w):0}%;background:${col}"></i></span>
       <span class="pv">${Math.round(v)}<em>${lab}</em></span></div>`;
   });
-  wrap.innerHTML = max>0 ? rows : '<div class="sub">Aucun pollen significatif aujourd\u2019hui — profitez-en !</div>';
+  wrap.innerHTML = (max>0 ? rows : '<div class="sub">Aucun pollen significatif aujourd\u2019hui — profitez-en !</div>')
+    + (state.aqStale?'<div class="sub" style="margin-top:6px"><i>Dernières valeurs connues.</i></div>':'');
   const [lab,col]=polInfo(max);
   badge.style.display='inline-block'; badge.style.background=col;
   badge.textContent = max>0 ? 'Risque '+lab.toLowerCase() : 'Nul';
