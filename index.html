@@ -464,9 +464,7 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
   <section class="wrap reveal">
     <div class="sec-head"><h2>Sur les 16 prochains jours</h2><span class="note">Prévisions étendues · pollen · mer</span></div>
     <div class="cols">
-      <div class="card" id="days" style="padding:12px 16px">
-        <button class="info-btn" data-info="days" aria-label="À propos de ce widget">i</button>
-      </div>
+      <div class="card" id="days" style="padding:12px 16px"></div>
       <div class="side">
         <div class="card sunbox">
           <button class="info-btn" data-info="sun" aria-label="À propos de ce widget">i</button>
@@ -948,7 +946,7 @@ setInterval(()=>{ if(state.fc) checkThunderAlert(); }, 10*60*1000);
 
 /* ================= FENÊTRES « À PROPOS » DES WIDGETS ================= */
 const INFO={
- rain:{t:'Pluie dans les prochaines heures',x:`Basé sur la prévision de pluie pas à pas (toutes les 15 min).<br>· Le <b>texte</b> annonce quand la pluie commence ou s'arrête.<br>· La <b>jauge</b> représente les 3 prochaines heures : chaque segment = 15 min ; plus le bleu est intense, plus il pleut.`},
+ rain:{t:'Pluie dans les prochaines heures',x:'Basé sur la prévision de pluie pas à pas (toutes les 15 min).<br>· Le <b>texte</b> annonce quand la pluie commence ou s\'arrête.<br>· La <b>jauge</b> représente les 3 prochaines heures : chaque segment = 15 min ; plus le bleu est intense, plus il pleut.'},
  outfit:{t:'Que porter aujourd\'hui',x:'Conseil calculé avec la <b>température ressentie</b>, le vent, la pluie attendue et l\'indice UV.<br>Les pastilles listent les accessoires utiles du moment : parapluie, crème solaire, bonnet…'},
  activities:{t:'Activités du jour',x:'Chaque activité est notée de <b>0 à 5 points</b> selon la météo (température, vent, pluie, UV).<br>5 points = conditions idéales ; 0-1 point = à éviter ou à reporter.'},
  stats:{t:'Indicateurs actuels',x:'· <b>Vent</b> : la flèche indique la direction d\'où vient le vent.<br>· <b>Point de rosée</b> : au-dessus de 18 °C, l\'air paraît lourd.<br>· <b>Pression</b> : &gt; 1020 hPa = temps stable, &lt; 1005 hPa = temps perturbé.<br>· <b>UV</b> : le curseur place l\'indice sur l\'échelle de 0 à 11+.<br>· <b>Visibilité</b> et <b>nébulosité</b> : part de ciel couvert.'},
@@ -961,7 +959,7 @@ const INFO={
  air:{t:'Qualité de l\'air',x:'<b>Indice européen</b> de 0 (très bon) à plus de 100 (exécrable).<br>PM2,5 / PM10 = particules fines en µg/m³ : plus la valeur est basse, mieux c\'est.'},
  pollen:{t:'Pollen & allergies',x:'Concentration estimée de chaque pollen dans l\'air.<br>La <b>barre</b> et le label donnent le niveau de risque d\'allergie : nul, faible, modéré, élevé, très élevé.'},
  marine:{t:'Conditions marines',x:'Données du point de mer le plus proche.<br>· <b>Eau</b> : température de la mer.<br>· <b>Vagues / houle</b> : hauteur en mètres et direction d\'origine.<br>· <b>Période</b> : temps entre deux vagues ; plus elle est longue, plus la houle est établie.'},
- map:{t:'Carte radar, satellite & vent',x:'· <b>Radar</b> : pluies des 2 dernières heures + courte prévision, en différé d\'environ 20-30 min (temps de traitement).<br>· <b>Satellite IR</b> : couverture nuageuse (blanc = nuages épais).<br>· <b>Vent</b> : particules animées (direction et force).<br>▶ anime la frise, le curseur déplace l\'heure, « Opacité » règle le calque météo.`}
+ map:{t:'Carte radar, satellite & vent',x:'· <b>Radar</b> : pluies des 2 dernières heures + courte prévision, en différé d\'environ 20-30 min (temps de traitement).<br>· <b>Satellite IR</b> : couverture nuageuse (blanc = nuages épais).<br>· <b>Vent</b> : particules animées (direction et force).<br>▶ anime la frise, le curseur déplace l\'heure, « Opacité » règle le calque météo.'}
 };
 function openInfo(k){
   const d=INFO[k]; if(!d)return;
