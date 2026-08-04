@@ -272,6 +272,24 @@ body.has-alert .alert-bar{top:0}
 .mnote{margin-top:12px;font-size:12px;color:var(--ink-soft);display:flex;align-items:center;gap:7px}
 .warr{width:16px;height:16px;fill:var(--accent);transition:transform 1s}
 
+/* ---- Carte « Emportez le ciel » (QR + install) ---- */
+.getapp{padding:26px}
+.ga-grid{display:grid;grid-template-columns:auto 1fr;gap:32px;align-items:center}
+.ga-qr img{border-radius:14px;background:#fff;padding:10px;display:block;box-shadow:0 10px 30px rgba(0,10,30,.25)}
+.ga-qr .sub{margin-top:8px;text-align:center}
+.ga-cols{display:grid;gap:22px}
+.ga-block h3{margin-bottom:8px}
+.ga-btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.ga-btn{border:0;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:14px;padding:11px 18px;
+  border-radius:999px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:transform .2s, box-shadow .2s}
+.ga-btn:hover{transform:translateY(-2px);box-shadow:0 8px 22px color-mix(in srgb,var(--accent) 45%,transparent)}
+.ga-btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.ga-btn.ghost:hover{border-color:var(--accent);box-shadow:none}
+@media (max-width:760px){
+  .ga-grid{grid-template-columns:1fr;justify-items:center;text-align:center}
+  .ga-btns{justify-content:center}
+}
+
 .map-card{padding:18px}
 .map-top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:14px}
 .map-top .grow{flex:1}
@@ -554,6 +572,34 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
     </div>
   </section>
 
+  <!-- ===== NOUVEAU : installer l'appli / QR code ===== -->
+  <section class="wrap reveal" id="appSec">
+    <div class="sec-head"><h2>Emportez le ciel avec vous</h2><span class="note">Installez Plein Ciel comme une vraie application</span></div>
+    <div class="card getapp">
+      <div class="ga-grid">
+        <div class="ga-qr">
+          <img id="qrImg" alt="QR code vers Plein Ciel" width="180" height="180">
+          <div class="sub">Scannez-moi ☀️</div>
+        </div>
+        <div class="ga-cols">
+          <div class="ga-block">
+            <h3>🤖 Android &amp; ordinateur</h3>
+            <p class="sub">Chrome → menu ⋮ → « Installer l'application », ou directement :</p>
+            <div class="ga-btns">
+              <button class="ga-btn" id="gaInstallBtn">⚡ Installer maintenant</button>
+              <button class="ga-btn ghost" id="gaCopyBtn">🔗 Copier le lien</button>
+              <a class="ga-btn ghost" id="gaApkBtn" style="display:none">📦 Télécharger l'APK</a>
+            </div>
+          </div>
+          <div class="ga-block">
+            <h3>🍏 iPhone &amp; iPad</h3>
+            <p class="sub">Bouton <b>Partager</b> de Safari puis « <b>Sur l'écran d'accueil</b> » : l'icône Plein Ciel apparaît comme une vraie appli, plein écran, même hors ligne.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <footer class="wrap">
     <div class="disp">PLEIN CIEL</div>
     Données météo, pollen &amp; marine : <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a> · Radar : RainViewer · Cartes : Leaflet<br>
@@ -691,7 +737,6 @@ const CARD=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSO','SO','OSO','O','
 const cardOf=d=>CARD[Math.round(((d%360)/22.5))%16];
 const mins=s=>{const p=s.slice(11,16).split(':');return +p[0]*60+ +p[1]};
 const hm=s=>s.slice(11,16);
-/* Durée lisible : « ~45 min », « ~1 h », « ~1 h 45 » */
 const fmtDur=min=>{
   const h=Math.floor(min/60), mm=min%60;
   if(h<=0) return `~${mm} min`;
@@ -1053,7 +1098,6 @@ function renderAll(){
   document.title=`${fmtT(c.temperature_2m)}${unitT()} ${WMO[code]} · ${state.loc.name} — Plein Ciel`;
 }
 
-/* ---- Pluie pas à pas : horizon limité à 3 h (12 pas de 15 min) ---- */
 function renderRainNow(){
   const fc=state.fc, m=fc.minutely_15, card=$('#rainNowCard');
   if(!m||!m.time||!m.precipitation){ card.style.display='none'; return; }
@@ -1062,7 +1106,7 @@ function renderRainNow(){
   if(i0<0) i0=times.findIndex(t=>t.slice(0,16)>=cur);
   if(i0<0) i0=0;
   const eps=0.05;
-  const end=Math.min(i0+13, P.length); /* créneau actuel + 3 h */
+  const end=Math.min(i0+13, P.length);
   const rainingNow=(P[i0]||0)>eps;
   let msg='';
   if(rainingNow){
@@ -1731,21 +1775,39 @@ window.addEventListener('beforeinstallprompt',e=>{
   e.preventDefault(); deferredPrompt=e; $('#installBtn').style.display='grid';
 });
 if(isIOS && !window.matchMedia('(display-mode: standalone)').matches) $('#installBtn').style.display='grid';
-$('#installBtn').addEventListener('click',async()=>{
+function tryInstall(){
   if(deferredPrompt){
     deferredPrompt.prompt();
-    const choice=await deferredPrompt.userChoice;
-    if(choice.outcome==='accepted'){ toast('Appli installée 🎉'); $('#installBtn').style.display='none'; }
-    deferredPrompt=null;
+    deferredPrompt.userChoice.then(ch=>{
+      if(ch.outcome==='accepted'){ toast('Appli installée 🎉'); $('#installBtn').style.display='none'; }
+      deferredPrompt=null;
+    });
   }else if(isIOS){
     toast("Sur iPhone/iPad : bouton Partager puis « Sur l'écran d'accueil »");
   }else{
-    toast("Menu du navigateur → « Installer l'application »");
+    toast("Menu du navigateur ⋮ → « Installer l'application »");
   }
-});
+}
+$('#installBtn').addEventListener('click',tryInstall);
 window.addEventListener('appinstalled',()=>toast('Plein Ciel ajouté à votre appareil 🎉'));
 window.addEventListener('offline',()=>toast('📴 Hors ligne — dernières données affichées'));
 window.addEventListener('online',()=>toast('📶 De retour en ligne'));
+
+/* ================= CARTE « EMPORTER LE CIEL » (QR + APK) ================= */
+const APK_URL=''; // ← Collez ici le lien de votre .apk (GitHub Releases) pour afficher le bouton 📦
+(function initGetApp(){
+  const base=location.origin+location.pathname;
+  const qr=$('#qrImg');
+  if(qr){
+    qr.src=`https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=10&data=${encodeURIComponent(base)}`;
+    qr.addEventListener('error',()=>{ qr.style.display='none'; });
+  }
+  if(APK_URL){ const a=$('#gaApkBtn'); a.style.display='inline-flex'; a.href=APK_URL; a.target='_blank'; a.rel='noopener'; }
+  const gb=$('#gaInstallBtn'); if(gb) gb.addEventListener('click',tryInstall);
+  const cb=$('#gaCopyBtn'); if(cb) cb.addEventListener('click',async()=>{
+    try{ await navigator.clipboard.writeText(base); toast('Lien copié 📋'); }catch(e){ toast('Copie impossible'); }
+  });
+})();
 </script>
 </body>
 </html>
