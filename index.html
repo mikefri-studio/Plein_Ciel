@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Plein Ciel — Météo en direct</title>
-<meta name="description" content="Météo complète : prévisions, radar de précipitations et carte satellite.">
+<meta name="description" content="Météo complète : prévisions 16 jours, pollen, conditions marines, radar et carte satellite.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛅</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -119,16 +119,17 @@ header{position:sticky;top:0;z-index:50;padding:12px 22px;display:flex;align-ite
 .sec-head{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin:44px 0 16px}
 .sec-head h2{font-family:'Big Shoulders Display';font-weight:800;font-size:clamp(28px,3.6vw,42px);letter-spacing:1px;text-transform:uppercase}
 .sec-head .note{color:var(--ink-soft);font-size:13.5px}
+.lbl{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft);font-weight:700}
+.sub{color:var(--ink-soft);font-size:12.5px}
 
 /* ---------- Bandeau stats ---------- */
-.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--line);border:1px solid var(--line);
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);
   border-radius:18px;overflow:hidden;margin-top:30px}
 .stat{background:var(--card);padding:16px 18px;display:flex;flex-direction:column;gap:9px;backdrop-filter:blur(6px);transition:background .3s}
 .stat:hover{background:color-mix(in srgb,var(--card) 70%,var(--accent) 14%)}
-.stat .lbl{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft);font-weight:700}
 .stat .val{font-size:21px;font-weight:700;display:flex;align-items:center;gap:9px}
 .stat .val small{font-size:12.5px;font-weight:600;color:var(--ink-soft)}
-.stat .sub{font-size:12.5px;color:var(--ink-soft)}
+.stat .sub{font-size:12.5px}
 .compass{width:30px;height:30px;flex:none}
 .compass circle{fill:none;stroke:var(--line);stroke-width:2}
 .compass .arr{stroke:var(--accent);stroke-width:2.6;fill:none;stroke-linecap:round;stroke-linejoin:round;transform-origin:15px 15px;transition:transform 1s cubic-bezier(.2,.8,.2,1)}
@@ -166,6 +167,7 @@ header{position:sticky;top:0;z-index:50;padding:12px 22px;display:flex;align-ite
 .dbar i{position:absolute;top:0;bottom:0;border-radius:99px;background:linear-gradient(90deg,#57b8ff,var(--accent));transition:left .8s, width .8s}
 .side{display:flex;flex-direction:column;gap:20px}
 .card h3{font-family:'Big Shoulders Display';font-size:20px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:12px;color:var(--ink-soft)}
+.card h3 .badge{margin-left:10px;vertical-align:2px}
 .sunbox svg{width:100%;height:auto;display:block}
 .sunarc{fill:none;stroke:var(--line);stroke-width:3;stroke-dasharray:4 7;stroke-linecap:round}
 .sunpos{fill:var(--accent);filter:drop-shadow(0 0 8px var(--accent))}
@@ -179,6 +181,21 @@ header{position:sticky;top:0;z-index:50;padding:12px 22px;display:flex;align-ite
 .aqirow .n{font-family:'Big Shoulders Display';font-size:46px;font-weight:800;line-height:1}
 .badge{padding:5px 12px;border-radius:999px;font-weight:700;font-size:13px;color:#082033}
 .pm{margin-top:10px;font-size:13px;color:var(--ink-soft)}
+
+/* ---------- Pollen ---------- */
+.pol{display:grid;grid-template-columns:86px 1fr 74px;gap:10px;align-items:center;padding:7px 0}
+.pol .pn{font-weight:600;font-size:13.5px}
+.pbar{height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+.pbar i{display:block;height:100%;border-radius:99px;transition:width .9s ease}
+.pol .pv{text-align:right;font-weight:700;font-size:13.5px}
+.pol .pv em{display:block;font-style:normal;font-weight:600;font-size:11px;color:var(--ink-soft)}
+
+/* ---------- Marine ---------- */
+.marine-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.mcell{display:flex;flex-direction:column;gap:5px;padding:12px 14px;border-radius:14px;background:color-mix(in srgb,var(--card) 60%,transparent);border:1px solid var(--line)}
+.mcell .mv{font-family:'Big Shoulders Display';font-size:26px;font-weight:700;letter-spacing:.5px}
+.mnote{margin-top:12px;font-size:12px;color:var(--ink-soft);display:flex;align-items:center;gap:7px}
+.warr{width:16px;height:16px;fill:var(--accent);transition:transform 1s}
 
 /* ---------- Carte radar / satellite ---------- */
 .map-card{padding:18px}
@@ -241,14 +258,14 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
   .hero{grid-template-columns:1fr;gap:8px}
   .hero-right{flex-direction:row;justify-content:flex-start}
   .hero-icon .wxi{width:120px}
-  .stats{grid-template-columns:repeat(3,1fr)}
+  .stats{grid-template-columns:repeat(2,1fr)}
   .cols{grid-template-columns:1fr}
 }
 @media (max-width:600px){
-  .stats{grid-template-columns:repeat(2,1fr)}
   .day{grid-template-columns:64px 34px 44px 38px 1fr 38px;gap:6px}
   header{padding:10px 14px}
   .search{order:3;max-width:none;flex-basis:100%}
+  .pol{grid-template-columns:72px 1fr 64px}
 }
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
@@ -320,9 +337,9 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
     <div class="card hours-card"><div class="hours-scroll" id="hours"></div></div>
   </section>
 
-  <!-- ============ 7 JOURS + SOLEIL / LUNE / AIR ============ -->
+  <!-- ============ 16 JOURS + PANNEAUX LATÉRAUX ============ -->
   <section class="wrap reveal">
-    <div class="sec-head"><h2>Sur les 7 prochains jours</h2></div>
+    <div class="sec-head"><h2>Sur les 16 prochains jours</h2><span class="note">Prévisions étendues · pollen · mer</span></div>
     <div class="cols">
       <div class="card" id="days" style="padding:12px 16px"></div>
       <div class="side">
@@ -350,6 +367,18 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
           <h3>Qualité de l'air</h3>
           <div class="aqirow"><span class="n" id="aqiN">—</span><span class="badge" id="aqiLbl" style="background:#35c26b">…</span></div>
           <div class="pm" id="pmTxt"></div>
+        </div>
+        <div class="card">
+          <h3>Pollen &amp; allergies <span class="badge" id="polBadge" style="background:#35c26b;display:none">—</span></h3>
+          <div id="pollenBox"></div>
+        </div>
+        <div class="card">
+          <h3>Conditions marines</h3>
+          <div class="marine-grid" id="marineBox"></div>
+          <div class="mnote">
+            <svg class="warr" viewBox="0 0 24 24" id="waveArr" style="display:none"><path d="M12 3l6 16-6-4-6 4z"/></svg>
+            <span id="marineNote">Modèle océanique Open-Meteo</span>
+          </div>
         </div>
       </div>
     </div>
@@ -386,7 +415,7 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
 
   <footer class="wrap">
     <div class="disp">PLEIN CIEL</div>
-    Données météo &amp; prévisions : <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a> · Radar : RainViewer · Cartes : Leaflet<br>
+    Données météo, pollen &amp; marine : <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a> · Radar : RainViewer · Cartes : Leaflet<br>
     Site statique — aucune clé API requise · <span id="year"></span>
   </footer>
 </main>
@@ -403,7 +432,7 @@ const store={get:k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){ret
 const state={
   loc: store.get('pc_loc') || {lat:48.8566, lon:2.3522, name:'Paris', sub:'Île-de-France · France'},
   units: store.get('pc_units') || 'C',
-  fc:null, aq:null, fx:'none',
+  fc:null, aq:null, marine:null, fx:'none',
   radar:{host:'',frames:[],sat:[],pastCount:0,idx:0,mode:'radar',playing:false,timer:null,op:{radar:.75,sat:.85}},
   map:null, bases:{}, overlay:null, marker:null, mapInited:false
 };
@@ -489,19 +518,34 @@ const mins=s=>{const p=s.slice(11,16).split(':');return +p[0]*60+ +p[1]};
 const hm=s=>s.slice(11,16);
 
 /* ================= DONNÉES ================= */
+async function fetchMarine(lat,lon){
+  const base=`https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}&current=`;
+  try{
+    const r=await fetch(base+'wave_height,wave_direction,wave_period,swell_wave_height,swell_wave_direction,swell_wave_period,sea_surface_temperature');
+    if(r.ok)return await r.json();
+  }catch(e){}
+  try{ /* repli si une variable n'est pas acceptée */
+    const r=await fetch(base+'wave_height,wave_direction,wave_period');
+    if(r.ok)return await r.json();
+  }catch(e){}
+  return null;
+}
 async function fetchData(){
   const {lat,lon}=state.loc;
   const fcU=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}`
     +`&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,cloud_cover,pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m`
-    +`&hourly=temperature_2m,precipitation_probability,weather_code,is_day,visibility`
+    +`&hourly=temperature_2m,precipitation_probability,weather_code,is_day,visibility,dew_point_2m`
     +`&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max,uv_index_max`
-    +`&forecast_days=8&timezone=auto`;
-  const aqU=`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=european_aqi,pm2_5,pm10&timezone=auto`;
-  const [fc,aq]=await Promise.all([
+    +`&forecast_days=16&timezone=auto`;
+  const aqU=`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}`
+    +`&current=european_aqi,pm2_5,pm10&daily=alder_pollen,birch_pollen,grass_pollen,mugwort_pollen,olive_pollen,ragweed_pollen`
+    +`&forecast_days=1&timezone=auto`;
+  const [fc,aq,marine]=await Promise.all([
     fetch(fcU).then(r=>{if(!r.ok)throw 0;return r.json()}),
-    fetch(aqU).then(r=>r.ok?r.json():null).catch(()=>null)
+    fetch(aqU).then(r=>r.ok?r.json():null).catch(()=>null),
+    fetchMarine(lat,lon)
   ]);
-  state.fc=fc; state.aq=aq;
+  state.fc=fc; state.aq=aq; state.marine=marine;
 }
 async function load(){
   try{
@@ -523,7 +567,6 @@ function renderAll(){
         : grp==='snow' ? (isDay?'snow-day':'snow-night') : 'thunder';
   applyTheme(th);
 
-  /* hero */
   $('#today').textContent=cap(new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}));
   $('#place').textContent=state.loc.name;
   $('#placeSub').textContent=state.loc.sub||'';
@@ -542,7 +585,8 @@ function renderAll(){
     ['☁',c.cloud_cover+' %','nuages']
   ].map(x=>`<span class="chip">${x[0]} <b>${x[1]}</b> ${x[2]}</span>`).join('');
 
-  renderStats(); renderHours(); renderDays(); renderSunMoon(); renderAir(); refreshMapFocus();
+  renderStats(); renderHours(); renderDays(); renderSunMoon(); renderAir(); renderPollen(); renderMarine();
+  refreshMapFocus();
   document.title=`${fmtT(c.temperature_2m)}${unitT()} ${WMO[code]} · ${state.loc.name} — Plein Ciel`;
 }
 
@@ -550,16 +594,21 @@ function renderStats(){
   const c=state.fc.current, h=state.fc.hourly, d=state.fc.daily;
   let hi=h.time.findIndex(t=>t.slice(0,13)===c.time.slice(0,13)); if(hi<0)hi=0;
   const vis=h.visibility?h.visibility[hi]:null;
+  const dp=h.dew_point_2m?h.dew_point_2m[hi]:null;
+  const dpLab=dp==null?'—':dp<10?'air sec':dp<16?'confortable':dp<18?'un peu lourd':dp<21?'temps lourd':'oppressant';
   const uv=d.uv_index_max[0], uvLab=uv<3?'Faible':uv<6?'Modéré':uv<8?'Élevé':uv<11?'Très élevé':'Extrême';
+  const cc=c.cloud_cover, ccLab=cc<=25?'ciel dégagé':cc<=60?'partiellement nuageux':'ciel couvert';
   $('#stats').innerHTML=`
     <div class="stat"><span class="lbl">Vent</span>
       <span class="val"><svg class="compass" viewBox="0 0 30 30"><circle cx="15" cy="15" r="13"/><path class="arr" style="transform:rotate(${Math.round(c.wind_direction_10m)}deg)" d="M15 7l3.4 9-3.4-2.4-3.4 2.4z"/></svg>${fmtW(c.wind_speed_10m)}</span>
       <span class="sub">Direction ${cardOf(c.wind_direction_10m)} (${Math.round(c.wind_direction_10m)}°)</span></div>
     <div class="stat"><span class="lbl">Rafales</span><span class="val">${fmtW(c.wind_gusts_10m)}</span><span class="sub">vent instantané max</span></div>
     <div class="stat"><span class="lbl">Humidité</span><span class="val">${c.relative_humidity_2m}<small>%</small></span><span class="sub">${c.relative_humidity_2m>=70?'atmosphère humide':c.relative_humidity_2m<=35?'air très sec':'confortable'}</span></div>
+    <div class="stat"><span class="lbl">Point de rosée</span><span class="val">${dp!=null?fmtT(dp)+unitT():'—'}</span><span class="sub">${dpLab}</span></div>
     <div class="stat"><span class="lbl">Pression</span><span class="val">${Math.round(c.pressure_msl)}<small>hPa</small></span><span class="sub">${c.pressure_msl>1020?'anticyclone':c.pressure_msl<1005?'dépressionnaire':'stable'}</span></div>
     <div class="stat"><span class="lbl">Indice UV</span><span class="val">${uv!=null?Math.round(uv*10)/10:'—'}<small>${uvLab}</small></span><span class="uvbar"><i style="left:${Math.min(100,(uv||0)/11*100)}%"></i></span></div>
-    <div class="stat"><span class="lbl">Visibilité</span><span class="val">${fmtVis(vis)}</span><span class="sub">${vis!=null&&vis/1000<5?'visibilité réduite':'bonne visibilité'}</span></div>`;
+    <div class="stat"><span class="lbl">Visibilité</span><span class="val">${fmtVis(vis)}</span><span class="sub">${vis!=null&&vis/1000<5?'visibilité réduite':'bonne visibilité'}</span></div>
+    <div class="stat"><span class="lbl">Nébulosité</span><span class="val">${cc}<small>%</small></span><span class="sub">${ccLab}</span></div>`;
 }
 
 function renderHours(){
@@ -575,7 +624,6 @@ function renderHours(){
       <span class="hp">${pop>=5?`<svg viewBox="0 0 24 24"><path d="M12 3c3 4.5 6 7.6 6 11a6 6 0 1 1-12 0c0-3.4 3-6.5 6-11z"/></svg>${pop}%`:''}</span></div>`;
   });
   $('#hours').innerHTML=items;
-  /* courbe */
   const temps=idx.map(i=>h.temperature_2m[i]);
   const tmin=Math.min(...temps), tmax=Math.max(...temps), span=Math.max(1,tmax-tmin);
   const pts=idx.map((i,k)=>({x:k*W+W/2, y:96-((temps[k]-tmin)/span)*66}));
@@ -593,14 +641,14 @@ function renderHours(){
 }
 
 function renderDays(){
-  const d=state.fc.daily;
-  const wmin=Math.min(...d.temperature_2m_min.slice(0,7)), wmax=Math.max(...d.temperature_2m_max.slice(0,7)), span=Math.max(1,wmax-wmin);
+  const d=state.fc.daily, n=d.time.length;
+  const wmin=Math.min(...d.temperature_2m_min), wmax=Math.max(...d.temperature_2m_max), span=Math.max(1,wmax-wmin);
   let html='';
-  for(let i=0;i<7;i++){
+  for(let i=0;i<n;i++){
     const date=new Date(d.time[i]+'T12:00');
     const name=i===0?'Aujourd\u2019hui':cap(date.toLocaleDateString('fr-FR',{weekday:'long'}));
     const sub=date.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
-    const left=(d.temperature_2m_min[i]-wmin)/span*100, width=Math.max(6,(d.temperature_2m_max[i]-d.temperature_2m_min[i])/span*100);
+    const left=(d.temperature_2m_min[i]-wmin)/span*100, width=Math.max(5,(d.temperature_2m_max[i]-d.temperature_2m_min[i])/span*100);
     const pop=d.precipitation_probability_max[i];
     html+=`<div class="day"><span class="dn">${name}<small>${sub}</small></span>${icon(d.weather_code[i],true)}
       <span class="dp">${pop>=5?'💧 '+pop+'%':''}</span>
@@ -621,7 +669,6 @@ function renderSunMoon(){
   const dot=$('#sunDot'); dot.setAttribute('cx',pt.x); dot.setAttribute('cy',pt.y);
   dot.style.opacity=(state.fc.current.is_day?1:.25);
 
-  /* lune */
   const syn=29.53058867, ref=Date.UTC(2000,0,6,18,14);
   let age=((Date.now()-ref)/864e5)%syn; if(age<0)age+=syn;
   const f=(1-Math.cos(2*Math.PI*age/syn))/2, waxing=age<syn/2;
@@ -642,6 +689,56 @@ function renderAir(){
   $('#aqiN').textContent=a; const b=$('#aqiLbl'); b.textContent=lbl; b.style.background=col;
   const pm25=state.aq.current.pm2_5, pm10=state.aq.current.pm10;
   $('#pmTxt').innerHTML=`Indice européen · PM2,5 : <b>${pm25!=null?pm25.toFixed(1):'—'}</b> µg/m³ · PM10 : <b>${pm10!=null?pm10.toFixed(1):'—'}</b> µg/m³`;
+}
+
+/* ---- Pollen ---- */
+const polInfo=v=> v<=0?['Nul','#9aa7b3']:v<15?['Faible','#35c26b']:v<50?['Modéré','#ffd23f']:v<100?['Élevé','#ff9f43']:['Très élevé','#ff6b6b'];
+function renderPollen(){
+  const d=state.aq&&state.aq.daily?state.aq.daily:null;
+  const wrap=$('#pollenBox'), badge=$('#polBadge');
+  if(!d){ wrap.innerHTML='<div class="sub">Données pollen indisponibles.</div>'; badge.style.display='none'; return; }
+  const POL=[['alder_pollen','Aulne'],['birch_pollen','Bouleau'],['grass_pollen','Graminées'],['mugwort_pollen','Armoise'],['olive_pollen','Olivier'],['ragweed_pollen','Ambroisie']];
+  let rows='', max=0;
+  POL.forEach(([k,n])=>{
+    const v=(d[k]&&d[k][0])||0; max=Math.max(max,v);
+    const [lab,col]=polInfo(v);
+    const w=Math.min(100,Math.round(v/1.5));
+    rows+=`<div class="pol"><span class="pn">${n}</span><span class="pbar"><i style="width:${v>0?Math.max(7,w):0}%;background:${col}"></i></span>
+      <span class="pv">${Math.round(v)}<em>${lab}</em></span></div>`;
+  });
+  wrap.innerHTML = max>0 ? rows : '<div class="sub">Aucun pollen significatif aujourd\u2019hui — profitez-en !</div>';
+  const [lab,col]=polInfo(max);
+  badge.style.display='inline-block'; badge.style.background=col;
+  badge.textContent = max>0 ? 'Risque '+lab.toLowerCase() : 'Nul';
+}
+
+/* ---- Marine ---- */
+const seaState=h=>h<0.5?'mer calme':h<1.25?'mer peu agitée':h<2.5?'mer assez agitée':h<4?'mer agitée':'mer forte';
+function renderMarine(){
+  const box=$('#marineBox'), arr=$('#waveArr'), note=$('#marineNote');
+  const m=state.marine;
+  arr.style.display='none';
+  if(!m||!m.current||m.current.wave_height==null){
+    box.innerHTML=''; note.textContent='Pas de données marines significatives à proximité de cet emplacement.';
+    return;
+  }
+  const c=m.current;
+  const cell=(lbl,val,sub)=>`<div class="mcell"><span class="lbl">${lbl}</span><span class="mv">${val}</span><span class="sub">${sub||''}</span></div>`;
+  let html='';
+  if(c.sea_surface_temperature!=null){
+    const t=c.sea_surface_temperature;
+    html+=cell('Eau', fmtT(t)+unitT(), t>=20?'baignade agréable':t>=15?'baignade fraîche':'eau froide');
+  }
+  if(c.wave_height!=null){
+    html+=cell('Vagues', c.wave_height.toFixed(1)+' m', seaState(c.wave_height)+(c.wave_direction!=null?` · venant de ${cardOf(c.wave_direction)}`:''));
+    if(c.wave_direction!=null){ arr.style.display='block'; arr.style.transform=`rotate(${Math.round(c.wave_direction+180)}deg)`; }
+  }
+  if(c.swell_wave_height!=null){
+    html+=cell('Houle', c.swell_wave_height.toFixed(1)+' m', c.swell_wave_direction!=null?`venant de ${cardOf(c.swell_wave_direction)}`:'');
+  }
+  if(c.wave_period!=null) html+=cell('Période', Math.round(c.wave_period)+' s', 'entre deux vagues');
+  box.innerHTML=html;
+  note.textContent='Point d\u2019eau le plus proche · modèle océanique Open-Meteo';
 }
 
 /* ================= CARTE LEAFLET + RAINVIEWER ================= */
@@ -810,11 +907,9 @@ function ensureParts(){
     :{x:Math.random()*cv.width,y:Math.random()*cv.height,l:9+Math.random()*14,v:11+Math.random()*9});
   parts.length=want;
 }
-let t0=0;
 function loop(t){
   requestAnimationFrame(loop);
   ctx.clearRect(0,0,cv.width,cv.height);
-  if(state.fx==='stars'||state.fx==='none'&&document.body.classList.contains('night-skip')){}
   if(state.fx==='stars'){
     const dt=t/1000;
     for(const s of stars){ ctx.globalAlpha=.35+.55*Math.abs(Math.sin(s.p+dt*s.s)); ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,7); ctx.fill(); }
@@ -841,8 +936,7 @@ function loop(t){
 requestAnimationFrame(loop);
 
 /* ================= REVEAL & DIVERS ================= */
-new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting)e.target.classList.add('in'); }),{threshold:.12})
-  .observe; $$('section.reveal').forEach(s=>new IntersectionObserver((es,ob)=>{ if(es[0].isIntersecting){ s.classList.add('in'); ob.disconnect(); } },{threshold:.1}).observe(s));
+$$('section.reveal').forEach(s=>new IntersectionObserver((es,ob)=>{ if(es[0].isIntersecting){ s.classList.add('in'); ob.disconnect(); } },{threshold:.1}).observe(s));
 
 function tween(el,to){
   const from=parseFloat(el.dataset.v); const start=performance.now();
