@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Plein Ciel — Météo en direct</title>
-<meta name="description" content="Météo complète : prévisions 16 jours, pollen, conditions marines, vent animé, alertes orage, radar et satellite.">
+<meta name="description" content="Météo complète : pluie minute par minute, prévisions 16 jours, pollen, marine, vent animé, alertes orage, heures dorées, radar et satellite.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛅</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -60,7 +60,6 @@ body.thunder #skyflash{animation:skyflash 8s infinite}
 header,main,footer{position:relative;z-index:2}
 .wrap{max-width:1180px;margin:0 auto;padding:0 22px}
 
-/* ---- BANNIÈRE ALERTE ORAGE ---- */
 .alert-bar{display:none;background:linear-gradient(90deg,#3a1040,#5a1a5e 50%,#3a1040);border-bottom:2px solid #ffb84d;
   color:#fff;padding:10px 22px;align-items:center;gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:60}
 .alert-bar.on{display:flex;animation:alertGlow 2.2s ease-in-out infinite alternate}
@@ -136,6 +135,13 @@ body.has-alert .alert-bar{top:0}
 .hero-icon .wxi{width:clamp(140px,21vw,208px);height:auto;filter:drop-shadow(0 22px 44px rgba(0,15,40,.3));animation:bob 7s ease-in-out infinite}
 @keyframes bob{50%{transform:translateY(-12px)}}
 .updated{font-size:12.5px;color:var(--ink-soft);letter-spacing:.06em}
+
+/* ---- Pluie prochaines heures ---- */
+.rainnow{margin-top:26px}
+.rn-txt{font-size:16px;font-weight:600;margin-bottom:14px}
+.rn-bar{display:flex;gap:3px}
+.rn-bar i{flex:1;height:12px;border-radius:4px;background:var(--line);transition:background .3s}
+.rn-scale{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-soft);margin-top:6px}
 
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px 22px;backdrop-filter:blur(6px);
   transition:transform .3s, border-color .3s, box-shadow .3s}
@@ -222,6 +228,7 @@ body.has-alert .alert-bar{top:0}
 .aqirow .n{font-family:'Big Shoulders Display';font-size:46px;font-weight:800;line-height:1}
 .badge{padding:5px 12px;border-radius:999px;font-weight:700;font-size:13px;color:#082033}
 .pm{margin-top:10px;font-size:13px;color:var(--ink-soft)}
+.pm b{color:var(--ink)}
 
 .pol{display:grid;grid-template-columns:86px 1fr 74px;gap:10px;align-items:center;padding:7px 0}
 .pol .pn{font-weight:600;font-size:13.5px}
@@ -321,7 +328,6 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
 
 <div id="load"><div class="box"><div id="loadIco"></div><p>Chargement du ciel…</p></div></div>
 
-<!-- BANNIÈRE ALERTE ORAGE -->
 <div class="alert-bar" id="alertBar" role="alert">
   <svg class="bolt" viewBox="0 0 24 24"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg>
   <div class="atxt" id="alertText"><b>ALERTE ORAGE</b> · Analyse en cours…</div>
@@ -385,6 +391,14 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
       </div>
     </div>
 
+    <!-- NOUVEAU : pluie minute par minute -->
+    <div class="card rainnow" id="rainNowCard" style="display:none">
+      <h3>🌧️ Pluie dans les prochaines heures</h3>
+      <div class="rn-txt" id="rainNowTxt"></div>
+      <div class="rn-bar" id="rainNowBar"></div>
+      <div class="rn-scale"><span>Maintenant</span><span>+1 h</span><span>+2 h</span><span>+3 h</span></div>
+    </div>
+
     <div class="advice">
       <div class="advice-card">
         <h3><span class="em">🧥</span> Que porter aujourd'hui</h3>
@@ -425,6 +439,17 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
             <div style="text-align:center">Jour<br><b id="dayLen">—</b></div>
             <div style="text-align:right">Coucher<br><b id="setT">—</b></div>
           </div>
+        </div>
+        <!-- NOUVEAU : comparaison il y a 1 an -->
+        <div class="card">
+          <h3>📅 Il y a 1 an</h3>
+          <div class="aqirow"><span class="n" id="climDiff">—</span><span class="badge" id="climBadge" style="background:#35c26b">…</span></div>
+          <div class="pm" id="climTxt"></div>
+        </div>
+        <!-- NOUVEAU : heures dorées / bleues -->
+        <div class="card">
+          <h3>📷 Lumière photo</h3>
+          <div id="photoBox"></div>
         </div>
         <div class="card">
           <h3>Lune</h3>
@@ -513,12 +538,11 @@ if(!savedLoc||!isFinite(savedLoc.lat)||!isFinite(savedLoc.lon))
 const state={
   loc: locFromURL() || savedLoc,
   units: store.get('pc_units') || 'C',
-  fc:null, aq:null, marine:null, wind:null, fx:'none',
+  fc:null, aq:null, marine:null, wind:null, climate:null, fx:'none',
   radar:{host:'',frames:[],sat:[],pastCount:0,idx:0,mode:'radar',playing:false,timer:null,op:{radar:.75,sat:.85}},
   map:null, bases:{}, overlay:null, marker:null, mapInited:false,
   windLayer:null, windOn:true,
-  /* --- Alerte orage --- */
-  alert:{muted: store.get('pc_alert_muted')==='1', lastSeen: store.get('pc_alert_seen')||'', perm: Notification ? Notification.permission : 'default'},
+  alert:{muted: store.get('pc_alert_muted')==='1', lastSeen: store.get('pc_alert_seen')||'', perm: ('Notification' in window)?Notification.permission:'default'},
   audioCtx:null
 };
 
@@ -613,6 +637,41 @@ const cardOf=d=>CARD[Math.round(((d%360)/22.5))%16];
 const mins=s=>{const p=s.slice(11,16).split(':');return +p[0]*60+ +p[1]};
 const hm=s=>s.slice(11,16);
 
+/* ================= POSITION SOLAIRE (style suncalc, simplifié) ================= */
+const RAD=Math.PI/180, DAYMS=86400000, J2000=2451545;
+function sunAltitude(ms,lat,lng){
+  const d=ms/DAYMS - 0.5 + 2440588 - J2000;
+  const M=RAD*(357.5291+0.98560028*d);
+  const C=RAD*(1.9148*Math.sin(M)+0.02*Math.sin(2*M)+0.0003*Math.sin(3*M));
+  const L=M+C+RAD*102.9372+Math.PI;
+  const e=RAD*23.4397;
+  const dec=Math.asin(Math.sin(e)*Math.sin(L));
+  const ra=Math.atan2(Math.sin(L)*Math.cos(e),Math.cos(L));
+  const phi=RAD*lat, lw=RAD*-lng;
+  const H=RAD*(280.16+360.9856235*d)-ra-lw;
+  return Math.asin(Math.sin(phi)*Math.sin(dec)+Math.cos(phi)*Math.cos(dec)*Math.cos(H))/RAD;
+}
+/* Événements du jour (en minutes locales) : lever/coucher, heures dorées & bleues */
+function computeSunEvents(lat,lng,offSec){
+  const nowLocal=new Date(Date.now()+offSec*1000);
+  const Y=nowLocal.getUTCFullYear(),Mo=nowLocal.getUTCMonth(),D=nowLocal.getUTCDate();
+  const altAt=m=>sunAltitude(Date.UTC(Y,Mo,D,0,m)-offSec*1000,lat,lng);
+  const ev={};
+  let prev=altAt(0);
+  for(let m=2;m<=1440;m+=2){
+    const a=altAt(m);
+    if(prev<-0.833&&a>=-0.833) ev.sunrise=m;
+    if(prev>=-0.833&&a<-0.833) ev.sunset=m;
+    if(prev<-6&&a>=-6) ev.blueStartAM=m;
+    if(prev>=-6&&a<-6) ev.blueEndPM=m;
+    if(prev<6&&a>=6) ev.goldEndAM=m;
+    if(prev>=6&&a<6) ev.goldStartPM=m;
+    prev=a;
+  }
+  return ev;
+}
+const fmtMin=m=>m==null?'—':`${String(Math.floor(m/60)%24).padStart(2,'0')}h${String(m%60).padStart(2,'0')}`;
+
 /* ================= DONNÉES ================= */
 async function fetchJSON(url){
   const r=await fetch(url,{cache:'no-store'});
@@ -645,12 +704,23 @@ async function fetchWindGrid(lat,lon){
   }catch(e){ console.warn('Wind grid indisponible :',e); }
   return null;
 }
+/* NOUVEAU : même jour l'an passé (API archive) */
+async function fetchClimate(lat,lon){
+  const now=new Date();
+  const y=now.getFullYear()-1;
+  const mm=String(now.getMonth()+1).padStart(2,'0'), dd=String(now.getDate()).padStart(2,'0');
+  const date=`${y}-${mm}-${dd}`;
+  try{
+    return await fetchJSON(`https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}&start_date=${date}&end_date=${date}&daily=temperature_2m_max,temperature_2m_min&timezone=auto`);
+  }catch(e){ console.warn('Climat indisponible :',e); return null; }
+}
 async function fetchData(){
   const {lat,lon}=state.loc;
   const fcBase=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}`
     +`&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,cloud_cover,pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m`
     +`&hourly=temperature_2m,precipitation_probability,weather_code,is_day,visibility,dew_point_2m`
     +`&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max,uv_index_max`
+    +`&minutely_15=precipitation`
     +`&timezone=auto`;
   let fc;
   try{ fc=await fetchJSON(fcBase+'&forecast_days=16'); }
@@ -658,12 +728,13 @@ async function fetchData(){
   const aqU=`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}`
     +`&current=european_aqi,pm2_5,pm10&daily=alder_pollen,birch_pollen,grass_pollen,mugwort_pollen,olive_pollen,ragweed_pollen`
     +`&forecast_days=1&timezone=auto`;
-  const [aq,marine,wind]=await Promise.all([
+  const [aq,marine,wind,climate]=await Promise.all([
     fetchJSON(aqU).catch(e=>{console.warn('Air/pollen indisponible :',e);return null;}),
     fetchMarine(lat,lon),
-    fetchWindGrid(lat,lon)
+    fetchWindGrid(lat,lon),
+    fetchClimate(lat,lon)
   ]);
-  state.fc=fc; state.aq=aq; state.marine=marine; state.wind=wind;
+  state.fc=fc; state.aq=aq; state.marine=marine; state.wind=wind; state.climate=climate;
 }
 
 let loadTry=0;
@@ -672,7 +743,7 @@ async function load(){
     await fetchData();
     loadTry=0;
     renderAll();
-    checkThunderAlert(); /* <-- vérification orage */
+    checkThunderAlert();
     $('#load').classList.add('off');
   }catch(e){
     console.error('Plein Ciel — erreur de chargement :',e);
@@ -701,43 +772,28 @@ function showLoadError(e){
   });
 }
 
-/* ============================================================ */
-/* ================= DÉTECTION & ALERTE ORAGE ================= */
-/* ============================================================ */
-
-/* Analyse les prévisions horaires : retourne {level, inMinutes, hours, details}
-   level: 0=rien, 1=orage dans 2-6h, 2=orage dans 0-2h, 3=orage actuel */
+/* ================= ALERTE ORAGE ================= */
 function analyzeThunder(){
   const fc=state.fc; if(!fc||!fc.hourly)return {level:0};
   const h=fc.hourly, c=fc.current;
   let i0=h.time.findIndex(t=>t.slice(0,13)===c.time.slice(0,13)); if(i0<0)i0=0;
-  const thunderHours=[]; /* indices d'heures à risque */
+  const thunderHours=[];
   const codes=h.weather_code, pops=h.precipitation_probability||[];
   for(let i=i0;i<Math.min(i0+18, codes.length);i++){
     const code=codes[i], pop=pops[i]||0;
-    /* Orages déclarés OU forte probabilité + conditions propices */
-    if(code===95||code===96||code===99){ thunderHours.push({i,reason:'storm',code,pop,time:h.time[i]}); }
-    else if(pop>=70 && (code>=80&&code<=82)){ thunderHours.push({i,reason:'heavy-shower',code,pop,time:h.time[i]}); }
+    if(code===95||code===96||code===99){ thunderHours.push({i,code,pop,time:h.time[i]}); }
+    else if(pop>=70 && (code>=80&&code<=82)){ thunderHours.push({i,code,pop,time:h.time[i]}); }
   }
   if(!thunderHours.length) return {level:0};
   const first=thunderHours[0];
   const deltaMin=(first.i-i0)*60;
   let level;
-  if(first.i===i0) level=3; /* orage maintenant */
-  else if(deltaMin<=120) level=2; /* dans 2h */
-  else level=1; /* dans 2-6h */
+  if(first.i===i0) level=3;
+  else if(deltaMin<=120) level=2;
+  else level=1;
   const hail=thunderHours.some(x=>x.code===96||x.code===99);
-  return {
-    level,
-    inMinutes:deltaMin,
-    firstTime:first.time,
-    count:thunderHours.length,
-    hail,
-    hours:thunderHours
-  };
+  return {level,inMinutes:deltaMin,firstTime:first.time,count:thunderHours.length,hail,hours:thunderHours};
 }
-
-/* Bip via Web Audio (aucun fichier son nécessaire) */
 function playAlertSound(){
   if(state.alert.muted) return;
   try{
@@ -747,7 +803,6 @@ function playAlertSound(){
       state.audioCtx=new AC();
     }
     const ctx=state.audioCtx, t0=ctx.currentTime;
-    /* Trois bips courts + un long, comme une alerte météo */
     const beep=(freq,start,dur)=>{
       const osc=ctx.createOscillator(), gain=ctx.createGain();
       osc.type='sine'; osc.frequency.value=freq;
@@ -760,18 +815,14 @@ function playAlertSound(){
     beep(880,0,0.12); beep(880,0.18,0.12); beep(880,0.36,0.12); beep(660,0.6,0.4);
   }catch(e){ console.warn('Son alerte indisponible',e); }
 }
-
-/* Notification système (fonctionne même si l'onglet est en arrière-plan) */
 function sendBrowserNotification(title,body){
   if(!('Notification' in window)) return;
   if(Notification.permission==='granted'){
     try{
-      new Notification(title,{body,icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path fill="%23ffd23f" d="M32 4l-4 20h6l-6 24 18-28h-8l4-16z"/></svg>',tag:'pleinciel-thunder',requireInteraction:false});
+      new Notification(title,{body,tag:'pleinciel-thunder'});
     }catch(e){}
   }
 }
-
-/* Affiche ou masque la bannière */
 function updateAlertBar(info){
   const bar=$('#alertBar'), txt=$('#alertText');
   if(!info||info.level===0){
@@ -793,18 +844,14 @@ function updateAlertBar(info){
   bar.classList.add('on');
   document.body.classList.add('has-alert');
 }
-
-/* Orchestration principale */
 function checkThunderAlert(forceNotify=false){
   const info=analyzeThunder();
   updateAlertBar(info);
   if(info.level===0) return;
-  /* Identifiant unique de l'épisode : heure de début de l'orage */
   const episodeId=info.firstTime+'-'+info.level;
-  if(episodeId===state.alert.lastSeen && !forceNotify) return; /* déjà signalé */
+  if(episodeId===state.alert.lastSeen && !forceNotify) return;
   state.alert.lastSeen=episodeId;
   store.set('pc_alert_seen',episodeId);
-  /* Son + notification */
   playAlertSound();
   const titles=['Pré-alerte orage','Alerte orage imminente','ORAGE EN COURS'];
   const bodies=[
@@ -814,8 +861,6 @@ function checkThunderAlert(forceNotify=false){
   ];
   sendBrowserNotification('⛈️ '+titles[info.level-1], bodies[info.level-1]);
 }
-
-/* Contrôles de la bannière */
 $('#alertNotifBtn').addEventListener('click',async()=>{
   if(!('Notification' in window)) return toast('Notifications non supportées par ce navigateur.');
   try{
@@ -837,18 +882,15 @@ $('#alertMuteBtn').addEventListener('click',()=>{
   toast(state.alert.muted?'Bip sonore désactivé':'Bip sonore activé');
 });
 $('#alertCloseBtn').addEventListener('click',()=>{
-  /* On garde l'alerte mémorisée pour ne pas la réafficher tant que l'épisode dure */
   $('#alertBar').classList.remove('on');
   document.body.classList.remove('has-alert');
 });
-/* Met à jour le bouton notifications selon l'état courant */
 (function initNotifBtn(){
   if(!('Notification' in window)) return;
   if(Notification.permission==='granted') $('#alertNotifBtn').textContent='🔔 Activées ✓';
   else if(Notification.permission==='denied') $('#alertNotifBtn').textContent='🔔 Bloquées';
 })();
 $('#alertMuteBtn').textContent=state.alert.muted?'🔇 Son coupé':'🔊 Son';
-/* Re-vérification toutes les 10 min (la frise radar refresh toutes les 5 min, ça s'ajuste) */
 setInterval(()=>{ if(state.fc) checkThunderAlert(); }, 10*60*1000);
 
 /* ================= RENDUS ================= */
@@ -882,12 +924,95 @@ function renderAll(){
     ['☁',c.cloud_cover+' %','nuages']
   ].map(x=>`<span class="chip">${x[0]} <b>${x[1]}</b> ${x[2]}</span>`).join('');
 
+  safe('rainnow',renderRainNow);
   safe('advice',renderAdvice);
+  safe('climate',renderClimate);
+  safe('photo',renderPhoto);
   safe('stats',renderStats); safe('hours',renderHours); safe('days',renderDays);
   safe('sunmoon',renderSunMoon); safe('air',renderAir); safe('pollen',renderPollen);
   safe('marine',renderMarine); safe('map',refreshMapFocus);
   renderFavButton(); renderFavs();
   document.title=`${fmtT(c.temperature_2m)}${unitT()} ${WMO[code]} · ${state.loc.name} — Plein Ciel`;
+}
+
+/* --- NOUVEAU : pluie minute par minute --- */
+function renderRainNow(){
+  const fc=state.fc, m=fc.minutely_15, card=$('#rainNowCard');
+  if(!m||!m.time||!m.precipitation){ card.style.display='none'; return; }
+  const times=m.time, P=m.precipitation, cur=fc.current.time;
+  let i0=times.findIndex(t=>t.slice(0,16)===cur.slice(0,16));
+  if(i0<0){ i0=times.findIndex(t=>t>=cur.slice(0,16)); if(i0<0)i0=0; }
+  const eps=0.05;
+  const rainingNow=(P[i0]||0)>eps;
+  let msg='';
+  if(rainingNow){
+    let stop=-1;
+    for(let i=i0;i<P.length;i++){ if((P[i]||0)<=eps){ stop=i; break; } }
+    if(stop<0) msg=`Pluie en cours, elle devrait continuer au moins jusqu'à ${hm(times[P.length-1])}.`;
+    else if(stop<=i0+1) msg=`Pluie en cours, elle s'arrête très bientôt (vers ${hm(times[stop])}).`;
+    else msg=`Pluie en cours, fin dans ~${(stop-i0)*15} min (vers ${hm(times[stop])}).`;
+  }else{
+    let start=-1;
+    for(let i=i0;i<P.length;i++){ if((P[i]||0)>eps){ start=i; break; } }
+    if(start<0) msg=`Pas de pluie prévue dans les 3 prochaines heures.`;
+    else{
+      const min=(start-i0)*15;
+      msg=`Pas de pluie pour l'instant — elle arrive dans ~${min} min (vers ${hm(times[start])}). Prenez le parapluie !`;
+    }
+  }
+  card.style.display='';
+  $('#rainNowTxt').textContent=msg;
+  const segs=[];
+  for(let k=0;k<12;k++) segs.push(P[i0+k]||0);
+  const maxV=Math.max(0.5,...segs);
+  $('#rainNowBar').innerHTML=segs.map(v=>{
+    const a=Math.min(1,v/maxV);
+    const col=v<=eps?'var(--line)':`rgba(90,180,255,${(0.25+0.75*a).toFixed(2)})`;
+    return `<i style="background:${col}"></i>`;
+  }).join('');
+}
+
+/* --- NOUVEAU : comparaison il y a 1 an --- */
+function renderClimate(){
+  const cl=state.climate, d=state.fc.daily;
+  if(!cl||!cl.daily||cl.daily.temperature_2m_max==null||cl.daily.temperature_2m_max[0]==null){
+    $('#climDiff').textContent='—'; $('#climBadge').textContent='pas de données'; $('#climTxt').textContent='';
+    return;
+  }
+  const oldMax=cl.daily.temperature_2m_max[0], oldMin=cl.daily.temperature_2m_min[0];
+  const todayMax=d.temperature_2m_max[0], todayMin=d.temperature_2m_min[0];
+  const diff=todayMax-oldMax;
+  const sign=diff>0?'+':'';
+  $('#climDiff').textContent=sign+(Math.round(diff*10)/10)+'°';
+  const b=$('#climBadge');
+  if(diff>1.5){ b.textContent='plus chaud'; b.style.background='#ff9f43'; }
+  else if(diff<-1.5){ b.textContent='plus frais'; b.style.background='#6fd3ff'; }
+  else { b.textContent='équivalent'; b.style.background='#35c26b'; }
+  $('#climTxt').innerHTML=`Même date l'an dernier : <b>${fmtT(oldMax)}${unitT()}</b> max / <b>${fmtT(oldMin)}${unitT()}</b> min<br>Aujourd'hui : <b>${fmtT(todayMax)}${unitT()}</b> max / <b>${fmtT(todayMin)}${unitT()}</b> min`;
+}
+
+/* --- NOUVEAU : heures dorées & bleues --- */
+function renderPhoto(){
+  const fc=state.fc;
+  const off=fc.utc_offset_seconds!=null?fc.utc_offset_seconds:0;
+  const ev=computeSunEvents(state.loc.lat,state.loc.lon,off);
+  const nowLocal=new Date(Date.now()+off*1000);
+  const nowM=nowLocal.getUTCHours()*60+nowLocal.getUTCMinutes();
+  const rows=[
+    ['🌌','Heure bleue (matin)',ev.blueStartAM,ev.sunrise],
+    ['🌅','Heure dorée (matin)',ev.sunrise,ev.goldEndAM],
+    ['🌇','Heure dorée (soir)',ev.goldStartPM,ev.sunset],
+    ['🌌','Heure bleue (soir)',ev.sunset,ev.blueEndPM]
+  ];
+  let html='';
+  rows.forEach(([em,lbl,a,b2])=>{
+    const active=a!=null&&b2!=null&&nowM>=a&&nowM<b2;
+    html+=`<div class="pol" style="grid-template-columns:34px 1fr auto;${active?'background:color-mix(in srgb,var(--accent) 18%,transparent);border-radius:10px;padding:7px 8px':''}">
+      <span style="font-size:18px">${em}</span>
+      <span class="pn">${lbl}${active?' · en ce moment !':''}</span>
+      <span class="pv">${a!=null&&b2!=null?fmtMin(a)+' – '+fmtMin(b2):'—'}</span></div>`;
+  });
+  $('#photoBox').innerHTML=html;
 }
 
 function renderAdvice(){
