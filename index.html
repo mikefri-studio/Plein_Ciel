@@ -767,7 +767,8 @@ function initMap(){
   state.bases.sat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:20,maxNativeZoom:19,attribution:'Tiles © Esri — Esri, Maxar, Earthstar Geographics'});
   state.bases.plan=L.tileLayer('https://{s}.basemap.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:20,maxNativeZoom:20,attribution:'© OpenStreetMap © CARTO'});
   /* Noms de villes/lieux par-dessus l'imagerie satellite (tuiles transparentes) */
-  state.bases.labels=L.tileLayer('https://{s}.basemap.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png',{maxZoom:20,maxNativeZoom:20,zIndex:450,attribution:'Noms de lieux © CARTO'});
+  // APRÈS
+  state.bases.labels=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',{maxZoom:20,maxNativeZoom:19,zIndex:450,attribution:'Noms de lieux © Esri'});
   state.bases.sat.addTo(map);
   state.bases.labels.addTo(map);
   state.marker=L.circleMarker([state.loc.lat,state.loc.lon],{radius:7,color:'#fff',weight:2,fillColor:'#ffd166',fillOpacity:.95}).addTo(map);
