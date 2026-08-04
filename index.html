@@ -113,6 +113,27 @@ body.has-alert .alert-bar{top:0}
 .seg button{border:0;background:none;color:var(--ink-soft);padding:6px 13px;border-radius:999px;cursor:pointer;font-weight:700;font-size:13.5px;transition:.25s}
 .seg button.on{background:var(--accent);color:var(--accent-ink)}
 
+/* ---- Boutons info ⓘ ---- */
+.card,.advice-card{position:relative}
+.info-btn{position:absolute;top:10px;right:10px;width:24px;height:24px;border-radius:50%;
+  border:1px solid var(--line);background:color-mix(in srgb,var(--card) 70%,transparent);
+  color:var(--ink-soft);font:italic 700 13px/1 Georgia,serif;cursor:pointer;
+  display:grid;place-items:center;opacity:.55;transition:.2s;z-index:3}
+.info-btn:hover,.info-btn:focus{opacity:1;color:var(--accent);border-color:var(--accent);transform:scale(1.12)}
+.info-btn.inline{position:static;opacity:.85;flex:none}
+.stats-wrap{position:relative;margin-top:30px}
+.stats-wrap .info-btn{top:-30px;right:2px}
+#infoModal{position:fixed;inset:0;z-index:120;display:none;place-items:center;background:rgba(4,10,25,.62);backdrop-filter:blur(4px);padding:20px}
+#infoModal.open{display:grid}
+#infoModal .im-box{max-width:540px;width:100%;background:var(--panel);border:1px solid var(--line);border-radius:18px;
+  padding:24px 26px;position:relative;box-shadow:0 30px 80px rgba(0,0,0,.5);max-height:82vh;overflow:auto}
+#infoModal h4{font-family:'Big Shoulders Display';font-size:22px;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;padding-right:36px;color:var(--ink)}
+#infoModal .im-txt{font-size:14.5px;line-height:1.7;color:var(--ink)}
+#infoModal .im-txt b{color:var(--accent)}
+#imClose{position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);
+  background:transparent;color:var(--ink);cursor:pointer;font-size:15px}
+#imClose:hover{color:var(--accent);border-color:var(--accent)}
+
 .favs{display:flex;gap:8px;flex-wrap:wrap;padding:12px 0 4px}
 .favs:empty{display:none}
 .fav-chip{display:inline-flex;gap:8px;align-items:center;padding:7px 14px;border-radius:999px;background:var(--card);
@@ -179,7 +200,7 @@ body.has-alert .alert-bar{top:0}
 .act .dots i.on{background:var(--accent)}
 
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);
-  border-radius:18px;overflow:hidden;margin-top:30px}
+  border-radius:18px;overflow:hidden}
 .stat{background:var(--card);padding:16px 18px;display:flex;flex-direction:column;gap:9px;backdrop-filter:blur(6px);transition:background .3s}
 .stat:hover{background:color-mix(in srgb,var(--card) 70%,var(--accent) 14%)}
 .stat .val{font-size:21px;font-weight:700;display:flex;align-items:center;gap:9px}
@@ -402,6 +423,7 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
     </div>
 
     <div class="card rainnow" id="rainNowCard" style="display:none">
+      <button class="info-btn" data-info="rain" aria-label="À propos de ce widget">i</button>
       <h3>🌧️ Pluie dans les prochaines heures</h3>
       <div class="rn-txt" id="rainNowTxt"></div>
       <div class="rn-bar" id="rainNowBar"></div>
@@ -410,6 +432,7 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
 
     <div class="advice">
       <div class="advice-card">
+        <button class="info-btn" data-info="outfit" aria-label="À propos de ce widget">i</button>
         <h3><span class="em">🧥</span> Que porter aujourd'hui</h3>
         <div class="outfit-main">
           <div class="big-icon" id="outfitIcon">👕</div>
@@ -418,25 +441,35 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
         <div class="outfit-items" id="outfitItems"></div>
       </div>
       <div class="advice-card">
+        <button class="info-btn" data-info="activities" aria-label="À propos de ce widget">i</button>
         <h3><span class="em">🎯</span> Activités du jour</h3>
         <div class="activities" id="activities"></div>
       </div>
     </div>
 
-    <div class="stats" id="stats"></div>
+    <div class="stats-wrap">
+      <button class="info-btn" data-info="stats" aria-label="À propos de ce widget">i</button>
+      <div class="stats" id="stats"></div>
+    </div>
   </section>
 
   <section class="wrap reveal">
     <div class="sec-head"><h2>Les prochaines 24 heures</h2><span class="note">Températures heure par heure — faites défiler →</span></div>
-    <div class="card hours-card"><div class="hours-scroll" id="hours"></div></div>
+    <div class="card hours-card">
+      <button class="info-btn" data-info="hours" aria-label="À propos de ce widget">i</button>
+      <div class="hours-scroll" id="hours"></div>
+    </div>
   </section>
 
   <section class="wrap reveal">
     <div class="sec-head"><h2>Sur les 16 prochains jours</h2><span class="note">Prévisions étendues · pollen · mer</span></div>
     <div class="cols">
-      <div class="card" id="days" style="padding:12px 16px"></div>
+      <div class="card" id="days" style="padding:12px 16px">
+        <button class="info-btn" data-info="days" aria-label="À propos de ce widget">i</button>
+      </div>
       <div class="side">
         <div class="card sunbox">
+          <button class="info-btn" data-info="sun" aria-label="À propos de ce widget">i</button>
           <h3>Course du soleil</h3>
           <svg viewBox="0 0 240 106">
             <line x1="6" y1="92" x2="234" y2="92" stroke="var(--line)" stroke-width="2"/>
@@ -450,15 +483,18 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
           </div>
         </div>
         <div class="card">
+          <button class="info-btn" data-info="climate" aria-label="À propos de ce widget">i</button>
           <h3>📅 Il y a 1 an</h3>
           <div class="aqirow"><span class="n" id="climDiff">—</span><span class="badge" id="climBadge" style="background:#35c26b">…</span></div>
           <div class="pm" id="climTxt"></div>
         </div>
         <div class="card">
+          <button class="info-btn" data-info="photo" aria-label="À propos de ce widget">i</button>
           <h3>📷 Lumière photo</h3>
           <div id="photoBox"></div>
         </div>
         <div class="card">
+          <button class="info-btn" data-info="moon" aria-label="À propos de ce widget">i</button>
           <h3>Lune</h3>
           <div class="moonrow">
             <svg viewBox="0 0 64 64" id="moonSvg"></svg>
@@ -466,15 +502,18 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
           </div>
         </div>
         <div class="card">
+          <button class="info-btn" data-info="air" aria-label="À propos de ce widget">i</button>
           <h3>Qualité de l'air</h3>
           <div class="aqirow"><span class="n" id="aqiN">—</span><span class="badge" id="aqiLbl" style="background:#35c26b">…</span></div>
           <div class="pm" id="pmTxt"></div>
         </div>
         <div class="card">
+          <button class="info-btn" data-info="pollen" aria-label="À propos de ce widget">i</button>
           <h3>Pollen &amp; allergies <span class="badge" id="polBadge" style="background:#35c26b;display:none">—</span></h3>
           <div id="pollenBox"></div>
         </div>
         <div class="card">
+          <button class="info-btn" data-info="marine" aria-label="À propos de ce widget">i</button>
           <h3>Conditions marines</h3>
           <div class="marine-grid" id="marineBox"></div>
           <div class="mnote">
@@ -495,6 +534,7 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
           <button data-m="sat">Satellite IR</button>
         </div>
         <div class="grow"></div>
+        <button class="info-btn inline" data-info="map" aria-label="À propos de ce widget">i</button>
         <div class="seg" id="baseSeg">
           <button data-b="sat" class="on">Fond satellite</button>
           <button data-b="plan">Fond plan</button>
@@ -521,6 +561,15 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
     Appli installable (PWA) — site statique, aucune clé API requise · <span id="year"></span>
   </footer>
 </main>
+
+<!-- Fenêtre « À propos » des widgets -->
+<div id="infoModal" role="dialog" aria-modal="true">
+  <div class="im-box">
+    <button id="imClose" aria-label="Fermer">✕</button>
+    <h4 id="imTitle"></h4>
+    <div class="im-txt" id="imTxt"></div>
+  </div>
+</div>
 
 <div id="toast"></div>
 
@@ -897,6 +946,37 @@ $('#alertCloseBtn').addEventListener('click',()=>{
 $('#alertMuteBtn').textContent=state.alert.muted?'🔇 Son coupé':'🔊 Son';
 setInterval(()=>{ if(state.fc) checkThunderAlert(); }, 10*60*1000);
 
+/* ================= FENÊTRES « À PROPOS » DES WIDGETS ================= */
+const INFO={
+ rain:{t:'Pluie dans les prochaines heures',x:`Basé sur la prévision de pluie pas à pas (toutes les 15 min).<br>· Le <b>texte</b> annonce quand la pluie commence ou s'arrête.<br>· La <b>jauge</b> représente les 3 prochaines heures : chaque segment = 15 min ; plus le bleu est intense, plus il pleut.`},
+ outfit:{t:'Que porter aujourd\'hui',x:'Conseil calculé avec la <b>température ressentie</b>, le vent, la pluie attendue et l\'indice UV.<br>Les pastilles listent les accessoires utiles du moment : parapluie, crème solaire, bonnet…'},
+ activities:{t:'Activités du jour',x:'Chaque activité est notée de <b>0 à 5 points</b> selon la météo (température, vent, pluie, UV).<br>5 points = conditions idéales ; 0-1 point = à éviter ou à reporter.'},
+ stats:{t:'Indicateurs actuels',x:'· <b>Vent</b> : la flèche indique la direction d\'où vient le vent.<br>· <b>Point de rosée</b> : au-dessus de 18 °C, l\'air paraît lourd.<br>· <b>Pression</b> : &gt; 1020 hPa = temps stable, &lt; 1005 hPa = temps perturbé.<br>· <b>UV</b> : le curseur place l\'indice sur l\'échelle de 0 à 11+.<br>· <b>Visibilité</b> et <b>nébulosité</b> : part de ciel couvert.'},
+ hours:{t:'Les prochaines 24 heures',x:'Faites défiler horizontalement.<br>· La <b>courbe</b> suit l\'évolution de la température.<br>· Le pourcentage bleu = <b>probabilité de pluie</b> à cette heure.<br>· Une heure encadrée d\'orange signale un <b>risque d\'orage</b>.'},
+ days:{t:'Sur les 16 prochains jours',x:'Chaque ligne = un jour : météo, probabilité de pluie, températures min et max.<br>La <b>barre colorée</b> place la fourchette du jour entre le jour le plus froid et le plus chaud de la période : une barre longue et à droite = journée chaude.'},
+ sun:{t:'Course du soleil',x:'L\'arc représente la trajectoire du soleil entre le <b>lever</b> et le <b>coucher</b>.<br>Le <b>point lumineux</b> indique sa position actuelle ; la durée du jour est affichée au centre.'},
+ climate:{t:'Il y a 1 an',x:'Compare la température maximale d\'aujourd\'hui avec celle du <b>même jour l\'an dernier</b> (données réanalysées ERA5).<br>Le badge indique si c\'est nettement plus chaud, plus frais ou équivalent.'},
+ photo:{t:'Lumière photo',x:'Horaires calculés par astronomie pour votre position exacte.<br>· <b>Heure dorée</b> : lumière chaude et rasante, soleil entre 0 et 6°.<br>· <b>Heure bleue</b> : ciel bleu profond juste avant le lever / après le coucher.<br>La ligne surlignée d\'or = créneau en cours.'},
+ moon:{t:'Lune',x:'Le dessin montre la partie éclairée de la Lune visible ce soir.<br>Le pourcentage = fraction du disque illuminée ; le texte donne la phase (croissant, quartier, pleine lune…).'},
+ air:{t:'Qualité de l\'air',x:'<b>Indice européen</b> de 0 (très bon) à plus de 100 (exécrable).<br>PM2,5 / PM10 = particules fines en µg/m³ : plus la valeur est basse, mieux c\'est.'},
+ pollen:{t:'Pollen & allergies',x:'Concentration estimée de chaque pollen dans l\'air.<br>La <b>barre</b> et le label donnent le niveau de risque d\'allergie : nul, faible, modéré, élevé, très élevé.'},
+ marine:{t:'Conditions marines',x:'Données du point de mer le plus proche.<br>· <b>Eau</b> : température de la mer.<br>· <b>Vagues / houle</b> : hauteur en mètres et direction d\'origine.<br>· <b>Période</b> : temps entre deux vagues ; plus elle est longue, plus la houle est établie.'},
+ map:{t:'Carte radar, satellite & vent',x:'· <b>Radar</b> : pluies des 2 dernières heures + courte prévision, en différé d\'environ 20-30 min (temps de traitement).<br>· <b>Satellite IR</b> : couverture nuageuse (blanc = nuages épais).<br>· <b>Vent</b> : particules animées (direction et force).<br>▶ anime la frise, le curseur déplace l\'heure, « Opacité » règle le calque météo.`}
+};
+function openInfo(k){
+  const d=INFO[k]; if(!d)return;
+  $('#imTitle').textContent=d.t;
+  $('#imTxt').innerHTML=d.x;
+  $('#infoModal').classList.add('open');
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('.info-btn');
+  if(b){ openInfo(b.dataset.info); return; }
+  if(e.target.id==='infoModal') $('#infoModal').classList.remove('open');
+});
+$('#imClose').addEventListener('click',()=>$('#infoModal').classList.remove('open'));
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') $('#infoModal').classList.remove('open'); });
+
 /* ================= RENDUS ================= */
 const safe=(name,f)=>{ try{ f(); }catch(err){ console.error('Erreur de rendu ['+name+'] :',err); } };
 function renderAll(){
@@ -1120,7 +1200,7 @@ function renderHours(){
 function renderDays(){
   const d=state.fc.daily, n=d.time.length;
   const wmin=Math.min(...d.temperature_2m_min), wmax=Math.max(...d.temperature_2m_max), span=Math.max(1,wmax-wmin);
-  let html='';
+  let html='<button class="info-btn" data-info="days" aria-label="À propos de ce widget">i</button>';
   for(let i=0;i<n;i++){
     const date=new Date(d.time[i]+'T12:00');
     const name=i===0?'Aujourd\u2019hui':cap(date.toLocaleDateString('fr-FR',{weekday:'long'}));
@@ -1594,7 +1674,7 @@ $('#year').textContent=new Date().getFullYear();
 writeURL(state.loc);
 load();
 
-/* ================= PWA : installation + hors-ligne ================= */
+/* ================= PWA ================= */
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
     navigator.serviceWorker.register('sw.js').catch(e=>console.warn('Service worker non enregistré :',e));
