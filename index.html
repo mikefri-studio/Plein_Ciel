@@ -17,7 +17,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Plein Ciel">
-<link rel="apple-touch-icon" href="icon.svg">
+<!-- v1.2.0 : PNG 180×180 requis par iOS (le SVG n'est pas supporté en icône d'écran d'accueil) -->
+<link rel="apple-touch-icon" href="icon-180.png">
 <style>
 @property --sky-top { syntax:'<color>'; inherits:true; initial-value:#1470c8; }
 @property --sky-mid { syntax:'<color>'; inherits:true; initial-value:#4aa3e0; }
@@ -81,9 +82,10 @@ header,main,footer{position:relative;z-index:2}
   border-radius:999px;font-weight:700;font-size:12.5px;cursor:pointer;transition:.2s}
 .alert-bar button:hover{background:rgba(255,255,255,.18)}
 
+/* v1.2.0 : hauteur de bannière mesurée en JS (--alert-h), plus de chevauchement mobile */
 header{position:sticky;top:0;z-index:50;padding:12px 22px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
   background:color-mix(in srgb, var(--sky-top) 55%, transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-body.has-alert header{top:48px}
+body.has-alert header{top:var(--alert-h,48px)}
 body.has-alert .alert-bar{top:0}
 .brand{display:flex;align-items:center;gap:9px;font-family:'Big Shoulders Display';font-weight:800;font-size:26px;letter-spacing:1.5px}
 .brand svg{width:32px;height:32px}
@@ -654,7 +656,8 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
 <script>
 "use strict";
 const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
-const store={get:k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set:(k,v)=>localStorage.setItem(k,JSON.stringify(v))};
+/* v1.2.0 : store.set sécurisé (navigation privée Safari, quota, etc.) */
+const store={get:k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 /* ================= ÉTAT ================= */
@@ -674,7 +677,7 @@ const state={
   fc:null, aq:null, marine:null, wind:null, climate:null, fx:'none', aqStale:false,
   radar:{host:'',frames:[],pastCount:0,idx:0,playing:false,timer:null,op:.75},
   map:null, bases:{}, overlay:null, marker:null, mapInited:false,
-  windLayer:null, windOn:true,
+  windLayer:null, windOn:true, mapVisible:false,
   alert:{muted: store.get('pc_alert_muted')==='1', lastSeen: store.get('pc_alert_seen')||'', perm: ('Notification' in window)?Notification.permission:'default'},
   audioCtx:null
 };
@@ -884,6 +887,7 @@ async function fetchJSON(url){
   if(!r.ok) throw new Error('HTTP '+r.status+' — '+url.split('?')[0]);
   return r.json();
 }
+/* v1.2.0 : le pollen n'existe qu'en « hourly » (le paramètre daily faisait planter l'API) */
 function aqURL(lat,lon){
   return `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}`
     +`&current=european_aqi,pm2_5,pm10`
@@ -916,14 +920,19 @@ async function fetchWindGrid(lat,lon){
   }catch(e){ console.warn('Wind grid indisponible :',e); }
   return null;
 }
+/* v1.2.0 : archive mise en cache 24 h (ces données ne changent qu'une fois par jour) */
 async function fetchClimate(lat,lon){
-  const now=new Date();
-  const y=now.getFullYear()-1;
+  const key='pc_clim_'+lat.toFixed(2)+','+lon.toFixed(2);
+  const c=store.get(key);
+  if(c&&c.d&&Date.now()-c.t<24*3600*1000) return c.d;
+  const now=new Date(), y=now.getFullYear()-1;
   const mm=String(now.getMonth()+1).padStart(2,'0'), dd=String(now.getDate()).padStart(2,'0');
   const date=`${y}-${mm}-${dd}`;
   try{
-    return await fetchJSON(`https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}&start_date=${date}&end_date=${date}&daily=temperature_2m_max,temperature_2m_min&timezone=auto`);
-  }catch(e){ console.warn('Climat indisponible :',e); return null; }
+    const d=await fetchJSON(`https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}&start_date=${date}&end_date=${date}&daily=temperature_2m_max,temperature_2m_min&timezone=auto`);
+    store.set(key,{t:Date.now(),d});
+    return d;
+  }catch(e){ console.warn('Climat indisponible :',e); return c?c.d:null; }
 }
 async function fetchData(){
   const {lat,lon}=state.loc;
@@ -1056,6 +1065,13 @@ function sendBrowserNotification(title,body){
     try{ new Notification(title,{body,tag:'pleinciel-thunder'}); }catch(e){}
   }
 }
+/* v1.2.0 : hauteur de bannière mesurée → plus de chevauchement du header sur mobile */
+function syncAlertHeight(){
+  if(!document.body.classList.contains('has-alert'))return;
+  const h=$('#alertBar').offsetHeight;
+  if(h) document.documentElement.style.setProperty('--alert-h',h+'px');
+}
+addEventListener('resize',syncAlertHeight);
 function updateAlertBar(info){
   const bar=$('#alertBar'), txt=$('#alertText');
   if(!info||info.level===0){
@@ -1076,6 +1092,7 @@ function updateAlertBar(info){
   txt.innerHTML=msg;
   bar.classList.add('on');
   document.body.classList.add('has-alert');
+  requestAnimationFrame(syncAlertHeight);
 }
 function checkThunderAlert(forceNotify=false){
   const info=analyzeThunder();
@@ -1139,7 +1156,7 @@ const INFO={
  photo:{t:'Lumière photo',x:'Horaires calculés par astronomie pour votre position exacte.<br>· <b>Heure dorée</b> : lumière chaude et rasante, soleil entre 0 et 6°.<br>· <b>Heure bleue</b> : ciel bleu profond juste avant le lever / après le coucher.<br>La ligne surlignée d\'or = créneau en cours.'},
  moon:{t:'Lune',x:'Le dessin montre la partie éclairée de la Lune visible ce soir.<br>Le pourcentage = fraction du disque illuminée ; le texte donne la phase (croissant, quartier, pleine lune…).'},
  air:{t:'Qualité de l\'air',x:'<b>Indice européen</b> de 0 (très bon) à plus de 100 (exécrable).<br>PM2,5 / PM10 = particules fines en µg/m³ : plus la valeur est basse, mieux c\'est.<br>Si le service est en panne, les dernières valeurs connues sont affichées et le site réessaie tout seul.'},
- pollen:{t:'Pollen & allergies',x:'Concentration estimée de chaque pollen dans l\'air.<br>La <b>barre</b> et le label donnent le niveau de risque d\'allergie : nul, faible, modéré, élevé, très élevé.'},
+ pollen:{t:'Pollen & allergies',x:'Pic du jour pour chaque pollen (grains/m³).<br>La <b>barre</b> et le label donnent le niveau de risque d\'allergie : nul, faible, modéré, élevé, très élevé.<br><i>Prévision CAMS — Europe uniquement.</i>'},
  marine:{t:'Conditions marines',x:'Données du point de mer le plus proche.<br>· <b>Eau</b> : température de la mer.<br>· <b>Vagues / houle</b> : hauteur en mètres et direction d\'origine.<br>· <b>Période</b> : temps entre deux vagues ; plus elle est longue, plus la houle est établie.'},
  map:{t:'Carte radar & vent',x:'· <b>Radar</b> : précipitations des 2 dernières heures + courte prévision, en différé d\'environ 20-30 min (temps de traitement).<br>· <b>Vent</b> : particules animées (direction et force).<br>▶ anime la frise, le curseur déplace l\'heure, « Opacité » règle le calque radar.'}
 };
@@ -1436,14 +1453,15 @@ function renderAir(){
 }
 
 const polInfo=v=> v<=0?['Nul','#9aa7b3']:v<15?['Faible','#35c26b']:v<50?['Modéré','#ffd23f']:v<100?['Élevé','#ff9f43']:['Très élevé','#ff6b6b'];
+/* v1.2.0 : pollen lu dans « hourly » (pic du jour) + message propre hors Europe */
 function renderPollen(){
   const h=state.aq&&state.aq.hourly?state.aq.hourly:null;
   const wrap=$('#pollenBox'), badge=$('#polBadge');
   if(!h){ wrap.innerHTML='<div class="sub">Données pollen indisponibles.</div>'; badge.style.display='none'; return; }
   const POL=[['alder_pollen','Aulne'],['birch_pollen','Bouleau'],['grass_pollen','Graminées'],['mugwort_pollen','Armoise'],['olive_pollen','Olivier'],['ragweed_pollen','Ambroisie']];
-  const dayMax=arr=>{ let m=0; if(arr) for(const v of arr) if(v!=null&&v>m) m=v; return m; };
   const allNull=POL.every(([k])=>{ const arr=h[k]; return !arr||arr.every(v=>v==null); });
   if(allNull){ wrap.innerHTML='<div class="sub">Pollen : prévision disponible en Europe uniquement.</div>'; badge.style.display='none'; return; }
+  const dayMax=arr=>{ let m=0; if(arr) for(const v of arr) if(v!=null&&v>m) m=v; return m; };
   let rows='', max=0;
   POL.forEach(([k,n])=>{
     const v=dayMax(h[k]); max=Math.max(max,v);
@@ -1491,7 +1509,7 @@ function initMap(){
   L.control.zoom({position:'bottomright'}).addTo(map);
   state.bases.sat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:20,maxNativeZoom:19,attribution:'Tiles © Esri — Esri, Maxar, Earthstar Geographics'});
   state.bases.plan=L.tileLayer('https://{s}.basemap.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:20,maxNativeZoom:20,attribution:'© OpenStreetMap © CARTO'});
-  state.bases.labels=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{x}/{y}',{maxZoom:20,maxNativeZoom:19,zIndex:450,attribution:'Noms de lieux © Esri'});
+  state.bases.labels=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',{maxZoom:20,maxNativeZoom:19,zIndex:450,attribution:'Noms de lieux © Esri'});
   state.bases.sat.addTo(map); state.bases.labels.addTo(map);
   state.marker=L.circleMarker([state.loc.lat,state.loc.lon],{radius:7,color:'#fff',weight:2,fillColor:'#ffd166',fillOpacity:.95}).addTo(map);
   state.map=map;
@@ -1553,6 +1571,8 @@ function refreshMapFocus(){
   updateWindParticles();
 }
 new IntersectionObserver((es,ob)=>{ if(es[0].isIntersecting){ initMap(); ob.disconnect(); } },{rootMargin:'200px'}).observe($('#secMap'));
+/* v1.2.0 : pause les particules de vent quand la carte n'est pas à l'écran (batterie) */
+new IntersectionObserver(es=>{ state.mapVisible=es[0].isIntersecting; },{rootMargin:'120px'}).observe($('#secMap'));
 
 /* ================= PARTICULES DE VENT ================= */
 function initWindLayer(){
@@ -1599,7 +1619,7 @@ function initWindLayer(){
     },
     _animate(){
       this._raf=requestAnimationFrame(()=>this._animate());
-      if(!state.windOn||!this._map) return;
+      if(!state.windOn||!this._map||!state.mapVisible) return;
       const ctx=this._ctx, c=this._canvas, map=this._map;
       ctx.fillStyle='rgba(0,0,0,0.08)';
       ctx.globalCompositeOperation='destination-out';
@@ -1850,7 +1870,7 @@ let toastT=null;
 function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),3600); }
 
 /* ================= DÉMARRAGE ================= */
-const APP_VERSION = '1.1.1';
+const APP_VERSION = '1.2.0';
 console.log(`%c☁️ Plein Ciel v${APP_VERSION}`, 'color:#ffd166;font-size:18px;font-weight:bold');
 console.log('Développé avec ❤️ — météo Open-Meteo, radar RainViewer');
 $('#loadIco').innerHTML=icon(2,true);
@@ -1860,19 +1880,16 @@ writeURL(state.loc);
 applyWidgets();
 load();
   /* ================= GÉOLOCALISATION AU DÉMARRAGE ================= */
+  /* v1.2.0 : ne casse plus les liens partagés, et évite le double chargement */
 function geolocateOnStart() {
   if (!navigator.geolocation) return;
   if (store.get('pc_geo_denied') === '1') return;
-  
+  if (locFromURL()) return; // 🔗 lien partagé (?lat=…&lon=…) : on respecte le lieu du lien
   navigator.geolocation.getCurrentPosition(
     p => {
-      const loc = {
-        lat: p.coords.latitude,
-        lon: p.coords.longitude,
-        name: 'Ma position',
-        sub: 'Position actuelle'
-      };
-      setLoc(loc);
+      const lat = p.coords.latitude, lon = p.coords.longitude;
+      if (Math.hypot(lat - state.loc.lat, lon - state.loc.lon) < 0.05) return; // 📍 déjà ~à côté : pas de 2e chargement
+      setLoc({ lat, lon, name: 'Ma position', sub: 'Position actuelle' });
     },
     err => {
       if (err.code === err.PERMISSION_DENIED) {
