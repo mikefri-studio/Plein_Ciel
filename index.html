@@ -123,16 +123,27 @@ body.has-alert .alert-bar{top:0}
 .info-btn.inline{position:static;opacity:.85;flex:none}
 .stats-wrap{position:relative;margin-top:30px}
 .stats-wrap .info-btn{top:-30px;right:2px}
-#infoModal{position:fixed;inset:0;z-index:120;display:none;place-items:center;background:rgba(4,10,25,.62);backdrop-filter:blur(4px);padding:20px}
-#infoModal.open{display:grid}
-#infoModal .im-box{max-width:540px;width:100%;background:var(--panel);border:1px solid var(--line);border-radius:18px;
+
+/* ---- Modales (info + réglages) ---- */
+#infoModal,#settingsModal{position:fixed;inset:0;z-index:120;display:none;place-items:center;background:rgba(4,10,25,.62);backdrop-filter:blur(4px);padding:20px}
+#infoModal.open,#settingsModal.open{display:grid}
+.im-box{max-width:540px;width:100%;background:var(--panel);border:1px solid var(--line);border-radius:18px;
   padding:24px 26px;position:relative;box-shadow:0 30px 80px rgba(0,0,0,.5);max-height:82vh;overflow:auto}
-#infoModal h4{font-family:'Big Shoulders Display';font-size:22px;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;padding-right:36px;color:var(--ink)}
-#infoModal .im-txt{font-size:14.5px;line-height:1.7;color:var(--ink)}
-#infoModal .im-txt b{color:var(--accent)}
-#imClose{position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);
+.im-box h4{font-family:'Big Shoulders Display';font-size:22px;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;padding-right:36px;color:var(--ink)}
+.im-txt{font-size:14.5px;line-height:1.7;color:var(--ink)}
+.im-txt b{color:var(--accent)}
+.imClose{position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);
   background:transparent;color:var(--ink);cursor:pointer;font-size:15px}
-#imClose:hover{color:var(--accent);border-color:var(--accent)}
+.imClose:hover{color:var(--accent);border-color:var(--accent)}
+
+/* ---- Liste des widgets (réglages) ---- */
+.wrow{display:flex;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px dashed var(--line);cursor:pointer;transition:background .2s;border-radius:8px}
+.wrow:hover{background:color-mix(in srgb,var(--accent) 8%,transparent)}
+.wrow:last-child{border-bottom:0}
+.wrow input{accent-color:var(--accent);width:18px;height:18px;cursor:pointer;flex:none}
+.wrow .wl{font-weight:600;font-size:14.5px}
+.wrow .we{font-size:18px;flex:none}
+.set-actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
 
 .favs{display:flex;gap:8px;flex-wrap:wrap;padding:12px 0 4px}
 .favs:empty{display:none}
@@ -408,6 +419,9 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
     <div id="qlist"></div>
   </div>
   <div class="hbtns">
+    <button class="ibtn" id="settingsBtn" title="Personnaliser l'affichage" aria-label="Réglages">
+      <svg viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+    </button>
     <button class="ibtn" id="installBtn" title="Installer l'application" aria-label="Installer" style="display:none">
       <svg viewBox="0 0 24 24"><path d="M12 3v10m0 0l-4-4m4 4l4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
     </button>
@@ -458,8 +472,8 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
       <div class="rn-scale"><span>Maintenant</span><span>+1 h</span><span>+2 h</span><span>+3 h</span></div>
     </div>
 
-    <div class="advice">
-      <div class="advice-card">
+    <div class="advice" id="adviceGrid">
+      <div class="advice-card" id="wOutfit">
         <button class="info-btn" data-info="outfit" aria-label="À propos de ce widget">i</button>
         <h3><span class="em">🧥</span> Que porter aujourd'hui</h3>
         <div class="outfit-main">
@@ -468,20 +482,20 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
         </div>
         <div class="outfit-items" id="outfitItems"></div>
       </div>
-      <div class="advice-card">
+      <div class="advice-card" id="wActivities">
         <button class="info-btn" data-info="activities" aria-label="À propos de ce widget">i</button>
         <h3><span class="em">🎯</span> Activités du jour</h3>
         <div class="activities" id="activities"></div>
       </div>
     </div>
 
-    <div class="stats-wrap">
+    <div class="stats-wrap" id="statsWrap">
       <button class="info-btn" data-info="stats" aria-label="À propos de ce widget">i</button>
       <div class="stats" id="stats"></div>
     </div>
   </section>
 
-  <section class="wrap reveal">
+  <section class="wrap reveal" id="secHours">
     <div class="sec-head"><h2>Les prochaines 24 heures</h2><span class="note">Températures heure par heure — faites défiler →</span></div>
     <div class="card hours-card">
       <button class="info-btn" data-info="hours" aria-label="À propos de ce widget">i</button>
@@ -489,12 +503,12 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
     </div>
   </section>
 
-  <section class="wrap reveal">
+  <section class="wrap reveal" id="secDays">
     <div class="sec-head"><h2>Sur les 16 prochains jours</h2><span class="note">Prévisions étendues · pollen · mer</span></div>
-    <div class="cols">
-      <div class="card" id="days" style="padding:12px 16px"></div>
+    <div class="cols" id="daysCols">
+      <div class="card" id="wDays" style="padding:12px 16px"></div>
       <div class="side">
-        <div class="card sunbox">
+        <div class="card sunbox" id="wSun">
           <button class="info-btn" data-info="sun" aria-label="À propos de ce widget">i</button>
           <h3>Course du soleil</h3>
           <svg viewBox="0 0 240 106">
@@ -508,18 +522,18 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
             <div style="text-align:right">Coucher<br><b id="setT">—</b></div>
           </div>
         </div>
-        <div class="card">
+        <div class="card" id="wClimate">
           <button class="info-btn" data-info="climate" aria-label="À propos de ce widget">i</button>
           <h3>📅 Il y a 1 an</h3>
           <div class="aqirow"><span class="n" id="climDiff">—</span><span class="badge" id="climBadge" style="background:#35c26b">…</span></div>
           <div class="pm" id="climTxt"></div>
         </div>
-        <div class="card">
+        <div class="card" id="wPhoto">
           <button class="info-btn" data-info="photo" aria-label="À propos de ce widget">i</button>
           <h3>📷 Lumière photo</h3>
           <div id="photoBox"></div>
         </div>
-        <div class="card">
+        <div class="card" id="wMoon">
           <button class="info-btn" data-info="moon" aria-label="À propos de ce widget">i</button>
           <h3>Lune</h3>
           <div class="moonrow">
@@ -527,18 +541,18 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
             <div><div class="mn" id="moonName">—</div><div class="mi" id="moonIll"></div></div>
           </div>
         </div>
-        <div class="card">
+        <div class="card" id="wAir">
           <button class="info-btn" data-info="air" aria-label="À propos de ce widget">i</button>
           <h3>Qualité de l'air</h3>
           <div class="aqirow"><span class="n" id="aqiN">—</span><span class="badge" id="aqiLbl" style="background:#35c26b">…</span></div>
           <div class="pm" id="pmTxt"></div>
         </div>
-        <div class="card">
+        <div class="card" id="wPollen">
           <button class="info-btn" data-info="pollen" aria-label="À propos de ce widget">i</button>
           <h3>Pollen &amp; allergies <span class="badge" id="polBadge" style="background:#35c26b;display:none">—</span></h3>
           <div id="pollenBox"></div>
         </div>
-        <div class="card">
+        <div class="card" id="wMarine">
           <button class="info-btn" data-info="marine" aria-label="À propos de ce widget">i</button>
           <h3>Conditions marines</h3>
           <div class="marine-grid" id="marineBox"></div>
@@ -551,7 +565,7 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
     </div>
   </section>
 
-  <section class="wrap reveal" id="mapSec">
+  <section class="wrap reveal" id="secMap">
     <div class="sec-head"><h2>Carte radar, satellite &amp; vent</h2><span class="note">Précipitations, imagerie infrarouge et particules de vent</span></div>
     <div class="card map-card">
       <div class="map-top">
@@ -581,8 +595,7 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
     </div>
   </section>
 
-  <!-- ===== Installer l'appli / QR code ===== -->
-  <section class="wrap reveal" id="appSec">
+  <section class="wrap reveal" id="secApp">
     <div class="sec-head"><h2>Emportez le ciel avec vous</h2><span class="note">Installez Plein Ciel comme une vraie application</span></div>
     <div class="card getapp">
       <div class="ga-grid">
@@ -616,11 +629,26 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
   </footer>
 </main>
 
+<!-- ===== Modale « À propos » ===== -->
 <div id="infoModal" role="dialog" aria-modal="true">
   <div class="im-box">
-    <button id="imClose" aria-label="Fermer">✕</button>
+    <button class="imClose" id="imClose" aria-label="Fermer">✕</button>
     <h4 id="imTitle"></h4>
     <div class="im-txt" id="imTxt"></div>
+  </div>
+</div>
+
+<!-- ===== Modale « Réglages d'affichage » ===== -->
+<div id="settingsModal" role="dialog" aria-modal="true">
+  <div class="im-box">
+    <button class="imClose" id="setClose" aria-label="Fermer">✕</button>
+    <h4>⚙️ Personnaliser l'affichage</h4>
+    <p class="sub" style="margin-bottom:12px">Cochez les widgets à afficher. Votre choix est enregistré sur cet appareil.</p>
+    <div id="widgetList"></div>
+    <div class="set-actions">
+      <button class="ga-btn ghost" id="widgetReset">Tout réafficher</button>
+      <button class="ga-btn" id="widgetDone">Terminé</button>
+    </div>
   </div>
 </div>
 
@@ -665,6 +693,75 @@ function writeURL(loc){
     history.replaceState(null,'',u.toString());
   }catch(e){}
 }
+
+/* ================= WIDGETS PERSONNALISABLES ================= */
+const WIDGETS=[
+ ['rain','🌧️','Pluie prochaines heures'],
+ ['outfit','🧥','Que porter aujourd\'hui'],
+ ['activities','🎯','Activités du jour'],
+ ['stats','📊','Indicateurs actuels'],
+ ['hours','🕐','Prochaines 24 heures'],
+ ['days','📆','Prévisions 16 jours'],
+ ['sun','☀️','Course du soleil'],
+ ['climate','📅','Il y a 1 an'],
+ ['photo','📷','Lumière photo'],
+ ['moon','🌙','Lune'],
+ ['air','🌫️','Qualité de l\'air'],
+ ['pollen','🌼','Pollen & allergies'],
+ ['marine','🌊','Conditions marines'],
+ ['map','🗺️','Carte radar & satellite'],
+ ['app','📲','Installer l\'appli'],
+];
+function wVis(id){ const p=store.get('pc_widgets')||{}; return p[id]!==false; }
+function applyWidgets(){
+  const sel={
+    rain:'#rainNowCard', outfit:'#wOutfit', activities:'#wActivities', stats:'#statsWrap',
+    hours:'#secHours', sun:'#wSun', climate:'#wClimate', photo:'#wPhoto', moon:'#wMoon',
+    air:'#wAir', pollen:'#wPollen', marine:'#wMarine', days:'#wDays', map:'#secMap', app:'#secApp'
+  };
+  for(const [id,s] of Object.entries(sel)){
+    const el=$(s); if(el) el.style.display = wVis(id)? '' : 'none';
+  }
+  /* Grille conseils : 1 colonne si un seul widget visible, masquée si aucun */
+  const adv=$('#adviceGrid');
+  if(adv){
+    const both=wVis('outfit')&&wVis('activities');
+    const any=wVis('outfit')||wVis('activities');
+    adv.style.display = any? '' : 'none';
+    adv.style.gridTemplateColumns = both? '' : '1fr';
+  }
+  /* Section 16 jours : masquée si jours + tous les widgets latéraux cachés */
+  const secDays=$('#secDays');
+  if(secDays){
+    const anySide=['sun','climate','photo','moon','air','pollen','marine'].some(k=>wVis(k));
+    secDays.style.display = (wVis('days')||anySide)? '' : 'none';
+    const cols=$('#daysCols');
+    if(cols) cols.style.gridTemplateColumns = wVis('days')? '' : '1fr';
+  }
+}
+function buildWidgetList(){
+  const p=store.get('pc_widgets')||{};
+  $('#widgetList').innerHTML=WIDGETS.map(([id,em,label])=>
+    `<label class="wrow"><input type="checkbox" data-w="${id}" ${p[id]!==false?'checked':''}><span class="we">${em}</span><span class="wl">${label}</span></label>`
+  ).join('');
+}
+$('#settingsBtn').addEventListener('click',()=>{ buildWidgetList(); $('#settingsModal').classList.add('open'); });
+$('#setClose').addEventListener('click',()=>$('#settingsModal').classList.remove('open'));
+$('#widgetDone').addEventListener('click',()=>$('#settingsModal').classList.remove('open'));
+$('#settingsModal').addEventListener('click',e=>{ if(e.target.id==='settingsModal') $('#settingsModal').classList.remove('open'); });
+$('#widgetList').addEventListener('change',e=>{
+  const cb=e.target.closest('input[data-w]'); if(!cb)return;
+  const p=store.get('pc_widgets')||{};
+  p[cb.dataset.w]=cb.checked;
+  store.set('pc_widgets',p);
+  applyWidgets();
+});
+$('#widgetReset').addEventListener('click',()=>{
+  store.set('pc_widgets',{});
+  buildWidgetList();
+  applyWidgets();
+  toast('Tous les widgets sont réaffichés');
+});
 
 /* ================= THÈMES ================= */
 const THEMES={
@@ -1063,7 +1160,7 @@ document.addEventListener('click',e=>{
   if(e.target.id==='infoModal') $('#infoModal').classList.remove('open');
 });
 $('#imClose').addEventListener('click',()=>$('#infoModal').classList.remove('open'));
-document.addEventListener('keydown',e=>{ if(e.key==='Escape') $('#infoModal').classList.remove('open'); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ $('#infoModal').classList.remove('open'); $('#settingsModal').classList.remove('open'); } });
 
 /* ================= RENDUS ================= */
 const safe=(name,f)=>{ try{ f(); }catch(err){ console.error('Erreur de rendu ['+name+'] :',err); } };
@@ -1110,7 +1207,7 @@ function renderAll(){
 
 function renderRainNow(){
   const fc=state.fc, m=fc.minutely_15, card=$('#rainNowCard');
-  if(!m||!m.time||!m.precipitation){ card.style.display='none'; return; }
+  if(!wVis('rain')||!m||!m.time||!m.precipitation){ card.style.display='none'; return; }
   const times=m.time, P=m.precipitation, cur=fc.current.time.slice(0,16);
   let i0=times.findIndex(t=>t.slice(0,16)===cur);
   if(i0<0) i0=times.findIndex(t=>t.slice(0,16)>=cur);
@@ -1462,7 +1559,7 @@ function refreshMapFocus(){
   if(state.map){ state.map.setView([state.loc.lat,state.loc.lon],Math.max(state.map.getZoom(),6)); state.marker.setLatLng([state.loc.lat,state.loc.lon]); }
   updateWindParticles();
 }
-new IntersectionObserver((es,ob)=>{ if(es[0].isIntersecting){ initMap(); ob.disconnect(); } },{rootMargin:'200px'}).observe($('#mapSec'));
+new IntersectionObserver((es,ob)=>{ if(es[0].isIntersecting){ initMap(); ob.disconnect(); } },{rootMargin:'200px'}).observe($('#secMap'));
 
 /* ================= PARTICULES DE VENT ================= */
 function initWindLayer(){
@@ -1768,13 +1865,14 @@ let toastT=null;
 function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),3600); }
 
 /* ================= DÉMARRAGE ================= */
-const APP_VERSION = '1.0.0';
+const APP_VERSION = '1.1.0';
 console.log(`%c☁️ Plein Ciel v${APP_VERSION}`, 'color:#ffd166;font-size:18px;font-weight:bold');
 console.log('Développé avec ❤️ — météo Open-Meteo, radar RainViewer');
 $('#loadIco').innerHTML=icon(2,true);
 $('#year').textContent=new Date().getFullYear();
 $('#appVersion').textContent=APP_VERSION;
 writeURL(state.loc);
+applyWidgets();
 load();
 
 /* ================= ACTUALISATION AUTO ================= */
