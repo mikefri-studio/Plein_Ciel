@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Plein Ciel — Météo en direct</title>
-<meta name="description" content="Météo complète : pluie minute par minute, prévisions 16 jours, pollen, marine, vent animé, alertes orage, heures dorées, radar et satellite.">
+<meta name="description" content="Météo complète : pluie minute par minute, prévisions 16 jours, pollen, marine, vent animé, alertes orage, heures dorées et radar.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛅</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -566,13 +566,9 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
   </section>
 
   <section class="wrap reveal" id="secMap">
-    <div class="sec-head"><h2>Carte radar, satellite &amp; vent</h2><span class="note">Précipitations, imagerie infrarouge et particules de vent</span></div>
+    <div class="sec-head"><h2>Carte radar &amp; vent</h2><span class="note">Précipitations en temps réel et particules de vent animées</span></div>
     <div class="card map-card">
       <div class="map-top">
-        <div class="seg" id="modeSeg">
-          <button data-m="radar" class="on">Radar précipitations</button>
-          <button data-m="sat">Satellite IR</button>
-        </div>
         <div class="grow"></div>
         <button class="info-btn inline" data-info="map" aria-label="À propos de ce widget">i</button>
         <div class="seg" id="baseSeg">
@@ -676,7 +672,7 @@ const state={
   loc: locFromURL() || savedLoc,
   units: store.get('pc_units') || 'C',
   fc:null, aq:null, marine:null, wind:null, climate:null, fx:'none', aqStale:false,
-  radar:{host:'',frames:[],sat:[],pastCount:0,idx:0,mode:'radar',playing:false,timer:null,op:{radar:.75,sat:.85}},
+  radar:{host:'',frames:[],pastCount:0,idx:0,playing:false,timer:null,op:.75},
   map:null, bases:{}, overlay:null, marker:null, mapInited:false,
   windLayer:null, windOn:true,
   alert:{muted: store.get('pc_alert_muted')==='1', lastSeen: store.get('pc_alert_seen')||'', perm: ('Notification' in window)?Notification.permission:'default'},
@@ -709,7 +705,7 @@ const WIDGETS=[
  ['air','🌫️','Qualité de l\'air'],
  ['pollen','🌼','Pollen & allergies'],
  ['marine','🌊','Conditions marines'],
- ['map','🗺️','Carte radar & satellite'],
+ ['map','🗺️','Carte radar & vent'],
  ['app','📲','Installer l\'appli'],
 ];
 function wVis(id){ const p=store.get('pc_widgets')||{}; return p[id]!==false; }
@@ -722,7 +718,6 @@ function applyWidgets(){
   for(const [id,s] of Object.entries(sel)){
     const el=$(s); if(el) el.style.display = wVis(id)? '' : 'none';
   }
-  /* Grille conseils : 1 colonne si un seul widget visible, masquée si aucun */
   const adv=$('#adviceGrid');
   if(adv){
     const both=wVis('outfit')&&wVis('activities');
@@ -730,7 +725,6 @@ function applyWidgets(){
     adv.style.display = any? '' : 'none';
     adv.style.gridTemplateColumns = both? '' : '1fr';
   }
-  /* Section 16 jours : masquée si jours + tous les widgets latéraux cachés */
   const secDays=$('#secDays');
   if(secDays){
     const anySide=['sun','climate','photo','moon','air','pollen','marine'].some(k=>wVis(k));
@@ -1146,7 +1140,7 @@ const INFO={
  air:{t:'Qualité de l\'air',x:'<b>Indice européen</b> de 0 (très bon) à plus de 100 (exécrable).<br>PM2,5 / PM10 = particules fines en µg/m³ : plus la valeur est basse, mieux c\'est.<br>Si le service est en panne, les dernières valeurs connues sont affichées et le site réessaie tout seul.'},
  pollen:{t:'Pollen & allergies',x:'Concentration estimée de chaque pollen dans l\'air.<br>La <b>barre</b> et le label donnent le niveau de risque d\'allergie : nul, faible, modéré, élevé, très élevé.'},
  marine:{t:'Conditions marines',x:'Données du point de mer le plus proche.<br>· <b>Eau</b> : température de la mer.<br>· <b>Vagues / houle</b> : hauteur en mètres et direction d\'origine.<br>· <b>Période</b> : temps entre deux vagues ; plus elle est longue, plus la houle est établie.'},
- map:{t:'Carte radar, satellite & vent',x:'· <b>Radar</b> : pluies des 2 dernières heures + courte prévision, en différé d\'environ 20-30 min (temps de traitement).<br>· <b>Satellite IR</b> : couverture nuageuse (blanc = nuages épais).<br>· <b>Vent</b> : particules animées (direction et force).<br>▶ anime la frise, le curseur déplace l\'heure, « Opacité » règle le calque météo.'}
+ map:{t:'Carte radar & vent',x:'· <b>Radar</b> : précipitations des 2 dernières heures + courte prévision, en différé d\'environ 20-30 min (temps de traitement).<br>· <b>Vent</b> : particules animées (direction et force).<br>▶ anime la frise, le curseur déplace l\'heure, « Opacité » règle le calque radar.'}
 };
 function openInfo(k){
   const d=INFO[k]; if(!d)return;
@@ -1493,7 +1487,7 @@ function initMap(){
   L.control.zoom({position:'bottomright'}).addTo(map);
   state.bases.sat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:20,maxNativeZoom:19,attribution:'Tiles © Esri — Esri, Maxar, Earthstar Geographics'});
   state.bases.plan=L.tileLayer('https://{s}.basemap.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:20,maxNativeZoom:20,attribution:'© OpenStreetMap © CARTO'});
-  state.bases.labels=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',{maxZoom:20,maxNativeZoom:19,zIndex:450,attribution:'Noms de lieux © Esri'});
+  state.bases.labels=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{x}/{y}',{maxZoom:20,maxNativeZoom:19,zIndex:450,attribution:'Noms de lieux © Esri'});
   state.bases.sat.addTo(map); state.bases.labels.addTo(map);
   state.marker=L.circleMarker([state.loc.lat,state.loc.lon],{radius:7,color:'#fff',weight:2,fillColor:'#ffd166',fillOpacity:.95}).addTo(map);
   state.map=map;
@@ -1505,48 +1499,43 @@ async function loadRadarFrames(){
   try{
     const d=await fetch('https://api.rainviewer.com/public/weather-maps.json').then(r=>r.json());
     const R=state.radar;
-    const oldLen=curFrames().length;
+    const oldLen=R.frames.length;
     const atEnd=R.idx>=oldLen-1;
     R.host=d.host;
     R.frames=[...(d.radar.past||[]).map(f=>({...f,prev:false})),...(d.radar.nowcast||[]).map(f=>({...f,prev:true}))];
     R.pastCount=(d.radar.past||[]).length;
-    R.sat=(d.satellite||[]).map(f=>({...f,prev:false}));
-    const newLen=curFrames().length;
+    const newLen=R.frames.length;
     R.idx = atEnd ? newLen-1 : Math.min(R.idx, newLen-1);
     $('#frameRange').max=Math.max(0,newLen-1);
     setFrame(R.idx);
   }catch(e){ console.warn('Radar indisponible :',e); }
 }
-const curFrames=()=>state.radar.mode==='radar'?state.radar.frames:state.radar.sat;
+const curFrames=()=>state.radar.frames;
 function tileURL(f){
-  const sch=state.radar.mode==='radar'?'2/1_1':'0/0';
-  return `${state.radar.host}${f.path}/512/{z}/{x}/{y}/${sch}.png`;
+  /* Schéma de couleur radar uniquement */
+  return `${state.radar.host}${f.path}/512/{z}/{x}/{y}/2/1_1.png`;
 }
 function setFrame(i){
-  const R=state.radar, frames=curFrames(); if(!frames.length)return;
+  const R=state.radar, frames=R.frames; if(!frames.length)return;
   R.idx=(i+frames.length)%frames.length;
   const f=frames[R.idx];
   if(state.overlay&&state.map){ state.map.removeLayer(state.overlay); state.overlay=null; }
   if(state.map){
-    state.overlay=L.tileLayer(tileURL(f),{opacity:R.op[R.mode],tileSize:512,zoomOffset:-1,maxNativeZoom:7,maxZoom:20});
+    state.overlay=L.tileLayer(tileURL(f),{opacity:R.op,tileSize:512,zoomOffset:-1,maxNativeZoom:7,maxZoom:20});
     state.overlay.addTo(state.map);
     if(state.bases.labels&&state.map.hasLayer(state.bases.labels))state.bases.labels.bringToFront();
   }
   $('#frameRange').value=R.idx; $('#frameRange').max=frames.length-1;
   const t=new Date(f.time*1000).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
-  $('#mapTime').innerHTML = state.radar.mode==='radar' ? t+(f.prev?'<span class="prev">PRÉVISION</span>':'') : t+' · IR';
+  $('#mapTime').innerHTML = t + (f.prev?'<span class="prev">PRÉVISION</span>':'');
   updateDelayNote();
 }
 function updateDelayNote(){
   const R=state.radar, el=$('#radarDelay');
-  if(R.mode==='radar'&&R.pastCount>0){
+  if(R.pastCount>0){
     const t=R.frames[R.pastCount-1].time;
     const dl=Math.max(0,Math.round((Date.now()/1000-t)/60));
     el.textContent=`Radar en différé d'environ ${dl} min · nouvelles images toutes les 5 min`;
-  }else if(R.mode==='sat'&&R.sat.length){
-    const t=R.sat[R.sat.length-1].time;
-    const dl=Math.max(0,Math.round((Date.now()/1000-t)/60));
-    el.textContent=`Image infrarouge vieille de ${dl} min`;
   }else el.textContent='';
 }
 function togglePlay(){
@@ -1779,17 +1768,9 @@ $$('#units button').forEach(b=>b.classList.toggle('on',b.dataset.u===state.units
 $('#playBtn').addEventListener('click',togglePlay);
 $('#frameRange').addEventListener('input',e=>{ if(state.radar.playing)togglePlay(); setFrame(+e.target.value); });
 $('#opRange').addEventListener('input',e=>{
-  const v=e.target.value/100; state.radar.op[state.radar.mode]=v;
+  const v=e.target.value/100; state.radar.op=v;
   if(state.overlay)state.overlay.setOpacity(v);
 });
-$$('#modeSeg button').forEach(b=>b.addEventListener('click',()=>{
-  if(state.radar.mode===b.dataset.m)return;
-  $$('#modeSeg button').forEach(x=>x.classList.toggle('on',x===b));
-  state.radar.mode=b.dataset.m;
-  if(state.radar.playing)togglePlay();
-  $('#opRange').value=state.radar.op[b.dataset.m]*100;
-  setFrame(b.dataset.m==='radar'?Math.max(0,state.radar.pastCount-1):Math.max(0,state.radar.sat.length-1));
-}));
 $$('#baseSeg button').forEach(b=>b.addEventListener('click',()=>{
   $$('#baseSeg button').forEach(x=>x.classList.toggle('on',x===b));
   if(!state.map)return;
@@ -1865,7 +1846,7 @@ let toastT=null;
 function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),3600); }
 
 /* ================= DÉMARRAGE ================= */
-const APP_VERSION = '1.1.0';
+const APP_VERSION = '1.1.1';
 console.log(`%c☁️ Plein Ciel v${APP_VERSION}`, 'color:#ffd166;font-size:18px;font-weight:bold');
 console.log('Développé avec ❤️ — météo Open-Meteo, radar RainViewer');
 $('#loadIco').innerHTML=icon(2,true);
@@ -1877,7 +1858,6 @@ load();
   /* ================= GÉOLOCALISATION AU DÉMARRAGE ================= */
 function geolocateOnStart() {
   if (!navigator.geolocation) return;
-  // Ne pas redemander si l'utilisateur a déjà refusé
   if (store.get('pc_geo_denied') === '1') return;
   
   navigator.geolocation.getCurrentPosition(
@@ -1891,7 +1871,6 @@ function geolocateOnStart() {
       setLoc(loc);
     },
     err => {
-      // Mémoriser le refus pour ne plus demander
       if (err.code === err.PERMISSION_DENIED) {
         store.set('pc_geo_denied', '1');
       }
@@ -1900,7 +1879,6 @@ function geolocateOnStart() {
   );
 }
 
-// Lancer 1,5s après le démarrage (laisse le temps au site de s'afficher)
 const inWebView = !!window.ReactNativeWebView;
 setTimeout(geolocateOnStart, inWebView ? 4000 : 1500);
 
