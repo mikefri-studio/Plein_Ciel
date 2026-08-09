@@ -164,6 +164,8 @@ body.has-alert .alert-bar{top:0}
 .hero-icon .wxi{width:clamp(140px,21vw,208px);height:auto;filter:drop-shadow(0 22px 44px rgba(0,15,40,.3));animation:bob 7s ease-in-out infinite}
 @keyframes bob{50%{transform:translateY(-12px)}}
 .updated{font-size:12.5px;color:var(--ink-soft);letter-spacing:.06em}
+.updated-stale{color:var(--accent)!important;font-weight:600}
+.updated-stale::after{content:' · actualisation…';opacity:.7}
 
 .rainnow{margin-top:26px}
 .rn-txt{font-size:16px;font-weight:600;margin-bottom:14px}
@@ -336,6 +338,13 @@ body.has-alert .alert-bar{top:0}
 .reveal.in{opacity:1;transform:none}
 footer{margin:60px 0 30px;text-align:center;color:var(--ink-soft);font-size:13px;line-height:1.9}
 footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
+#appVersion{
+  font-family:'Big Shoulders Display';
+  font-size:15px;
+  letter-spacing:.5px;
+  color:var(--ink);
+  opacity:.85;
+}
 #toast{position:fixed;bottom:26px;left:50%;transform:translate(-50%,80px);background:var(--panel);border:1px solid var(--line);
   color:var(--ink);padding:12px 22px;border-radius:999px;z-index:99;transition:transform .4s cubic-bezier(.2,.8,.2,1);font-weight:600;box-shadow:0 14px 40px rgba(0,10,30,.4)}
 #toast.show{transform:translate(-50%,0)}
@@ -572,7 +581,7 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
     </div>
   </section>
 
-  <!-- ===== NOUVEAU : installer l'appli / QR code ===== -->
+  <!-- ===== Installer l'appli / QR code ===== -->
   <section class="wrap reveal" id="appSec">
     <div class="sec-head"><h2>Emportez le ciel avec vous</h2><span class="note">Installez Plein Ciel comme une vraie application</span></div>
     <div class="card getapp">
@@ -603,7 +612,7 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
   <footer class="wrap">
     <div class="disp">PLEIN CIEL</div>
     Données météo, pollen &amp; marine : <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a> · Radar : RainViewer · Cartes : Leaflet<br>
-    Appli installable (PWA) — site statique, aucune clé API requise · <span id="year"></span>
+    <span id="year"></span> · Version <span id="appVersion"></span>
   </footer>
 </main>
 
@@ -1078,6 +1087,7 @@ function renderAll(){
   $('#feels').textContent=`Ressenti ${fmtT(c.apparent_temperature)}${unitT()}`;
   $('#heroIcon').innerHTML=icon(code,isDay);
   $('#updated').textContent=`Mis à jour à ${hm(c.time)}`;
+  $('#updated').classList.remove('updated-stale');
   const la=state.loc.lat.toFixed(2), lo=state.loc.lon.toFixed(2);
   $('#coords').textContent=`${Math.abs(la)}° ${la>=0?'N':'S'} · ${Math.abs(lo)}° ${lo>=0?'E':'O'}`;
   $('#chips').innerHTML=[
@@ -1758,30 +1768,30 @@ let toastT=null;
 function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),3600); }
 
 /* ================= DÉMARRAGE ================= */
+const APP_VERSION = '1.0.0';
+console.log(`%c☁️ Plein Ciel v${APP_VERSION}`, 'color:#ffd166;font-size:18px;font-weight:bold');
+console.log('Développé avec ❤️ — météo Open-Meteo, radar RainViewer');
 $('#loadIco').innerHTML=icon(2,true);
 $('#year').textContent=new Date().getFullYear();
+$('#appVersion').textContent=APP_VERSION;
 writeURL(state.loc);
 load();
 
 /* ================= ACTUALISATION AUTO ================= */
-/* Rafraîchit les données toutes les 5 minutes, silencieusement si l'onglet est ouvert */
 const REFRESH_MS = 5 * 60 * 1000;
 setInterval(async () => {
   try {
     await fetchData();
     renderAll();
     checkThunderAlert();
-    /* Petit indicateur visuel : le toast "Mis à jour à HH:MM" */
-    $('#updated').textContent = `Mis à jour à ${hm(state.fc.current.time)}`;
   } catch (e) {
     console.warn('Actualisation auto échouée, on réessaiera plus tard :', e);
+    $('#updated').classList.add('updated-stale');
   }
 }, REFRESH_MS);
 
-/* Rafraîchit immédiatement quand l'utilisateur revient sur l'onglet */
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible' && state.fc) {
-    /* Recharge uniquement si les données ont plus de 2 minutes */
     if (Date.now() - new Date(state.fc.current.time).getTime() > 2 * 60 * 1000) {
       load();
     }
@@ -1819,7 +1829,7 @@ window.addEventListener('offline',()=>toast('📴 Hors ligne — dernières donn
 window.addEventListener('online',()=>toast('📶 De retour en ligne'));
 
 /* ================= CARTE « EMPORTER LE CIEL » (QR + APK) ================= */
-const APK_URL=''; // ← Collez ici le lien de votre .apk (GitHub Releases) pour afficher le bouton 📦
+const APK_URL='';
 (function initGetApp(){
   const base=location.origin+location.pathname;
   const qr=$('#qrImg');
