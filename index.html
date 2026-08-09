@@ -1763,6 +1763,31 @@ $('#year').textContent=new Date().getFullYear();
 writeURL(state.loc);
 load();
 
+/* ================= ACTUALISATION AUTO ================= */
+/* Rafraîchit les données toutes les 5 minutes, silencieusement si l'onglet est ouvert */
+const REFRESH_MS = 5 * 60 * 1000;
+setInterval(async () => {
+  try {
+    await fetchData();
+    renderAll();
+    checkThunderAlert();
+    /* Petit indicateur visuel : le toast "Mis à jour à HH:MM" */
+    $('#updated').textContent = `Mis à jour à ${hm(state.fc.current.time)}`;
+  } catch (e) {
+    console.warn('Actualisation auto échouée, on réessaiera plus tard :', e);
+  }
+}, REFRESH_MS);
+
+/* Rafraîchit immédiatement quand l'utilisateur revient sur l'onglet */
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && state.fc) {
+    /* Recharge uniquement si les données ont plus de 2 minutes */
+    if (Date.now() - new Date(state.fc.current.time).getTime() > 2 * 60 * 1000) {
+      load();
+    }
+  }
+});
+
 /* ================= PWA ================= */
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
