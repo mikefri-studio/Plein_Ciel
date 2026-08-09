@@ -1,16 +1,17 @@
 {
-  "name": "Plein Ciel — Météo",
+  "name": "Plein Ciel — Météo en direct",
   "short_name": "Plein Ciel",
-  "description": "Météo complète : prévisions 16 jours, radar, satellite, vent animé, alertes orage.",
+  "description": "Météo complète : prévisions, radar, satellite, alertes orage.",
   "lang": "fr",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "orientation": "portrait-primary",
   "background_color": "#0d1734",
   "theme_color": "#1470c8",
   "icons": [
-    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
-    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
   ]
 }
