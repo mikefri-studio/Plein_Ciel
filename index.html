@@ -1874,6 +1874,34 @@ $('#appVersion').textContent=APP_VERSION;
 writeURL(state.loc);
 applyWidgets();
 load();
+  /* ================= GÉOLOCALISATION AU DÉMARRAGE ================= */
+function geolocateOnStart() {
+  if (!navigator.geolocation) return;
+  // Ne pas redemander si l'utilisateur a déjà refusé
+  if (store.get('pc_geo_denied') === '1') return;
+  
+  navigator.geolocation.getCurrentPosition(
+    p => {
+      const loc = {
+        lat: p.coords.latitude,
+        lon: p.coords.longitude,
+        name: 'Ma position',
+        sub: 'Position actuelle'
+      };
+      setLoc(loc);
+    },
+    err => {
+      // Mémoriser le refus pour ne plus demander
+      if (err.code === err.PERMISSION_DENIED) {
+        store.set('pc_geo_denied', '1');
+      }
+    },
+    { timeout: 10000, maximumAge: 600000, enableHighAccuracy: true }
+  );
+}
+
+// Lancer 1,5s après le démarrage (laisse le temps au site de s'afficher)
+setTimeout(geolocateOnStart, 1500);
 
 /* ================= ACTUALISATION AUTO ================= */
 const REFRESH_MS = 5 * 60 * 1000;
