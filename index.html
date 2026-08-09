@@ -1901,7 +1901,8 @@ function geolocateOnStart() {
 }
 
 // Lancer 1,5s après le démarrage (laisse le temps au site de s'afficher)
-setTimeout(geolocateOnStart, 1500);
+const inWebView = !!window.ReactNativeWebView;
+setTimeout(geolocateOnStart, inWebView ? 4000 : 1500);
 
 /* ================= ACTUALISATION AUTO ================= */
 const REFRESH_MS = 5 * 60 * 1000;
