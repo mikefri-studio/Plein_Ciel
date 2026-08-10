@@ -888,13 +888,14 @@ async function fetchJSON(url){
   return r.json();
 }
 async function reverseGeocode(lat,lon){
-  const key='pc_revgeo_'+lat.toFixed(2)+','+lon.toFixed(2);
+  const key='pc_revgeo2_'+lat.toFixed(2)+','+lon.toFixed(2);
   const c=store.get(key); if(c) return c;
   let r=null;
   try{
     const d=await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=fr`).then(x=>x.json());
-    const name=d.city||d.locality||d.principalSubdivision;
-    if(name) r={name, sub:[d.principalSubdivision,d.countryName].filter(Boolean).join(' · ')};
+    const clean=t=>(t||'').replace(/\s*\(.*?\)\s*$/,'');
+    const name=clean(d.city)||clean(d.locality)||clean(d.principalSubdivision);
+    if(name) r={name, sub:[clean(d.principalSubdivision),clean(d.countryName)].filter(Boolean).join(' · ')};
   }catch(e){ console.warn('Reverse geocoding 1 indisponible :',e); }
   if(!r) try{
     const d=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&accept-language=fr&zoom=12`).then(x=>x.json());
