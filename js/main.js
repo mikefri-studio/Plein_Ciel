@@ -1,0 +1,118 @@
+"use strict";
+/* ================= DÉMARRAGE ================= */
+const APP_VERSION = '1.2.0';
+console.log(`%c☁️ Plein Ciel v${APP_VERSION}`, 'color:#ffd166;font-size:18px;font-weight:bold');
+console.log('Développé avec ❤️ — météo Open-Meteo, radar RainViewer');
+$('#loadIco').innerHTML=icon(2,true);
+$('#year').textContent=new Date().getFullYear();
+$('#appVersion').textContent=APP_VERSION;
+writeURL(state.loc);
+applyWidgets();
+load();
+  /* ================= GÉOLOCALISATION AU DÉMARRAGE ================= */
+  /* v1.2.0 : ne casse plus les liens partagés, et évite le double chargement */
+function geolocateOnStart() {
+  if (!navigator.geolocation) return;
+  if (store.get('pc_geo_denied') === '1') return;
+  const urlLoc = locFromURL();
+  const saved = store.get('pc_loc');
+  if (urlLoc && (!saved || Math.hypot(urlLoc.lat - saved.lat, urlLoc.lon - saved.lon) > 0.05)) {
+    if (!urlLoc.name || urlLoc.name === 'Lieu partagé') {
+      reverseGeocode(urlLoc.lat, urlLoc.lon).then(g => { if (g) setLoc({ lat: urlLoc.lat, lon: urlLoc.lon, name: g.name, sub: g.sub }); });
+    }
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    async p => {
+      const lat = p.coords.latitude, lon = p.coords.longitude;
+      const close = Math.hypot(lat - state.loc.lat, lon - state.loc.lon) < 0.05;
+      const badName = !state.loc.name || state.loc.name === 'Lieu partagé' || state.loc.name === 'Ma position';
+      if (close && !badName) return;
+      const g = await reverseGeocode(lat, lon);
+      if (close) {
+        if (g) {
+          state.loc = { lat, lon, name: g.name, sub: g.sub };
+          store.set('pc_loc', state.loc); writeURL(state.loc); renderAll();
+        }
+        return;
+      }
+      setLoc({ lat, lon, name: g ? g.name : 'Ma position', sub: g ? g.sub : 'Position actuelle' });
+    },
+    err => {
+      if (err.code === err.PERMISSION_DENIED) {
+        store.set('pc_geo_denied', '1');
+      }
+    },
+    { timeout: 10000, maximumAge: 600000, enableHighAccuracy: true }
+  );
+}
+
+const inWebView = !!window.ReactNativeWebView;
+setTimeout(geolocateOnStart, inWebView ? 4000 : 1500);
+
+/* ================= ACTUALISATION AUTO ================= */
+const REFRESH_MS = 5 * 60 * 1000;
+setInterval(async () => {
+  try {
+    await fetchData();
+    renderAll();
+    checkThunderAlert();
+  } catch (e) {
+    console.warn('Actualisation auto échouée, on réessaiera plus tard :', e);
+    $('#updated').classList.add('updated-stale');
+  }
+}, REFRESH_MS);
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && state.fc) {
+    if (Date.now() - new Date(state.fc.current.time).getTime() > 2 * 60 * 1000) {
+      load();
+    }
+  }
+});
+
+/* ================= PWA ================= */
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js').catch(e=>console.warn('Service worker non enregistré :',e));
+  });
+}
+let deferredPrompt=null;
+const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault(); deferredPrompt=e; $('#installBtn').style.display='grid';
+});
+if(isIOS && !window.matchMedia('(display-mode: standalone)').matches) $('#installBtn').style.display='grid';
+function tryInstall(){
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(ch=>{
+      if(ch.outcome==='accepted'){ toast('Appli installée 🎉'); $('#installBtn').style.display='none'; }
+      deferredPrompt=null;
+    });
+  }else if(isIOS){
+    toast("Sur iPhone/iPad : bouton Partager puis « Sur l'écran d'accueil »");
+  }else{
+    toast("Menu du navigateur ⋮ → « Installer l'application »");
+  }
+}
+$('#installBtn').addEventListener('click',tryInstall);
+window.addEventListener('appinstalled',()=>toast('Plein Ciel ajouté à votre appareil 🎉'));
+window.addEventListener('offline',()=>toast('📴 Hors ligne — dernières données affichées'));
+window.addEventListener('online',()=>toast('📶 De retour en ligne'));
+
+/* ================= CARTE « EMPORTER LE CIEL » (QR + APK) ================= */
+const APK_URL='';
+(function initGetApp(){
+  const base=location.origin+location.pathname;
+  const qr=$('#qrImg');
+  if(qr){
+    qr.src=`https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=10&data=${encodeURIComponent(base)}`;
+    qr.addEventListener('error',()=>{ qr.style.display='none'; });
+  }
+  if(APK_URL){ const a=$('#gaApkBtn'); a.style.display='inline-flex'; a.href=APK_URL; a.target='_blank'; a.rel='noopener'; }
+  const gb=$('#gaInstallBtn'); if(gb) gb.addEventListener('click',tryInstall);
+  const cb=$('#gaCopyBtn'); if(cb) cb.addEventListener('click',async()=>{
+    try{ await navigator.clipboard.writeText(base); toast('Lien copié 📋'); }catch(e){ toast('Copie impossible'); }
+  });
+})();
