@@ -664,7 +664,9 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 /* ================= ÉTAT ================= */
 function locFromURL(){
   try{
-    const u=new URL(location.href), lat=+u.searchParams.get('lat'), lon=+u.searchParams.get('lon'), n=u.searchParams.get('n'), s=u.searchParams.get('s');
+    const u=new URL(location.href), la=u.searchParams.get('lat'), lo=u.searchParams.get('lon'), n=u.searchParams.get('n'), s=u.searchParams.get('s');
+    if(la==null||lo==null) return null;
+    const lat=+la, lon=+lo;
     if(isFinite(lat)&&isFinite(lon)) return {lat,lon,name:n||'Lieu partagé',sub:s||''};
   }catch(e){}
   return null;
