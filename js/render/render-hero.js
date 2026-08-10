@@ -1,4 +1,5 @@
 "use strict";
+const safe=(name,f)=>{ try{ f(); }catch(err){ console.error('Erreur de rendu ['+name+'] :',err); } };
 function renderAll(){
   const fc=state.fc, c=fc.current, day=fc.daily, isDay=c.is_day===1, code=c.weather_code;
   const grp=condGroup(code);
