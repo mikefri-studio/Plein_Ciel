@@ -1128,7 +1128,9 @@ function updateAlertBar(info){
   }
   const city=state.loc.name;
   let msg='';
-  if(info.level===3){
+  if(info.radar){
+    msg = info.level>=3 ? `<b>CELLULE ORAGEUSE AU RADAR</b> · ${city} — fortes précipitations en cours, mettez-vous à l'abri` : `<b>PLUIE AU RADAR</b> · ${city} — précipitations détectées à proximité`;
+  } else if(info.level===3){
     msg=`<b>ORAGE EN COURS</b> · ${city} — mettez-vous à l'abri`;
   }else{
     const h=Math.floor(info.inMinutes/60), m=info.inMinutes%60;
@@ -1141,8 +1143,41 @@ function updateAlertBar(info){
   document.body.classList.add('has-alert');
   requestAnimationFrame(syncAlertHeight);
 }
-function checkThunderAlert(forceNotify=false){
-  const info=analyzeThunder();
+async function radarLevelAtLoc(){
+  const R=state.radar;
+  if(!R.host||!R.frames.length) return 0;
+  const frame=R.frames[Math.max(0,R.pastCount-1)];
+  const z=7, n=1<<z;
+  const lat=state.loc.lat, lon=state.loc.lon;
+  const xf=(lon+180)/360*n, yf=(1-Math.log(Math.tan(lat*Math.PI/180)+1/Math.cos(lat*Math.PI/180))/Math.PI)/2*n;
+  const x=Math.floor(xf), y=Math.floor(yf);
+  const url=`${R.host}${frame.path}/256/${z}/${x}/${y}/2/1_1.png`;
+  const blob=await fetch(url).then(r=>r.ok?r.blob():null);
+  if(!blob) return 0;
+  const bmp=await createImageBitmap(blob);
+  const cv=document.createElement('canvas'); cv.width=256; cv.height=256;
+  const cx=cv.getContext('2d',{willReadFrequently:true});
+  cx.drawImage(bmp,0,0);
+  const px=Math.round((xf-x)*256), py=Math.round((yf-y)*256);
+  const x0=Math.max(0,px-4), y0=Math.max(0,py-4);
+  const d=cx.getImageData(x0,y0,9,9).data;
+  let lvl=0;
+  for(let i=0;i<d.length;i+=4){
+    if(d[i+3]<20) continue;
+    const r=d[i], g=d[i+1], b=d[i+2];
+    if((r>200&&g<180)||(r>140&&b>190)) return 3;
+    lvl=1;
+  }
+  return lvl;
+}
+async function checkThunderAlert(forceNotify=false){
+  let info=analyzeThunder();
+  if(info.level===0){
+    try{
+      const r=await radarLevelAtLoc();
+      if(r>0) info={level:r, radar:true, firstTime:'radar'+(state.radar.frames[Math.max(0,state.radar.pastCount-1)]||{time:0}).time};
+    }catch(e){}
+  }
   updateAlertBar(info);
   if(info.level===0) return;
   const episodeId=info.firstTime+'-'+info.level;
@@ -1594,6 +1629,7 @@ async function loadRadarFrames(){
     R.idx = atEnd ? newLen-1 : Math.min(R.idx, newLen-1);
     $('#frameRange').max=Math.max(0,newLen-1);
     setFrame(R.idx);
+    checkThunderAlert();
   }catch(e){ console.warn('Radar indisponible :',e); }
 }
 const curFrames=()=>state.radar.frames;
