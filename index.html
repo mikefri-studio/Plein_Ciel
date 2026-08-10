@@ -1927,12 +1927,28 @@ load();
 function geolocateOnStart() {
   if (!navigator.geolocation) return;
   if (store.get('pc_geo_denied') === '1') return;
-  if (locFromURL()) return; // 🔗 lien partagé (?lat=…&lon=…) : on respecte le lieu du lien
+  const urlLoc = locFromURL();
+  const saved = store.get('pc_loc');
+  if (urlLoc && (!saved || Math.hypot(urlLoc.lat - saved.lat, urlLoc.lon - saved.lon) > 0.05)) {
+    if (!urlLoc.name || urlLoc.name === 'Lieu partagé') {
+      reverseGeocode(urlLoc.lat, urlLoc.lon).then(g => { if (g) setLoc({ lat: urlLoc.lat, lon: urlLoc.lon, name: g.name, sub: g.sub }); });
+    }
+    return;
+  }
   navigator.geolocation.getCurrentPosition(
     async p => {
       const lat = p.coords.latitude, lon = p.coords.longitude;
-      if (Math.hypot(lat - state.loc.lat, lon - state.loc.lon) < 0.05) return;
+      const close = Math.hypot(lat - state.loc.lat, lon - state.loc.lon) < 0.05;
+      const badName = !state.loc.name || state.loc.name === 'Lieu partagé' || state.loc.name === 'Ma position';
+      if (close && !badName) return;
       const g = await reverseGeocode(lat, lon);
+      if (close) {
+        if (g) {
+          state.loc = { lat, lon, name: g.name, sub: g.sub };
+          store.set('pc_loc', state.loc); writeURL(state.loc); renderAll();
+        }
+        return;
+      }
       setLoc({ lat, lon, name: g ? g.name : 'Ma position', sub: g ? g.sub : 'Position actuelle' });
     },
     err => {
