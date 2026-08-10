@@ -677,7 +677,7 @@ const state={
   fc:null, aq:null, marine:null, wind:null, climate:null, fx:'none', aqStale:false,
   radar:{host:'',frames:[],pastCount:0,idx:0,playing:false,timer:null,op:.75},
   map:null, bases:{}, overlay:null, marker:null, mapInited:false,
-  windLayer:null, windOn:true, mapVisible:false,
+  windLayer:null, windOn:true, mapVisible:false, baseMode:'sat',
   alert:{muted: store.get('pc_alert_muted')==='1', lastSeen: store.get('pc_alert_seen')||'', perm: ('Notification' in window)?Notification.permission:'default'},
   audioCtx:null
 };
@@ -1634,7 +1634,7 @@ function initWindLayer(){
       ctx.globalCompositeOperation='destination-out';
       ctx.fillRect(0,0,c.width,c.height);
       ctx.globalCompositeOperation='lighter';
-      ctx.strokeStyle='rgba(255,255,255,0.55)';
+      ctx.strokeStyle=state.baseMode==='plan'?'rgba(15,60,120,0.65)':'rgba(255,255,255,0.55)';
       ctx.lineWidth=1.2;
       ctx.beginPath();
       for(const p of this._parts){
@@ -1807,7 +1807,8 @@ $('#opRange').addEventListener('input',e=>{
 $$('#baseSeg button').forEach(b=>b.addEventListener('click',()=>{
   $$('#baseSeg button').forEach(x=>x.classList.toggle('on',x===b));
   if(!state.map)return;
-  const sat=b.dataset.b==='sat';
+  state.baseMode=b.dataset.b;
+const sat=b.dataset.b==='sat';
   const want=sat?state.bases.sat:state.bases.plan, other=sat?state.bases.plan:state.bases.sat;
   state.map.removeLayer(other); want.addTo(state.map);
   if(sat)state.bases.labels.addTo(state.map); else state.map.removeLayer(state.bases.labels);
