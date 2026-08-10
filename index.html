@@ -677,7 +677,7 @@ const state={
   fc:null, aq:null, marine:null, wind:null, climate:null, fx:'none', aqStale:false,
   radar:{host:'',frames:[],pastCount:0,idx:0,playing:false,timer:null,op:.75},
   map:null, bases:{}, overlay:null, marker:null, mapInited:false,
-  windLayer:null, windOn:true, mapVisible:false, baseMode:'sat',
+  windLayer:null, windOn:true, mapVisible:false, baseMode:'sat', baseMode:'sat',
   alert:{muted: store.get('pc_alert_muted')==='1', lastSeen: store.get('pc_alert_seen')||'', perm: ('Notification' in window)?Notification.permission:'default'},
   audioCtx:null
 };
@@ -886,6 +886,24 @@ async function fetchJSON(url){
   const r=await fetch(url,{cache:'no-store'});
   if(!r.ok) throw new Error('HTTP '+r.status+' — '+url.split('?')[0]);
   return r.json();
+}
+async function reverseGeocode(lat,lon){
+  const key='pc_revgeo_'+lat.toFixed(2)+','+lon.toFixed(2);
+  const c=store.get(key); if(c) return c;
+  let r=null;
+  try{
+    const d=await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=fr`).then(x=>x.json());
+    const name=d.city||d.locality||d.principalSubdivision;
+    if(name) r={name, sub:[d.principalSubdivision,d.countryName].filter(Boolean).join(' · ')};
+  }catch(e){ console.warn('Reverse geocoding 1 indisponible :',e); }
+  if(!r) try{
+    const d=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&accept-language=fr&zoom=12`).then(x=>x.json());
+    const a=d.address||{};
+    const name=a.village||a.town||a.city||a.municipality||a.county;
+    if(name) r={name, sub:[a.state,a.country].filter(Boolean).join(' · ')};
+  }catch(e){ console.warn('Reverse geocoding 2 indisponible :',e); }
+  if(r) store.set(key,r);
+  return r;
 }
 /* v1.2.0 : le pollen n'existe qu'en « hourly » (le paramètre daily faisait planter l'API) */
 function aqURL(lat,lon){
@@ -1782,7 +1800,10 @@ $('#geoBtn').addEventListener('click',()=>{
   if(!navigator.geolocation)return toast('Géolocalisation non disponible.');
   toast('Recherche de votre position…');
   navigator.geolocation.getCurrentPosition(
-    p=>setLoc({lat:p.coords.latitude,lon:p.coords.longitude,name:'Ma position',sub:'Position actuelle'}),
+    async p=>{
+      const g=await reverseGeocode(p.coords.latitude,p.coords.longitude);
+      setLoc({lat:p.coords.latitude,lon:p.coords.longitude,name:g?g.name:'Ma position',sub:g?g.sub:'Position actuelle'});
+    },
     ()=>toast('Géolocalisation refusée — position par défaut conservée.'),
     {timeout:8000}
   );
@@ -1896,10 +1917,11 @@ function geolocateOnStart() {
   if (store.get('pc_geo_denied') === '1') return;
   if (locFromURL()) return; // 🔗 lien partagé (?lat=…&lon=…) : on respecte le lieu du lien
   navigator.geolocation.getCurrentPosition(
-    p => {
+    async p => {
       const lat = p.coords.latitude, lon = p.coords.longitude;
-      if (Math.hypot(lat - state.loc.lat, lon - state.loc.lon) < 0.05) return; // 📍 déjà ~à côté : pas de 2e chargement
-      setLoc({ lat, lon, name: 'Ma position', sub: 'Position actuelle' });
+      if (Math.hypot(lat - state.loc.lat, lon - state.loc.lon) < 0.05) return;
+      const g = await reverseGeocode(lat, lon);
+      setLoc({ lat, lon, name: g ? g.name : 'Ma position', sub: g ? g.sub : 'Position actuelle' });
     },
     err => {
       if (err.code === err.PERMISSION_DENIED) {
