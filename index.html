@@ -216,7 +216,8 @@ body.has-alert .alert-bar{top:0}
 
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);
   border-radius:18px;overflow:hidden}
-.stat{background:var(--card);padding:16px 18px;display:flex;flex-direction:column;gap:9px;backdrop-filter:blur(6px);transition:background .3s}
+.stat{background:var(--card);padding:16px 18px;display:flex;flex-direction:column;gap:9px;backdrop-filter:blur(6px);transition:background .3s;cursor:pointer}
+.stat:hover{background:color-mix(in srgb,var(--card) 82%,var(--accent) 10%)}
 
 .stat .val{font-size:21px;font-weight:700;display:flex;align-items:center;gap:9px}
 .stat .val small{font-size:12.5px;font-weight:600;color:var(--ink-soft)}
@@ -1177,7 +1178,15 @@ const INFO={
  air:{t:'Qualité de l\'air',x:'<b>Indice européen</b> de 0 (très bon) à plus de 100 (exécrable).<br>PM2,5 / PM10 = particules fines en µg/m³ : plus la valeur est basse, mieux c\'est.<br>Si le service est en panne, les dernières valeurs connues sont affichées et le site réessaie tout seul.'},
  pollen:{t:'Pollen & allergies',x:'Pic du jour pour chaque pollen (grains/m³).<br>La <b>barre</b> et le label donnent le niveau de risque d\'allergie : nul, faible, modéré, élevé, très élevé.<br><i>Prévision CAMS — Europe uniquement.</i>'},
  marine:{t:'Conditions marines',x:'Données du point de mer le plus proche.<br>· <b>Eau</b> : température de la mer.<br>· <b>Vagues / houle</b> : hauteur en mètres et direction d\'origine.<br>· <b>Période</b> : temps entre deux vagues ; plus elle est longue, plus la houle est établie.'},
- map:{t:'Carte radar & vent',x:'· <b>Radar</b> : précipitations des 2 dernières heures + courte prévision, en différé d\'environ 20-30 min (temps de traitement).<br>· <b>Vent</b> : particules animées (direction et force).<br>▶ anime la frise, le curseur déplace l\'heure, « Opacité » règle le calque radar.'}
+ map:{t:'Carte radar & vent',x:'· <b>Radar</b> : précipitations des 2 dernières heures + courte prévision, en différé d\'environ 20-30 min (temps de traitement).<br>· <b>Vent</b> : particules animées (direction et force).<br>▶ anime la frise, le curseur déplace l\'heure, « Opacité » règle le calque radar.'},
+ swind:{t:'Vent',x:'Vitesse moyenne du vent à <b>10 m du sol</b>. La boussole indique la direction <b>d\'où vient</b> le vent (NE = vent venant du nord-est).'},
+ sgust:{t:'Rafales',x:'Vitesse maximale du vent sur quelques secondes. Elles deviennent dangereuses au-delà de ~80 km/h.'},
+ shum:{t:'Humidité',x:'Part de vapeur d\'eau dans l\'air. <b>&lt; 35 %</b> : air sec · <b>&gt; 70 %</b> : air humide · au-delà de 80 % avec la chaleur : sensation de lourdeur.'},
+ sdew:{t:'Point de rosée',x:'Température à laquelle l\'air devient saturé. <b>&lt; 10°</b> : air sec · <b>16-18°</b> : confortable · <b>&gt; 20°</b> : temps lourd, propice aux orages.'},
+ spress:{t:'Pression',x:'Pression ramenée au niveau de la mer. <b>&gt; 1020 hPa</b> : anticyclone, temps stable · <b>&lt; 1005 hPa</b> : dépression, temps perturbé. Une chute rapide annonce souvent du vent.'},
+ suv:{t:'Indice UV',x:'Intensité du rayonnement ultraviolet au sol. <b>0-2</b> faible · <b>3-5</b> modéré · <b>6-7</b> élevé (protection conseillée) · <b>8-10</b> très élevé · <b>11+</b> extrême.'},
+ svis:{t:'Visibilité',x:'Distance maximale à laquelle on distingue un objet. Sous 5 km : brume, brouillard ou pluie · au-dessus de 10 km : bonne visibilité.'},
+ scloud:{t:'Nébulosité',x:'Fraction du ciel couverte par les nuages. 0 % = ciel dégagé · 100 % = ciel totalement couvert.'}
 };
 function openInfo(k){
   const d=INFO[k]; if(!d)return;
@@ -1188,6 +1197,8 @@ function openInfo(k){
 document.addEventListener('click',e=>{
   const b=e.target.closest('.info-btn');
   if(b){ openInfo(b.dataset.info); return; }
+  const st=e.target.closest('.stat[data-info]');
+  if(st){ openInfo(st.dataset.info); return; }
   if(e.target.id==='infoModal') $('#infoModal').classList.remove('open');
 });
 $('#imClose').addEventListener('click',()=>$('#infoModal').classList.remove('open'));
@@ -1374,16 +1385,16 @@ function renderStats(){
   const uvLab=uv==null?'—':uv<3?'Faible':uv<6?'Modéré':uv<8?'Élevé':uv<11?'Très élevé':'Extrême';
   const cc=c.cloud_cover, ccLab=cc<=25?'ciel dégagé':cc<=60?'partiellement nuageux':'ciel couvert';
   $('#stats').innerHTML=`
-    <div class="stat"><span class="lbl">Vent</span>
+    <div class="stat" data-info="swind" title="En savoir plus"><span class="lbl">Vent</span>
       <span class="val"><svg class="compass" viewBox="0 0 30 30"><circle cx="15" cy="15" r="13"/><path class="arr" style="transform:rotate(${Math.round(c.wind_direction_10m)}deg)" d="M15 7l3.4 9-3.4-2.4-3.4 2.4z"/></svg>${fmtW(c.wind_speed_10m)}</span>
       <span class="sub">Direction ${cardOf(c.wind_direction_10m)} (${Math.round(c.wind_direction_10m)}°)</span></div>
-    <div class="stat"><span class="lbl">Rafales</span><span class="val">${fmtW(c.wind_gusts_10m)}</span><span class="sub">vent instantané max</span></div>
-    <div class="stat"><span class="lbl">Humidité</span><span class="val">${c.relative_humidity_2m}<small>%</small></span><span class="sub">${c.relative_humidity_2m>=70?'atmosphère humide':c.relative_humidity_2m<=35?'air très sec':'confortable'}</span></div>
-    <div class="stat"><span class="lbl">Point de rosée</span><span class="val">${dp!=null?fmtT(dp)+unitT():'—'}</span><span class="sub">${dpLab}</span></div>
-    <div class="stat"><span class="lbl">Pression</span><span class="val">${Math.round(c.pressure_msl)}<small>hPa</small></span><span class="sub">${c.pressure_msl>1020?'anticyclone':c.pressure_msl<1005?'dépressionnaire':'stable'}</span></div>
-    <div class="stat"><span class="lbl">Indice UV</span><span class="val">${uv!=null?Math.round(uv*10)/10:'—'}<small>${uvLab}</small></span><span class="uvbar"><i style="left:${Math.min(100,(uv||0)/11*100)}%"></i></span></div>
-    <div class="stat"><span class="lbl">Visibilité</span><span class="val">${fmtVis(vis)}</span><span class="sub">${vis!=null&&vis/1000<5?'visibilité réduite':'bonne visibilité'}</span></div>
-    <div class="stat"><span class="lbl">Nébulosité</span><span class="val">${cc}<small>%</small></span><span class="sub">${ccLab}</span></div>`;
+    <div class="stat" data-info="sgust" title="En savoir plus"><span class="lbl">Rafales</span><span class="val">${fmtW(c.wind_gusts_10m)}</span><span class="sub">vent instantané max</span></div>
+    <div class="stat" data-info="shum" title="En savoir plus"><span class="lbl">Humidité</span><span class="val">${c.relative_humidity_2m}<small>%</small></span><span class="sub">${c.relative_humidity_2m>=70?'atmosphère humide':c.relative_humidity_2m<=35?'air très sec':'confortable'}</span></div>
+    <div class="stat" data-info="sdew" title="En savoir plus"><span class="lbl">Point de rosée</span><span class="val">${dp!=null?fmtT(dp)+unitT():'—'}</span><span class="sub">${dpLab}</span></div>
+    <div class="stat" data-info="spress" title="En savoir plus"><span class="lbl">Pression</span><span class="val">${Math.round(c.pressure_msl)}<small>hPa</small></span><span class="sub">${c.pressure_msl>1020?'anticyclone':c.pressure_msl<1005?'dépressionnaire':'stable'}</span></div>
+    <div class="stat" data-info="suv" title="En savoir plus"><span class="lbl">Indice UV</span><span class="val">${uv!=null?Math.round(uv*10)/10:'—'}<small>${uvLab}</small></span><span class="uvbar"><i style="left:${Math.min(100,(uv||0)/11*100)}%"></i></span></div>
+    <div class="stat" data-info="svis" title="En savoir plus"><span class="lbl">Visibilité</span><span class="val">${fmtVis(vis)}</span><span class="sub">${vis!=null&&vis/1000<5?'visibilité réduite':'bonne visibilité'}</span></div>
+    <div class="stat" data-info="scloud" title="En savoir plus"><span class="lbl">Nébulosité</span><span class="val">${cc}<small>%</small></span><span class="sub">${ccLab}</span></div>`;
 }
 
 function renderHours(){
