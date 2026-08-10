@@ -588,6 +588,7 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
         <div id="mapTime">—</div>
         <div class="opwrap">Opacité <input type="range" id="opRange" min="20" max="100" value="75"></div>
         <div class="opwrap"><label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="windToggle" checked style="accent-color:var(--accent)"> Vent</label></div>
+        <div class="seg" id="windLevelSeg"><button data-l="10">Vent sol</button><button data-l="700" class="on">Vent 3 km</button></div>
       </div>
       <div class="legend"><span>Faible</span><span class="bar"></span><span>Fort</span><span>· Grêle / neige en blanc</span><span id="radarDelay"></span></div>
       <div class="map-attr">Imagerie © <a href="https://www.rainviewer.com" target="_blank" rel="noopener">RainViewer</a> · Vent : Open-Meteo · Fonds © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>/CARTO &amp; Esri</div>
@@ -680,7 +681,7 @@ const state={
   fc:null, aq:null, marine:null, wind:null, climate:null, fx:'none', aqStale:false,
   radar:{host:'',frames:[],pastCount:0,idx:0,playing:false,timer:null,op:.75},
   map:null, bases:{}, overlay:null, marker:null, mapInited:false,
-  windLayer:null, windOn:true, mapVisible:false, baseMode:'sat', baseMode:'sat',
+  windLayer:null, windOn:true, mapVisible:false, baseMode:'sat', windLevel:'10', windChoice:'700', baseMode:'sat',
   alert:{muted: store.get('pc_alert_muted')==='1', lastSeen: store.get('pc_alert_seen')||'', perm: ('Notification' in window)?Notification.permission:'default'},
   audioCtx:null
 };
@@ -1855,6 +1856,14 @@ $('#windToggle').addEventListener('change',e=>{
     if(state.windOn)state.windLayer._ensureParts();
   }
 });
+$$('#windLevelSeg button').forEach(b=>b.addEventListener('click',async()=>{
+  if(state.windChoice===b.dataset.l)return;
+  state.windChoice=b.dataset.l;
+  $$('#windLevelSeg button').forEach(x=>x.classList.toggle('on',x===b));
+  toast(b.dataset.l==='700'?'Particules : vent à 3 km (celui qui pousse les nuages)':'Particules : vent au sol (10 m)');
+  state.wind=await fetchWindGrid(state.loc.lat,state.loc.lon);
+  updateWindParticles();
+}));
 
 /* ================= FX CANVAS ================= */
 const cv=$('#fx'), ctx=cv.getContext('2d');
