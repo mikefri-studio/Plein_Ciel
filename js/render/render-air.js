@@ -14,7 +14,7 @@ function renderAir(){
 }
 
 const polInfo=v=> v<=0?['Nul','#9aa7b3']:v<15?['Faible','#35c26b']:v<50?['Modéré','#ffd23f']:v<100?['Élevé','#ff9f43']:['Très élevé','#ff6b6b'];
-/* v1.2.0 : pollen lu dans « hourly » (pic du jour) + message propre hors Europe */
+/* v1.4.0 : pollen lu dans « hourly » (pic du jour) + message propre hors Europe */
 function renderPollen(){
   const h=state.aq&&state.aq.hourly?state.aq.hourly:null;
   const wrap=$('#pollenBox'), badge=$('#polBadge');

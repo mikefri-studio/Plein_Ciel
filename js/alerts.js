@@ -49,7 +49,7 @@ function sendBrowserNotification(title,body){
     try{ new Notification(title,{body,tag:'pleinciel-thunder'}); }catch(e){}
   }
 }
-/* v1.2.0 : hauteur de bannière mesurée → plus de chevauchement du header sur mobile */
+/* v1.4.0 : hauteur de bannière mesurée → plus de chevauchement du header sur mobile */
 function syncAlertHeight(){
   if(!document.body.classList.contains('has-alert'))return;
   const h=$('#alertBar').offsetHeight;

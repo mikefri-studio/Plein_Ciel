@@ -1,4 +1,4 @@
-const CACHE = 'pleinciel-v4';
+const CACHE = 'pleinciel-1.4.0';
 const CORE = [
   './', 'index.html', 'css/style.css',
   'js/core.js','js/api.js','js/alerts.js','js/info.js',

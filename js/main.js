@@ -1,6 +1,6 @@
 "use strict";
 /* ================= DÉMARRAGE ================= */
-const APP_VERSION = '1.2.0';
+const APP_VERSION = '1.4.0';
 console.log(`%c☁️ Plein Ciel v${APP_VERSION}`, 'color:#ffd166;font-size:18px;font-weight:bold');
 console.log('Développé avec ❤️ — météo Open-Meteo, radar RainViewer');
 $('#loadIco').innerHTML=icon(2,true);
@@ -10,7 +10,7 @@ writeURL(state.loc);
 applyWidgets();
 load();
   /* ================= GÉOLOCALISATION AU DÉMARRAGE ================= */
-  /* v1.2.0 : ne casse plus les liens partagés, et évite le double chargement */
+  /* v1.4.0 : ne casse plus les liens partagés, et évite le double chargement */
 function geolocateOnStart() {
   if (!navigator.geolocation) return;
   if (store.get('pc_geo_denied') === '1') return;

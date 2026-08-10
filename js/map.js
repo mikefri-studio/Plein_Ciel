@@ -78,7 +78,7 @@ function refreshMapFocus(){
   updateWindParticles();
 }
 new IntersectionObserver((es,ob)=>{ if(es[0].isIntersecting){ initMap(); ob.disconnect(); } },{rootMargin:'200px'}).observe($('#secMap'));
-/* v1.2.0 : pause les particules de vent quand la carte n'est pas à l'écran (batterie) */
+/* v1.4.0 : pause les particules de vent quand la carte n'est pas à l'écran (batterie) */
 new IntersectionObserver(es=>{ state.mapVisible=es[0].isIntersecting; },{rootMargin:'120px'}).observe($('#secMap'));
 
 /* ================= PARTICULES DE VENT ================= */

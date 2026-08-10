@@ -1,6 +1,6 @@
 "use strict";
 const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
-/* v1.2.0 : store.set sécurisé (navigation privée Safari, quota, etc.) */
+/* v1.4.0 : store.set sécurisé (navigation privée Safari, quota, etc.) */
 const store={get:k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 

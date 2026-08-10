@@ -24,7 +24,7 @@ async function reverseGeocode(lat,lon){
   if(r) store.set(key,r);
   return r;
 }
-/* v1.2.0 : le pollen n'existe qu'en « hourly » (le paramètre daily faisait planter l'API) */
+/* v1.4.0 : le pollen n'existe qu'en « hourly » (le paramètre daily faisait planter l'API) */
 function aqURL(lat,lon){
   return `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}`
     +`&current=european_aqi,pm2_5,pm10`
@@ -78,7 +78,7 @@ async function fetchWindGrid(lat,lon){
   }catch(e){ console.warn('Wind grid indisponible :',e); }
   return null;
 }
-/* v1.2.0 : archive mise en cache 24 h (ces données ne changent qu'une fois par jour) */
+/* v1.4.0 : archive mise en cache 24 h (ces données ne changent qu'une fois par jour) */
 async function fetchClimate(lat,lon){
   const key='pc_clim_'+lat.toFixed(2)+','+lon.toFixed(2);
   const c=store.get(key);
