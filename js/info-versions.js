@@ -5,6 +5,27 @@
   document.head.appendChild(st);
 })();
 
+/* Rend cliquable n'importe quel texte "Version x.y.z" de la page */
+(function(){
+  function wrap(){
+    const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
+    let node;
+    while((node=walker.nextNode())){
+      if(node.parentElement && node.parentElement.closest('.footer-version')) continue;
+      if(/Version\s+\d/.test(node.textContent)){
+        const span=document.createElement('span');
+        span.className='footer-version';
+        span.title='Historique des versions';
+        node.parentNode.replaceChild(span,node);
+        span.appendChild(node);
+        break;
+      }
+    }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wrap);
+  else wrap();
+})();
+
 function versionBlock(num,date,items){
   return '<div style="margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.12)">'
    +'<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-weight:700;color:#ffd166">v'+num+'</span><span style="opacity:.6;font-size:12px">'+date+'</span></div>'
@@ -50,5 +71,5 @@ function openVersions(){
 }
 
 document.addEventListener('click',e=>{
-  if(e.target.closest('.footer-version')) openVersions();
+  if(e.target.closest && e.target.closest('.footer-version')) openVersions();
 });
