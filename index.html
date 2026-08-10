@@ -402,8 +402,6 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
   <svg class="bolt" viewBox="0 0 24 24"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg>
   <div class="atxt" id="alertText"><b>ALERTE ORAGE</b> · Analyse en cours…</div>
   <div class="abtns">
-    <button id="alertNotifBtn" title="Recevoir les alertes même en arrière-plan">🔔 Activer les notifications</button>
-    <button id="alertMuteBtn" title="Couper le bip sonore">🔊 Son</button>
     <button id="alertCloseBtn" title="Fermer">✕</button>
   </div>
 </div>
@@ -644,6 +642,10 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
     <button class="imClose" id="setClose" aria-label="Fermer">✕</button>
     <h4>⚙️ Personnaliser l'affichage</h4>
     <p class="sub" style="margin-bottom:12px">Cochez les widgets à afficher. Votre choix est enregistré sur cet appareil.</p>
+    <div class="lbl" style="margin:4px 0 6px">Alertes orage</div>
+    <label class="wrow"><input type="checkbox" id="setNotif"><span class="we">🔔</span><span class="wl">Notifications d'orage</span></label>
+    <label class="wrow"><input type="checkbox" id="setSound"><span class="we">🔊</span><span class="wl">Bip sonore en cas d'alerte</span></label>
+    <div class="lbl" style="margin:14px 0 6px">Widgets affichés</div>
     <div id="widgetList"></div>
     <div class="set-actions">
       <button class="ga-btn ghost" id="widgetReset">Tout réafficher</button>
@@ -1104,6 +1106,7 @@ function playAlertSound(){
   }catch(e){ console.warn('Son alerte indisponible',e); }
 }
 function sendBrowserNotification(title,body){
+  if(store.get('pc_alert_notif')!=='1') return;
   if(!('Notification' in window)) return;
   if(Notification.permission==='granted'){
     try{ new Notification(title,{body,tag:'pleinciel-thunder'}); }catch(e){}
@@ -1155,36 +1158,34 @@ function checkThunderAlert(forceNotify=false){
   ];
   sendBrowserNotification('⛈️ '+titles[info.level-1], bodies[info.level-1]);
 }
-$('#alertNotifBtn').addEventListener('click',async()=>{
-  if(!('Notification' in window)) return toast('Notifications non supportées par ce navigateur.');
-  try{
-    const p=await Notification.requestPermission();
-    state.alert.perm=p;
-    if(p==='granted'){
-      toast('🔔 Notifications activées — vous serez prévenu même en arrière-plan');
-      sendBrowserNotification('⛈️ Notifications Plein Ciel','Vous serez alerté en cas d\'orage.');
-      $('#alertNotifBtn').textContent='🔔 Activées ✓';
-    } else if(p==='denied'){
-      toast('Notifications bloquées — autorisez-les dans les paramètres du site.');
-    }
-  }catch(e){ toast('Impossible de demander la permission.'); }
-});
-$('#alertMuteBtn').addEventListener('click',()=>{
-  state.alert.muted=!state.alert.muted;
-  store.set('pc_alert_muted',state.alert.muted?'1':'0');
-  $('#alertMuteBtn').textContent=state.alert.muted?'🔇 Son coupé':'🔊 Son';
-  toast(state.alert.muted?'Bip sonore désactivé':'Bip sonore activé');
-});
 $('#alertCloseBtn').addEventListener('click',()=>{
   $('#alertBar').classList.remove('on');
   document.body.classList.remove('has-alert');
 });
-(function initNotifBtn(){
-  if(!('Notification' in window)) return;
-  if(Notification.permission==='granted') $('#alertNotifBtn').textContent='🔔 Activées ✓';
-  else if(Notification.permission==='denied') $('#alertNotifBtn').textContent='🔔 Bloquées';
-})();
-$('#alertMuteBtn').textContent=state.alert.muted?'🔇 Son coupé':'🔊 Son';
+function syncAlertPrefs(){
+  const n=$('#setNotif'), s=$('#setSound');
+  if(n) n.checked = store.get('pc_alert_notif')==='1';
+  if(s) s.checked = !state.alert.muted;
+}
+$('#setNotif').addEventListener('change',async e=>{
+  if(e.target.checked){
+    if(!('Notification' in window)){ toast('Notifications non supportées par ce navigateur.'); e.target.checked=false; return; }
+    try{
+      const p=await Notification.requestPermission();
+      if(p==='granted'){ store.set('pc_alert_notif','1'); toast('🔔 Notifications d\'orage activées'); }
+      else { e.target.checked=false; store.set('pc_alert_notif','0'); toast('Notifications refusées par le navigateur'); }
+    }catch(err){ e.target.checked=false; toast('Impossible de demander la permission.'); }
+  } else {
+    store.set('pc_alert_notif','0');
+    toast('Notifications d\'orage désactivées');
+  }
+});
+$('#setSound').addEventListener('change',e=>{
+  state.alert.muted=!e.target.checked;
+  store.set('pc_alert_muted',state.alert.muted?'1':'0');
+  toast(state.alert.muted?'Bip sonore désactivé':'Bip sonore activé');
+});
+syncAlertPrefs();
 setInterval(()=>{ if(state.fc) checkThunderAlert(); }, 10*60*1000);
 
 /* ================= FENÊTRES « À PROPOS » ================= */
