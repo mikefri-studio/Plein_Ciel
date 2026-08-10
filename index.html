@@ -935,11 +935,32 @@ async function fetchWindGrid(lat,lon){
   ];
   const lats=pts.map(p=>p[0].toFixed(3)).join(',');
   const lons=pts.map(p=>p[1].toFixed(3)).join(',');
+  
+  const grab=async(uv,tag)=>{
+    try{
+      const d=await fetchJSON(`https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}&current=temperature_2m&hourly=${uv}&timezone=auto`);
+      if(Array.isArray(d)&&d.length===9){
+        const [ku,kv]=uv.split(',');
+        const grid=d.map((x,i)=>{
+          const t0=(x.current&&x.current.time||'').slice(0,13);
+          let idx=(x.hourly&&x.hourly.time)?x.hourly.time.findIndex(t=>t.slice(0,13)===t0):0;
+          if(idx<0)idx=0;
+          return {lat:pts[i][0],lon:pts[i][1],u:x.hourly[ku][idx],v:x.hourly[kv][idx]};
+        });
+        state.windLevel=tag;
+        return grid;
+      }
+    }catch(e){}
+    return null;
+  };
+  
   try{
-    const d=await fetchJSON(`https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}&current=wind_u_component_10m,wind_v_component_10m&timezone=auto`);
-    if(Array.isArray(d)&&d.length===9){
-      return d.map((x,i)=>({lat:pts[i][0],lon:pts[i][1],u:x.current.wind_u_component_10m,v:x.current.wind_v_component_10m}));
+    if(state.windChoice==='10'){
+      return await grab('wind_u_component_10m,wind_v_component_10m','10')
+          || await grab('wind_u_component_700hPa,wind_v_component_700hPa','700');
     }
+    return await grab('wind_u_component_700hPa,wind_v_component_700hPa','700')
+        || await grab('wind_u_component_10m,wind_v_component_10m','10');
   }catch(e){ console.warn('Wind grid indisponible :',e); }
   return null;
 }
