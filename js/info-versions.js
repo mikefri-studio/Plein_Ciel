@@ -5,25 +5,17 @@
   document.head.appendChild(st);
 })();
 
-/* Rend cliquable n'importe quel texte "Version x.y.z" de la page */
+/* Rend le numéro de version cliquable (injecté par main.js dans #appVersion) */
 (function(){
-  function wrap(){
-    const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
-    let node;
-    while((node=walker.nextNode())){
-      if(node.parentElement && node.parentElement.closest('.footer-version')) continue;
-      if(/Version\s+\d/.test(node.textContent)){
-        const span=document.createElement('span');
-        span.className='footer-version';
-        span.title='Historique des versions';
-        node.parentNode.replaceChild(span,node);
-        span.appendChild(node);
-        break;
-      }
+  function bind(){
+    const el=document.getElementById('appVersion');
+    if(el && !el.classList.contains('footer-version')){
+      el.classList.add('footer-version');
+      el.title='Historique des versions';
     }
   }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wrap);
-  else wrap();
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bind);
+  else bind();
 })();
 
 function versionBlock(num,date,items){
