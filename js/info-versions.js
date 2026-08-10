@@ -1,84 +1,54 @@
 "use strict";
+(function(){
+  const st=document.createElement('style');
+  st.textContent='.footer-version{cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px}.footer-version:hover{color:var(--accent,#ffd166)}';
+  document.head.appendChild(st);
+})();
 
-function openVersions() {
-  const modal = document.createElement('div');
-  modal.className = 'modal-overlay';
-  modal.innerHTML = `
-    <div class="modal">
-      <div class="modal-head">
-        <div class="modal-title">📋 Historique des versions</div>
-        <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">✕</button>
-      </div>
-      <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
-        <div class="version-item">
-          <div class="version-head">
-            <span class="version-num">v1.4.0</span>
-            <span class="version-date">11 août 2026</span>
-          </div>
-          <ul class="version-list">
-            <li>⚡ Détection radar des orages : la bannière d'alerte se déclenche même si le modèle météo ne prévoit rien (lecture des pixels à ta position)</li>
-            <li>🌬️ Sélecteur vent sol / vent 3 km : les particules peuvent maintenant suivre le vent d'altitude (celui qui pousse les nuages)</li>
-            <li>⚙️ Réglages d'alerte déplacés dans la modale (plus de boutons parasites pendant l'orage)</li>
-            <li>🏗️ Code découpé en ~20 modules spécialisés (plus maintenable)</li>
-            <li>📖 Documentation complète (README.md)</li>
-          </ul>
-        </div>
-
-        <div class="version-item">
-          <div class="version-head">
-            <span class="version-num">v1.3.0</span>
-            <span class="version-date">10 août 2026</span>
-          </div>
-          <ul class="version-list">
-            <li>🏙️ Géolocalisation auto avec nom de la ville (plus "Ma position" ni "Lieu partagé")</li>
-            <li>🗺️ Fond de carte plan corrigé (CARTO au lieu d'OSM qui ne chargeait plus)</li>
-            <li>💨 Vent visible partout (adaptation bleu/blanc selon le fond)</li>
-            <li>ℹ️ Indicateurs cliquables avec explications détaillées (boutons ⓘ)</li>
-            <li>🔒 Stockage localStorage sécurisé (JSON.stringify/parse partout)</li>
-          </ul>
-        </div>
-
-        <div class="version-item">
-          <div class="version-head">
-            <span class="version-num">v1.2.0</span>
-            <span class="version-date">9 août 2026</span>
-          </div>
-          <ul class="version-list">
-            <li>⛈️ Bannière d'alerte orage avec 3 niveaux (à venir / imminent / en cours)</li>
-            <li>🌼 Pollen en cache (évite les requêtes répétées)</li>
-            <li>🔔 Notifications navigateur optionnelles</li>
-            <li>🔊 Bip sonore désactivable</li>
-          </ul>
-        </div>
-
-        <div class="version-item">
-          <div class="version-head">
-            <span class="version-num">v1.0.0</span>
-            <span class="version-date">8 août 2026</span>
-          </div>
-          <ul class="version-list">
-            <li>🌡️ Météo actuelle + prévisions 16 jours (Open-Meteo)</li>
-            <li>🌧️ Pluie dans les 3 prochaines heures (pas de 15 min)</li>
-            <li>🗺️ Carte interactive avec radar RainViewer animé</li>
-            <li>💨 Particules de vent animées</li>
-            <li>📱 PWA installable (Android / iPhone)</li>
-            <li>🌼 Pollen & qualité de l'air (Europe)</li>
-            <li>🌊 Conditions marines (vagues, houle, température eau)</li>
-            <li>📷 Heures dorées et heures bleues</li>
-            <li>🌙 Phase de la lune + course du soleil</li>
-            <li>🧥 Conseils "que porter" + activités du jour</li>
-            <li>⭐ Favoris, recherche de villes</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  `;
-  document.body.appendChild(modal);
-  modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+function versionBlock(num,date,items){
+  return '<div style="margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.12)">'
+   +'<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-weight:700;color:#ffd166">v'+num+'</span><span style="opacity:.6;font-size:12px">'+date+'</span></div>'
+   +'<ul style="margin:0;padding-left:18px">'+items.map(i=>'<li style="margin-bottom:5px">'+i+'</li>').join('')+'</ul></div>';
 }
 
-// Clic sur la version dans le pied de page
-document.addEventListener('DOMContentLoaded', () => {
-  const ver = document.querySelector('.footer-version');
-  if (ver) ver.addEventListener('click', openVersions);
+function openVersions(){
+  if(document.getElementById('versionsModal'))return;
+  const ov=document.createElement('div');
+  ov.id='versionsModal';
+  ov.style.cssText='position:fixed;inset:0;background:rgba(4,10,25,.6);backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
+  ov.innerHTML='<div style="max-width:600px;width:100%;max-height:82vh;overflow-y:auto;background:rgba(13,25,48,.97);border:1px solid rgba(255,255,255,.16);border-radius:18px;padding:20px 22px;color:#eef4ff;box-shadow:0 24px 70px rgba(0,0,0,.55);font-size:14px;line-height:1.55">'
+  +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><b style="font-size:17px">📋 Historique des versions</b><button id="verClose" style="background:none;border:none;color:#eef4ff;font-size:18px;cursor:pointer">✕</button></div>'
+  +versionBlock('1.4.0','11 août 2026',[
+    '⚡ Détection radar des orages : alerte même si le modèle ne prévoit rien',
+    '🌬️ Sélecteur vent sol / vent 3 km',
+    '⚙️ Réglages d\'alerte déplacés dans ⚙️',
+    '🏗️ Code découpé en ~20 modules',
+    '📖 README + historique des versions'
+  ])
+  +versionBlock('1.3.0','10 août 2026',[
+    '🏙️ Nom de ville automatique à la géolocalisation',
+    '🗺️ Fond plan corrigé (CARTO)',
+    '💨 Vent visible sur tous les fonds',
+    'ℹ️ Indicateurs cliquables avec explications'
+  ])
+  +versionBlock('1.2.0','9 août 2026',[
+    '⛈️ Bannière d\'alerte orage 3 niveaux',
+    '🔔 Notifications + bip sonore optionnels',
+    '🌼 Pollen mis en cache'
+  ])
+  +versionBlock('1.0.0','8 août 2026',[
+    '🌡️ Météo + 16 jours + pluie minute',
+    '🗺️ Radar animé + particules de vent',
+    '🌼☀️🌙 Pollen, marine, soleil, lune',
+    '🧥 Conseils tenue + activités',
+    '📱 PWA installable hors-ligne'
+  ])
+  +'</div>';
+  document.body.appendChild(ov);
+  ov.querySelector('#verClose').addEventListener('click',()=>ov.remove());
+  ov.addEventListener('click',e=>{if(e.target===ov)ov.remove();});
+}
+
+document.addEventListener('click',e=>{
+  if(e.target.closest('.footer-version')) openVersions();
 });

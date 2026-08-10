@@ -1,7 +1,7 @@
 const CACHE = 'pleinciel-1.4.0';
 const CORE = [
   './', 'index.html', 'css/style.css',
-  'js/core.js','js/api.js','js/alerts.js','js/info.js',
+  'js/core.js','js/api.js','js/alerts.js','js/info.js','js/info-versions.js',
   'js/render/render-hero.js','js/render/render-rain.js','js/render/render-advice.js',
   'js/render/render-stats.js','js/render/render-hours.js','js/render/render-days.js',
   'js/render/render-sun.js','js/render/render-air.js','js/render/render-marine.js',
