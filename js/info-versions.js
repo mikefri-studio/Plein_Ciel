@@ -32,7 +32,7 @@ function openVersions(){
   ov.innerHTML='<div style="max-width:600px;width:100%;max-height:82vh;overflow-y:auto;background:rgba(13,25,48,.97);border:1px solid rgba(255,255,255,.16);border-radius:18px;padding:20px 22px;color:#eef4ff;box-shadow:0 24px 70px rgba(0,0,0,.55);font-size:14px;line-height:1.55">'
   +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><b style="font-size:17px">📋 Historique des versions</b><button id="verClose" style="background:none;border:none;color:#eef4ff;font-size:18px;cursor:pointer">✕</button></div>'
   +versionBlock('1.4.2','11 août 2026',[
-    '📱 Fiabilité dans l'appli Android : pied de page hors boutons de navigation'
+    '📱 Appli Android : pied de page au-dessus des boutons de navigation'
   ])
 +versionBlock('1.4.1','11 août 2026',[
     '📱 Safe areas : site hors barres système Android/iOS',
