@@ -47,6 +47,7 @@ function sendBrowserNotification(title,body){
   if(!('Notification' in window)) return;
   if(Notification.permission==='granted'){
     try{ new Notification(title,{body,tag:'pleinciel-thunder'}); }catch(e){}
+    try{ if(navigator.vibrate) navigator.vibrate([300,150,300]); }catch(e){}
   }
 }
 /* v1.4.0 : hauteur de bannière mesurée → plus de chevauchement du header sur mobile */
@@ -143,7 +144,7 @@ $('#setNotif').addEventListener('change',async e=>{
   if(e.target.checked){
     if(!('Notification' in window)){ toast('Notifications non supportées par ce navigateur.'); e.target.checked=false; return; }
     try{
-      const p=await Notification.requestPermission();
+      const p=('Notification' in window)?await Notification.requestPermission():'granted';
       if(p==='granted'){ store.set('pc_alert_notif','1'); toast('🔔 Notifications d\'orage activées'); }
       else { e.target.checked=false; store.set('pc_alert_notif','0'); toast('Notifications refusées par le navigateur'); }
     }catch(err){ e.target.checked=false; toast('Impossible de demander la permission.'); }
