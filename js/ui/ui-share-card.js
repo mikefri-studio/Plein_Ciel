@@ -48,11 +48,15 @@ function exportCard(cv,city){
 function generateShareCard(){
   var st=window.state||{};
   var loc=st.loc||{};
-  var cur=st.cur||{};
-  var city=loc.name||"Plein Ciel";
+  var ls=null; try{ ls=JSON.parse(localStorage.getItem("pc_widget_loc")||"null"); }catch(e){}
+  var cur=st.cur||(st.fc&&st.fc.current)||{};
+  var city=loc.name||(ls&&ls.name)||st.name||"Plein Ciel";
+  var lat=loc.lat||(ls&&ls.lat)||48.85;
+  var lon=loc.lon||(ls&&ls.lon)||2.35;
   var t=Math.round(cur.temperature_2m!=null?cur.temperature_2m:0);
   var code=cur.weather_code!=null?cur.weather_code:0;
-  var day=cur.is_day!=null?cur.is_day===1:true;
+  var hh=new Date().getHours();
+  var day=cur.is_day!=null?cur.is_day===1:(hh>=7&&hh<21);
   var wind=Math.round(cur.wind_speed_10m!=null?cur.wind_speed_10m:0);
   var hum=Math.round(cur.relative_humidity_2m!=null?cur.relative_humidity_2m:0);
 
@@ -96,7 +100,7 @@ function generateShareCard(){
   c.fillText("💨 "+wind+" km/h   ·   💧 "+hum+" %",W/2,980);
 
   var qrUrl="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data="+
-    encodeURIComponent("https://mikefri.github.io/Plein_Ciel/?lat="+(loc.lat||48.85)+"&lon="+(loc.lon||2.35)+"&n="+encodeURIComponent(city));
+    encodeURIComponent("https://mikefri.github.io/Plein_Ciel/?lat="+lat+"&lon="+lon+"&n="+encodeURIComponent(city));
 
   c.fillStyle="rgba(255,255,255,.95)";
   roundRect(c,60,H-330,W-120,270,30);c.fill();
