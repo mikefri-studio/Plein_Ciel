@@ -46,7 +46,7 @@ function exportCard(cv,city){
 }
 
 function generateShareCard(){
-  var st=window.state||{};
+  var st=(typeof state!=="undefined")?state:{};
   var loc=st.loc||{};
   var ls=null; try{ ls=JSON.parse(localStorage.getItem("pc_widget_loc")||"null"); }catch(e){}
   var cur=st.cur||(st.fc&&st.fc.current)||{};
