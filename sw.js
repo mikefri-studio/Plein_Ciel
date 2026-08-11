@@ -1,11 +1,11 @@
-const CACHE = 'pleinciel-1.6.0';
+const CACHE = 'pleinciel-1.5.0';
 const CORE = [
   './', 'index.html', 'css/style.css',
   'js/core.js','js/api.js','js/alerts.js','js/info.js','js/info-versions.js',
   'js/render/render-hero.js','js/render/render-rain.js','js/render/render-advice.js',
   'js/render/render-stats.js','js/render/render-hours.js','js/render/render-days.js',
   'js/render/render-sun.js','js/render/render-air.js','js/render/render-marine.js',
-  'js/render.js','js/map-fires.js','js/map.js','js/ui/ui-favs.js','js/ui/ui-search.js','js/ui/ui-settings.js','js/ui/ui-effects.js','js/ui/ui-share-card.js',
+  'js/render.js','js/map.js','js/ui/ui-favs.js','js/ui/ui-search.js','js/ui/ui-settings.js','js/ui/ui-effects.js','js/ui/ui-share-card.js',
   'js/ui.js','js/main.js',
   'manifest.webmanifest', 'icon-180.png'
 ];
