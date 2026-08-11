@@ -128,4 +128,6 @@ const APK_URL='';
   probe.remove();
   if(envTop>0) return;
   document.documentElement.classList.add('in-app');
+  var v=document.getElementById('appVersion');
+  if(v && v.parentElement) v.parentElement.style.paddingBottom='70px';
 })();
