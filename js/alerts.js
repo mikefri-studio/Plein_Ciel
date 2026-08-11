@@ -142,7 +142,6 @@ function syncAlertPrefs(){
 }
 $('#setNotif').addEventListener('change',async e=>{
   if(e.target.checked){
-    if(!('Notification' in window)){ toast('Notifications non supportées par ce navigateur.'); e.target.checked=false; return; }
     try{
       const p=('Notification' in window)?await Notification.requestPermission():'granted';
       if(p==='granted'){ store.set('pc_alert_notif','1'); toast('🔔 Notifications d\'orage activées'); }
