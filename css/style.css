@@ -370,3 +370,8 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
 body{padding-top:env(safe-area-inset-top,0px)}
 header{top:env(safe-area-inset-top,0px)}
 footer{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 10px)}
+
+/* ===== Marges barres système (repli appli Android) ===== */
+html.in-app body{padding-top:30px}
+html.in-app header{top:30px}
+html.in-app footer{padding-bottom:60px}

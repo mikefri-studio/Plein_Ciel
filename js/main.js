@@ -116,3 +116,16 @@ const APK_URL='';
     try{ await navigator.clipboard.writeText(base); toast('Lien copié 📋'); }catch(e){ toast('Copie impossible'); }
   });
 })();
+
+/* ===== Repli barres système dans l'appli (WebView) ===== */
+(function(){
+  var inApp = (typeof window.ReactNativeWebView!=='undefined') || /\bwv\b/.test(navigator.userAgent||'');
+  if(!inApp) return;
+  var probe=document.createElement('div');
+  probe.style.cssText='position:fixed;visibility:hidden;padding-top:env(safe-area-inset-top,0px)';
+  document.documentElement.appendChild(probe);
+  var envTop=parseFloat(getComputedStyle(probe).paddingTop)||0;
+  probe.remove();
+  if(envTop>0) return;
+  document.documentElement.classList.add('in-app');
+})();
