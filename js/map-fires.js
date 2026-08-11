@@ -28,15 +28,17 @@ async function loadFires(){
     fireMarkerLayer=L.layerGroup();
     let count=0;
     evts.forEach(ev=>{
-      const geo=ev.geometries&&ev.geometries.length?ev.geometries[ev.geometries.length-1]:null;
+      const gl=ev.geometry||ev.geometries||[];
+      const geo=gl.length?gl[gl.length-1]:null;
       if(!geo||geo.type!=='Point') return;
       const [lon,lat]=geo.coordinates;
       if(!isFinite(lat)||!isFinite(lon)) return;
       const title=ev.title||'Incendie';
       const date=geo.date?new Date(geo.date).toLocaleDateString('fr-FR'):'';
-      const source=ev.sources&&ev.sources[0]?ev.sources[0].title:'';
+      const src=ev.sources&&ev.sources[0]?(ev.sources[0].id||''):'';
+      const mag=geo.magnitudeValue?Math.round(geo.magnitudeValue)+' '+(geo.magnitudeUnit||''):'—';
       const m=L.marker([lat,lon],{icon:fireIcon()});
-      m.bindPopup(`<b>🔥 ${title}</b><br>📅 ${date}<br>🛰️ ${source}`);
+      m.bindPopup(`<b>🔥 ${title}</b><br>📅 ${date}<br>📐 ${mag}<br>🛰️ ${src||'NASA EONET'}`);
       fireMarkerLayer.addLayer(m);
       count++;
     });
