@@ -1,6 +1,6 @@
 "use strict";
 /* ================= DÉMARRAGE ================= */
-const APP_VERSION = '1.4.1';
+const APP_VERSION = '1.4.2';
 console.log(`%c☁️ Plein Ciel v${APP_VERSION}`, 'color:#ffd166;font-size:18px;font-weight:bold');
 console.log('Développé avec ❤️ — météo Open-Meteo, radar RainViewer');
 $('#loadIco').innerHTML=icon(2,true);
@@ -130,4 +130,15 @@ const APK_URL='';
   document.documentElement.classList.add('in-app');
   var v=document.getElementById('appVersion');
   if(v && v.parentElement) v.parentElement.style.paddingBottom='70px';
+})();
+
+/* ===== Espace réservé sous le pied de page dans l'appli ===== */
+(function(){
+  if(!(typeof window.ReactNativeWebView!=='undefined' || /\bwv\b/.test(navigator.userAgent||''))) return;
+  if(document.getElementById('spacerBas')) return;
+  var sp=document.createElement('div');
+  sp.id='spacerBas';
+  sp.style.height='90px';
+  sp.style.flexShrink='0';
+  document.body.appendChild(sp);
 })();
