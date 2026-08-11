@@ -46,7 +46,15 @@ function sendBrowserNotification(title,body){
   if(store.get('pc_alert_notif')!=='1') return;
   if(!('Notification' in window)) return;
   if(Notification.permission==='granted'){
-    try{ new Notification(title,{body,tag:'pleinciel-thunder'}); }catch(e){}
+    try{
+      if(window.ReactNativeWebView){
+        // Appli Android : envoie au natif pour vraie notification système
+        window.ReactNativeWebView.postMessage('alert:'+JSON.stringify({title,body}));
+      }else{
+        // PC : notification navigateur
+        new Notification(title,{body,tag:'pleinciel-thunder'});
+      }
+    }catch(e){}
     try{ if(navigator.vibrate) navigator.vibrate([300,150,300]); }catch(e){}
   }
 }
