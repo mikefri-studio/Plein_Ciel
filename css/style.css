@@ -375,3 +375,6 @@ footer{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 10px)}
 html.in-app body{padding-top:30px}
 html.in-app header{top:30px}
 html.in-app footer{padding-bottom:60px}
+
+@keyframes fire-pulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.3);opacity:.9}}
+.fire-marker{background:transparent!important;border:none!important}
