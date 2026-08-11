@@ -337,8 +337,8 @@ footer .disp{font-size:17px;letter-spacing:2px;color:var(--ink)}
   color:var(--ink);
   opacity:.85;
 }
-#toast{position:fixed;bottom:26px;left:50%;transform:translate(-50%,80px);background:var(--panel);border:1px solid var(--line);
-  color:var(--ink);padding:12px 22px;border-radius:999px;z-index:99;transition:transform .4s cubic-bezier(.2,.8,.2,1);font-weight:600;box-shadow:0 14px 40px rgba(0,10,30,.4)}
+#toast{position:fixed;bottom:90px;left:50%;transform:translate(-50%,80px);background:var(--panel);border:1px solid var(--line);
+  color:var(--ink);padding:12px 22px;border-radius:999px;z-index:300;transition:transform .4s cubic-bezier(.2,.8,.2,1);font-weight:600;box-shadow:0 14px 40px rgba(0,10,30,.4)}
 #toast.show{transform:translate(-50%,0)}
 #load{position:fixed;inset:0;z-index:80;display:grid;place-items:center;background:linear-gradient(180deg,#1470c8,#4aa3e0 45%,#a8d8f2);transition:opacity .5s}
 #load.off{opacity:0;pointer-events:none}
@@ -376,6 +376,3 @@ html.in-app body{padding-top:30px}
 html.in-app header{top:30px}
 html.in-app footer{padding-bottom:60px}
 
-
-/* Toast au-dessus des modales + plus haut */
-#toast{z-index:300;bottom:90px}
