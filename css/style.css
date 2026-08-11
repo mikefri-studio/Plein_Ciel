@@ -376,3 +376,6 @@ html.in-app body{padding-top:30px}
 html.in-app header{top:30px}
 html.in-app footer{padding-bottom:60px}
 
+
+/* Toast au-dessus des modales + plus haut */
+#toast{z-index:300;bottom:90px}
