@@ -40,3 +40,16 @@ $$('#windLevelSeg button').forEach(b=>b.addEventListener('click',async()=>{
   updateWindParticles();
 }));
 
+
+// Bouton de test des notifications (Android/iOS native app)
+const testBtn = $('#testNotifBtn');
+if (testBtn) {
+  testBtn.addEventListener('click', () => {
+    if (window.ReactNativeWebView) {
+      window.ReactNativeWebView.postMessage('test_notification');
+      toast('Notification envoyée ! Vérifiez votre téléphone 🔔');
+    } else {
+      toast('Ce bouton ne fonctionne que dans l\'application native 📱');
+    }
+  });
+}
