@@ -503,3 +503,19 @@ input, textarea {
 /* Lignes un peu plus compactes */
 .day-hour-row { padding: 6px 10px; }
 .day-detail-hours { gap: 4px; }
+
+/* ===== Scrollbar fine sur toutes les modales ===== */
+.im-box {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,.25) transparent;
+}
+.im-box::-webkit-scrollbar {
+  width: 5px;
+}
+.im-box::-webkit-scrollbar-track {
+  background: transparent;
+}
+.im-box::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,.25);
+  border-radius: 3px;
+}
