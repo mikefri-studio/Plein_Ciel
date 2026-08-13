@@ -100,7 +100,7 @@ function generateShareCard(){
   c.fillText("💨 "+wind+" km/h   ·   💧 "+hum+" %",W/2,980);
 
   var qrUrl="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data="+
-    encodeURIComponent("https://mikefri.github.io/Plein_Ciel/?lat="+lat+"&lon="+lon+"&n="+encodeURIComponent(city));
+    encodeURIComponent("https://mikefri-studio.github.io/Plein_Ciel/?lat="+lat+"&lon="+lon+"&n="+encodeURIComponent(city));
 
   c.fillStyle="rgba(255,255,255,.95)";
   roundRect(c,60,H-330,W-120,270,30);c.fill();
@@ -111,7 +111,7 @@ function generateShareCard(){
   c.fillText("le ciel en direct !",420,H-180);
   c.font="400 32px system-ui, sans-serif";
   c.fillStyle="#5a6478";
-  c.fillText("mikefri.github.io/Plein_Ciel",420,H-110);
+  c.fillText("mikefri-studio.github.io/Plein_Ciel",420,H-110);
 
   var img=new Image();
   img.crossOrigin="anonymous";

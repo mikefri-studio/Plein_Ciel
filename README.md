@@ -4,7 +4,7 @@ Application météo complète et installable (PWA) : pluie minute par minute,
 prévisions 16 jours, pollen, qualité de l'air, conditions marines,
 radar de précipitations, vent animé, alertes orage, heures dorées/bleues et lune.
 
-🔗 En ligne : https://mikefri.github.io/Plein_Ciel/
+🔗 En ligne : https://mikefri-studio.github.io/Plein_Ciel/
 
 ## ✨ Fonctionnalités
 
