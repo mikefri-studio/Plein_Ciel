@@ -458,3 +458,24 @@ input, textarea {
   align-items: center;
   gap: 4px;
 }
+
+/* ===== Affichage du modal détail horaire ===== */
+#dayDetailModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+#dayDetailModal.open {
+  display: flex;
+}
+.day-detail-box {
+  width: 100%;
+  max-width: 500px;
+  max-height: 85vh;
+  overflow-y: auto;
+}
