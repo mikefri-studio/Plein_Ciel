@@ -392,3 +392,17 @@ input, textarea {
   -webkit-user-select: text;
   user-select: text;
 }
+
+/* ===== Toast plus large (évite les retours à la ligne) ===== */
+#toast {
+  max-width: 94vw;          /* presque toute la largeur de l'écran */
+  width: max-content;       /* s'adapte au texte */
+  padding: 12px 20px;
+}
+@media (max-width: 480px) {
+  #toast {
+    max-width: 96vw;
+    font-size: 13px;        /* un poil plus petit sur mobile */
+    padding: 10px 14px;
+  }
+}
