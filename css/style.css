@@ -479,3 +479,27 @@ input, textarea {
   max-height: 85vh;
   overflow-y: auto;
 }
+
+/* ===== Scrollbar fine et discrète (détail horaire) ===== */
+.day-detail-hours,
+.day-detail-box {
+  scrollbar-width: thin;                          /* Firefox */
+  scrollbar-color: rgba(255,255,255,.25) transparent;
+}
+.day-detail-hours::-webkit-scrollbar,
+.day-detail-box::-webkit-scrollbar {
+  width: 5px;                                     /* Chrome / appli */
+}
+.day-detail-hours::-webkit-scrollbar-track,
+.day-detail-box::-webkit-scrollbar-track {
+  background: transparent;
+}
+.day-detail-hours::-webkit-scrollbar-thumb,
+.day-detail-box::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,.25);
+  border-radius: 3px;
+}
+
+/* Lignes un peu plus compactes */
+.day-hour-row { padding: 6px 10px; }
+.day-detail-hours { gap: 4px; }
