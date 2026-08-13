@@ -376,3 +376,19 @@ html.in-app body{padding-top:30px}
 html.in-app header{top:30px}
 html.in-app footer{padding-bottom:60px}
 
+
+/* ===== Effet app native : pas de sélection de texte ===== */
+body {
+  -webkit-user-select: none;      /* iOS / Safari */
+  -moz-user-select: none;         /* Firefox */
+  -ms-user-select: none;          /* anciens Edge */
+  user-select: none;              /* standard */
+  -webkit-touch-callout: none;    /* bloque le menu copier/coller iOS */
+  -webkit-tap-highlight-color: transparent; /* pas de flash au tap */
+}
+
+/* Mais la recherche reste utilisable ! */
+input, textarea {
+  -webkit-user-select: text;
+  user-select: text;
+}
