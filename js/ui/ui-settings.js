@@ -53,3 +53,67 @@ if (testBtn) {
     }
   });
 }
+
+// Détail horaire au clic sur un jour
+function showDayDetail(dayIndex) {
+  const fc = state.fc;
+  if (!fc || !fc.daily || !fc.hourly) return;
+  
+  const d = fc.daily;
+  const h = fc.hourly;
+  
+  // Date du jour sélectionné
+  const dateStr = d.time[dayIndex];
+  const date = new Date(dateStr + 'T12:00');
+  const title = date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+  
+  // Lever/coucher soleil
+  const sunrise = new Date(d.sunrise[dayIndex]).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  const sunset = new Date(d.sunset[dayIndex]).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  
+  // Extraire les données horaires pour ce jour
+  const dayStart = dateStr + 'T00:00';
+  const dayEnd = dateStr + 'T23:00';
+  const startIndex = h.time.indexOf(dayStart);
+  const endIndex = h.time.indexOf(dayEnd);
+  
+  if (startIndex === -1 || endIndex === -1) {
+    console.warn('Données horaires non trouvées pour ce jour');
+    return;
+  }
+  
+  // Générer les lignes horaires
+  let hoursHtml = '';
+  for (let i = startIndex; i <= endIndex; i++) {
+    const time = new Date(h.time[i]).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    const temp = Math.round(h.temperature_2m[i]);
+    const code = h.weather_code[i];
+    const pop = h.precipitation_probability ? h.precipitation_probability[i] : null;
+    
+    hoursHtml += `
+      <div class="day-hour-row">
+        <span class="day-hour-time">${time}</span>
+        <span class="day-hour-icon">${icon(code, false)}</span>
+        <span class="day-hour-temp">${temp}°</span>
+        <span class="day-hour-rain">${pop >= 5 ? '💧 ' + pop + '%' : ''}</span>
+      </div>
+    `;
+  }
+  
+  // Remplir le modal
+  $('#dayDetailTitle').textContent = title;
+  $('#dayDetailSun').innerHTML = `
+    <span>🌅 ${sunrise}</span>
+    <span>🌇 ${sunset}</span>
+  `;
+  $('#dayDetailHours').innerHTML = hoursHtml;
+  
+  // Afficher
+  $('#dayDetailModal').classList.add('open');
+}
+
+// Event listeners pour le modal
+$('#dayDetailClose').addEventListener('click', () => $('#dayDetailModal').classList.remove('open'));
+$('#dayDetailModal').addEventListener('click', e => {
+  if (e.target.id === 'dayDetailModal') $('#dayDetailModal').classList.remove('open');
+});

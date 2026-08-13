@@ -9,11 +9,23 @@ function renderDays(){
     const sub=date.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
     const left=(d.temperature_2m_min[i]-wmin)/span*100, width=Math.max(5,(d.temperature_2m_max[i]-d.temperature_2m_min[i])/span*100);
     const pop=d.precipitation_probability_max?d.precipitation_probability_max[i]:null;
-    html+=`<div class="day"><span class="dn">${name}<small>${sub}</small></span>${icon(d.weather_code[i],true)}
+    html+=`<div class="day" data-day="${i}" style="cursor:pointer"><span class="dn">${name}<small>${sub}</small></span>${icon(d.weather_code[i],true)}
       <span class="dp">${pop>=5?'💧 '+pop+'%':''}</span>
       <span class="dmin">${fmtT(d.temperature_2m_min[i])}°</span>
       <span class="dbar"><i style="left:${left}%;width:${width}%"></i></span>
       <span class="dmax">${fmtT(d.temperature_2m_max[i])}°</span></div>`;
   }
   $('#wDays').innerHTML=html;
+  
+  // Ajouter les event listeners après le rendu
+  setTimeout(() => {
+    document.querySelectorAll('.day').forEach(el => {
+      el.addEventListener('click', () => {
+        const idx = parseInt(el.dataset.day);
+        if (typeof showDayDetail === 'function') {
+          showDayDetail(idx);
+        }
+      });
+    });
+  }, 0);
 }
