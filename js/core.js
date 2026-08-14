@@ -55,7 +55,6 @@ const WIDGETS=[
  ['pollen','🌼','Pollen & allergies'],
  ['marine','🌊','Conditions marines'],
  ['map','🗺️','Carte radar & vent'],
- ['app','📲','Installer l\'appli'],
 ];
 function wVis(id){ const p=store.get('pc_widgets')||{}; return p[id]!==false; }
 function applyWidgets(){
