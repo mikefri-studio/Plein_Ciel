@@ -93,7 +93,7 @@ function showDayDetail(dayIndex) {
     hoursHtml += `
       <div class="day-hour-row">
         <span class="day-hour-time">${time}</span>
-        <span class="day-hour-icon">${icon(code, false)}</span>
+        <span class="day-hour-icon">${icon(code, h.is_day[i]==1)}</span>
         <span class="day-hour-temp">${temp}°</span>
         <span class="day-hour-rain">${pop >= 5 ? '💧 ' + pop + '%' : ''}</span>
       </div>
