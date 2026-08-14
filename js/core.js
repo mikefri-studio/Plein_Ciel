@@ -62,7 +62,7 @@ function applyWidgets(){
   const sel={
     rain:'#rainNowCard', outfit:'#wOutfit', activities:'#wActivities', stats:'#statsWrap',
     hours:'#secHours', sun:'#wSun', climate:'#wClimate', photo:'#wPhoto', moon:'#wMoon',
-    air:'#wAir', pollen:'#wPollen', marine:'#wMarine', days:'#wDays', map:'#secMap', app:'#secApp'
+    air:'#wAir', pollen:'#wPollen', marine:'#wMarine', days:'#wDays', map:'#secMap'
   };
   for(const [id,s] of Object.entries(sel)){
     const el=$(s); if(el) el.style.display = wVis(id)? '' : 'none';
