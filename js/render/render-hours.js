@@ -10,7 +10,7 @@ function renderHours(){
   idx.forEach((i,k)=>{
     const pop=h.precipitation_probability?h.precipitation_probability[i]:null;
     const isAlert=alertSet.has(i);
-    items+=`<div class="hour ${isAlert?'alert':''}"><span class="ht">${k===0?'Maint.':hm(h.time[i])}</span>${icon(h.weather_code[i],h.is_day[i]===1)}
+    items+=`<div class="hour ${isAlert?'alert':''}"><span class="ht">${k===0?'Maint.':hm(h.time[i])}</span>${icon(h.weather_code[i],h.is_day[i]==1)}
       <span class="htemp">${fmtT(h.temperature_2m[i])}°</span>
       <span class="hp">${pop>=5?`<svg viewBox="0 0 24 24"><path d="M12 3c3 4.5 6 7.6 6 11a6 6 0 1 1-12 0c0-3.4 3-6.5 6-11z"/></svg>${pop}%`:''}</span></div>`;
   });

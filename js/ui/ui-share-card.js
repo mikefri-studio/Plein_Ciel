@@ -56,7 +56,7 @@ function generateShareCard(){
   var t=Math.round(cur.temperature_2m!=null?cur.temperature_2m:0);
   var code=cur.weather_code!=null?cur.weather_code:0;
   var hh=new Date().getHours();
-  var day=cur.is_day!=null?cur.is_day===1:(hh>=7&&hh<21);
+  var day=cur.is_day!=null?cur.is_day==1:(hh>=7&&hh<21);
   var wind=Math.round(cur.wind_speed_10m!=null?cur.wind_speed_10m:0);
   var hum=Math.round(cur.relative_humidity_2m!=null?cur.relative_humidity_2m:0);
 

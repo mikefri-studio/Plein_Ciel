@@ -9,7 +9,7 @@ function renderAdvice(){
   const code=c.weather_code, grp=condGroup(code);
   const uv=d.uv_index_max!=null?d.uv_index_max[0]:5;
   const hum=c.relative_humidity_2m;
-  const isDay=c.is_day===1;
+  const isDay=c.is_day==1;
 
   let mainIcon, mainDesc, items=[];
   const feelsT=feels;
