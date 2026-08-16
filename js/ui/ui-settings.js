@@ -11,10 +11,7 @@ $$('#units button').forEach(b=>b.classList.toggle('on',b.dataset.u===state.units
 /* ================= CONTRÔLES CARTE ================= */
 $('#playBtn').addEventListener('click',togglePlay);
 $('#frameRange').addEventListener('input',e=>{ if(state.radar.playing)togglePlay(); setFrame(+e.target.value); });
-$('#opRange').addEventListener('input',e=>{
-  const v=e.target.value/100; state.radar.op=v;
-  if(state.overlay)state.overlay.setOpacity(v);
-});
+
 $$('#baseSeg button').forEach(b=>b.addEventListener('click',()=>{
   $$('#baseSeg button').forEach(x=>x.classList.toggle('on',x===b));
   if(!state.map)return;
@@ -117,3 +114,31 @@ $('#dayDetailClose').addEventListener('click', () => $('#dayDetailModal').classL
 $('#dayDetailModal').addEventListener('click', e => {
   if (e.target.id === 'dayDetailModal') $('#dayDetailModal').classList.remove('open');
 });
+
+/* ================= OPACITÉ FIXE 100% ================= */
+if(state&&state.radar)state.radar.op=1;
+if(state&&state.overlay)state.overlay.setOpacity(1);
+
+/* ================= PANNEAU PARAMÈTRES ================= */
+(function(){
+  const fab=$('#settingsFab'), panel=$('#settingsPanel'), back=$('#settingsBackdrop'), close=$('#settingsClose');
+  if(!fab||!panel)return;
+  const open=()=>{panel.style.display='block';back.style.display='block';};
+  const shut=()=>{panel.style.display='none';back.style.display='none';};
+  fab.addEventListener('click',open);
+  close.addEventListener('click',shut);
+  back.addEventListener('click',shut);
+})();
+
+/* ================= RAYON ALERTE PLUIE ================= */
+(function(){
+  const seg=$('#rainRadiusSeg'); if(!seg)return;
+  const cur=Number(store.get('pc_rain_radius')||10);
+  seg.querySelectorAll('button').forEach(x=>x.classList.toggle('on',+x.dataset.r===cur));
+  seg.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+    const r=+b.dataset.r;
+    store.set('pc_rain_radius',r);
+    seg.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
+    toast('Alerte pluie si précipitations à moins de '+r+' km 🌧️');
+  }));
+})();
