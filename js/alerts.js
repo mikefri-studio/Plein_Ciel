@@ -105,8 +105,8 @@ async function radarLevelAtLoc(){
   const cx=cv.getContext('2d',{willReadFrequently:true});
   cx.drawImage(bmp,0,0);
   const px=Math.round((xf-x)*256), py=Math.round((yf-y)*256);
-  const x0=Math.max(0,px-4), y0=Math.max(0,py-4);
-  const d=cx.getImageData(x0,y0,9,9).data;
+  const x0=Math.max(0,px-2), y0=Math.max(0,py-2);
+  const d=cx.getImageData(x0,y0,5,5).data;
   let lvl=0;
   for(let i=0;i<d.length;i+=4){
     if(d[i+3]<20) continue;
