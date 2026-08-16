@@ -1,6 +1,6 @@
 "use strict";
 /* ================= DÉMARRAGE ================= */
-const APP_VERSION='1.7.3';
+const APP_VERSION='1.7.4';
 console.log(`%c☁️ Plein Ciel v${APP_VERSION}`, 'color:#ffd166;font-size:18px;font-weight:bold');
 console.log('Développé avec ❤️ — météo Open-Meteo, radar RainViewer');
 $('#loadIco').innerHTML=icon(2,true);

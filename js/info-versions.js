@@ -31,7 +31,9 @@ function openVersions(){
   ov.style.cssText='position:fixed;inset:0;background:rgba(4,10,25,.6);backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
   ov.innerHTML='<div style="max-width:600px;width:100%;max-height:82vh;overflow-y:auto;background:rgba(13,25,48,.97);border:1px solid rgba(255,255,255,.16);border-radius:18px;padding:20px 22px;color:#eef4ff;box-shadow:0 24px 70px rgba(0,0,0,.55);font-size:14px;line-height:1.55">'
   +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><b style="font-size:17px">📋 Historique des versions</b><button id="verClose" style="background:none;border:none;color:#eef4ff;font-size:18px;cursor:pointer">✕</button></div>'
-+versionBlock('1.7.3','16 août 2026',[
++versionBlock('1.7.4','16 août 2026',[
+  '⭐ Aperçu de la vitrine PRO (marées, radar 48 h, multi-villes)'
+])+versionBlock('1.7.3','16 août 2026',[
   '🌊 Réglage « Plus d’infos marine » (période houle + vague de vent)'
 ])+versionBlock('1.7.2','16 août 2026',[
   '📍 Réglage : géolocalisation auto au lancement (ON/OFF)'

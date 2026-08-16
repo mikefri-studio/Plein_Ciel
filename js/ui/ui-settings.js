@@ -154,6 +154,34 @@ if(state&&state.overlay)state.overlay.setOpacity(1);
   });
 })();
 
+/* ================= VITRINE PRO ================= */
+function proLine(ic,t,d){ return '<div style="display:flex;gap:10px;margin-bottom:10px"><span style="font-size:20px">'+ic+'</span><div><b>'+t+'</b><div style="opacity:.7;font-size:12.5px">'+d+'</div></div></div>'; }
+function openPro(){
+  if(document.getElementById('proModal'))return;
+  const ov=document.createElement('div');
+  ov.id='proModal';
+  ov.style.cssText='position:fixed;inset:0;background:rgba(4,10,25,.6);backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
+  ov.innerHTML='<div style="max-width:480px;width:100%;max-height:84vh;overflow-y:auto;background:rgba(13,25,48,.97);border:1px solid rgba(255,209,102,.35);border-radius:20px;padding:22px;color:#eef4ff;box-shadow:0 24px 70px rgba(0,0,0,.55);font-size:14px;line-height:1.55">'
+  +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b style="font-size:19px;color:#ffd166">⭐ PLEIN CIEL PRO</b><button id="proClose" style="background:none;border:none;color:#eef4ff;font-size:18px;cursor:pointer">✕</button></div>'
+  +'<div style="opacity:.75;margin-bottom:14px">La version gratuite reste complète, pour toujours. Le PRO ajoute le confort :</div>'
+  +proLine('🌊','Marées & courants','horaires des marées, meilleurs créneaux baignade et pêche')
+  +proLine('📡','Radar 48 h','anticipez les orages deux jours à l’avance')
+  +proLine('🔔','Alertes multi-villes','suivez jusqu’à 5 lieux (maison, vacances, proches)')
+  +proLine('🌀','Marine détaillée','période de houle et vague de vent (déjà inclus !)')
+  +proLine('🧩','Widget avancé','votre ciel direct sur l’écran d’accueil')
+  +'<div style="margin-top:16px;padding:12px;border-radius:12px;background:rgba(255,209,102,.12);border:1px solid rgba(255,209,102,.35);text-align:center"><b style="color:#ffd166">Bientôt : 2,99 €/mois ou 19,99 € à vie</b></div>'
+  +'<button id="proSoon" style="width:100%;margin-top:12px;padding:12px;border-radius:12px;border:0;background:#ffd166;color:#123;font-weight:800;cursor:pointer">Être prévenu au lancement 🚀</button>'
+  +'</div>';
+  document.body.appendChild(ov);
+  ov.querySelector('#proClose').addEventListener('click',()=>ov.remove());
+  ov.querySelector('#proSoon').addEventListener('click',()=>{ toast('Merci ! Vous serez prévenu au lancement 🚀'); ov.remove(); });
+  ov.addEventListener('click',e=>{if(e.target===ov)ov.remove();});
+}
+(function(){
+  const b=$('#proBtn'); if(!b)return;
+  b.addEventListener('click',openPro);
+})();
+
 /* ================= RAYON ALERTE PLUIE ================= */
 (function(){
   const seg=$('#rainRadiusSeg'); if(!seg)return;
