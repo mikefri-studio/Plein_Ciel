@@ -29,7 +29,6 @@ $$('#windLevelSeg button').forEach(b=>b.addEventListener('click',async()=>{
   updateWindParticles();
 }));
 
-
 // Bouton de test des notifications (Android/iOS native app)
 const testBtn = $('#testNotifBtn');
 if (testBtn) {
@@ -153,7 +152,6 @@ if(state&&state.overlay)state.overlay.setOpacity(1);
     toast(t.checked?'Infos marine détaillées activées 🌊':'Infos marine détaillées désactivées');
   });
 })();
-
 
 /* ================= RAYON ALERTE PLUIE ================= */
 (function(){
