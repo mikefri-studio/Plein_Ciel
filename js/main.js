@@ -80,14 +80,14 @@ if('serviceWorker' in navigator){
 let deferredPrompt=null;
 const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
 window.addEventListener('beforeinstallprompt',e=>{
-  e.preventDefault(); deferredPrompt=e; $('#installBtn').style.display='grid';
+  e.preventDefault(); deferredPrompt=e;
 });
-if(isIOS && !window.matchMedia('(display-mode: standalone)').matches) $('#installBtn').style.display='grid';
+
 function tryInstall(){
   if(deferredPrompt){
     deferredPrompt.prompt();
     deferredPrompt.userChoice.then(ch=>{
-      if(ch.outcome==='accepted'){ toast('Appli installée 🎉'); $('#installBtn').style.display='none'; }
+      if(ch.outcome==='accepted'){ toast('Appli installée 🎉'); }
       deferredPrompt=null;
     });
   }else if(isIOS){
@@ -96,7 +96,7 @@ function tryInstall(){
     toast("Menu du navigateur ⋮ → « Installer l'application »");
   }
 }
-$('#installBtn').addEventListener('click',tryInstall);
+
 window.addEventListener('appinstalled',()=>toast('Plein Ciel ajouté à votre appareil 🎉'));
 window.addEventListener('offline',()=>toast('📴 Hors ligne — dernières données affichées'));
 window.addEventListener('online',()=>toast('📶 De retour en ligne'));
