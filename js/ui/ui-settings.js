@@ -143,6 +143,17 @@ if(state&&state.overlay)state.overlay.setOpacity(1);
   });
 })();
 
+/* ================= INFOS MARINE + ================= */
+(function(){
+  const t=$('#marinePlusToggle'); if(!t)return;
+  t.checked = store.get('pc_marine_plus')==='1';
+  t.addEventListener('change',()=>{
+    store.set('pc_marine_plus', t.checked?'1':'0');
+    if(typeof renderMarine==='function') renderMarine();
+    toast(t.checked?'Infos marine détaillées activées 🌊':'Infos marine détaillées désactivées');
+  });
+})();
+
 /* ================= RAYON ALERTE PLUIE ================= */
 (function(){
   const seg=$('#rainRadiusSeg'); if(!seg)return;
