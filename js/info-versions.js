@@ -39,7 +39,8 @@ function openVersions(){
   '🗑️ Radar à 100 % + bouton Installer retiré',
   '🔍 Recherche tolérante : « saint saulge » trouve Saint-Saulge',
   '✍️ « St » et « Ste » compris comme Saint / Sainte',
-  '🔧 Villes récentes corrigées (erreur HTTP 400)'
+  '🔧 Villes récentes corrigées (erreur HTTP 400)',
+  '🛠️ Réparation auto de la position mémorisée au démarrage'
 ])+versionBlock('1.6.0','12 août 2026',[
     '🕐 Détail horaire : clic sur un jour → 24h de prévisions (température, % pluie, lever/coucher soleil)',
     '🚫 Sélection de texte désactivée (effet app native)',

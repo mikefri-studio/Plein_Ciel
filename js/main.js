@@ -1,11 +1,12 @@
 "use strict";
 /* ================= DÉMARRAGE ================= */
-const APP_VERSION='1.7.0';
+const APP_VERSION='1.7.1';
 console.log(`%c☁️ Plein Ciel v${APP_VERSION}`, 'color:#ffd166;font-size:18px;font-weight:bold');
 console.log('Développé avec ❤️ — météo Open-Meteo, radar RainViewer');
 $('#loadIco').innerHTML=icon(2,true);
 $('#year').textContent=new Date().getFullYear();
 $('#appVersion').textContent=APP_VERSION;
+if(state.loc&&state.loc.lat==null&&state.loc.latitude!=null){state.loc.lat=state.loc.latitude;state.loc.lon=state.loc.longitude;store.set('pc_loc',state.loc);}
 writeURL(state.loc);
 applyWidgets();
 load();
