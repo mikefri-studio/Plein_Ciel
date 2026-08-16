@@ -31,16 +31,15 @@ function openVersions(){
   ov.style.cssText='position:fixed;inset:0;background:rgba(4,10,25,.6);backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
   ov.innerHTML='<div style="max-width:600px;width:100%;max-height:82vh;overflow-y:auto;background:rgba(13,25,48,.97);border:1px solid rgba(255,255,255,.16);border-radius:18px;padding:20px 22px;color:#eef4ff;box-shadow:0 24px 70px rgba(0,0,0,.55);font-size:14px;line-height:1.55">'
   +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><b style="font-size:17px">📋 Historique des versions</b><button id="verClose" style="background:none;border:none;color:#eef4ff;font-size:18px;cursor:pointer">✕</button></div>'
-+versionBlock('1.7.7','16 août 2026',[
-  '🔍 Recherche tolérante : « saint saulge » trouve Saint-Saulge',
-  '🧩 Tirets, espaces et apostrophes ignorés automatiquement',
-  '✍️ « St » et « Ste » compris comme Saint / Sainte'
-])+versionBlock('1.7.1','16 août 2026',[
++versionBlock('1.8.0','16 août 2026',[
   '⚙️ Nouveau menu Paramètres (bouton flottant)',
-  '🎚️ Rayon d’alerte pluie réglable : 2 / 5 / 10 / 20 km',
-  '📏 Alerte pluie avec distance exacte (« précipitations à 3,2 km »)',
-  '️ Opacité radar fixe à 100 %',
+  '🎚️ Rayon d'alerte pluie réglable : 2 / 5 / 10 / 20 km',
+  '📏 Alerte pluie avec distance exacte affichée',
   '🌡️ Réglage °C/°F déplacé dans le menu Paramètres',
+  '🗑️ Radar à 100 % + bouton Installer retiré',
+  '🔍 Recherche tolérante : « saint saulge » trouve Saint-Saulge',
+  '✍️ « St » et « Ste » compris comme Saint / Sainte',
+  '🔧 Villes récentes corrigées (erreur HTTP 400)'
 ])+versionBlock('1.6.0','12 août 2026',[
     '🕐 Détail horaire : clic sur un jour → 24h de prévisions (température, % pluie, lever/coucher soleil)',
     '🚫 Sélection de texte désactivée (effet app native)',
