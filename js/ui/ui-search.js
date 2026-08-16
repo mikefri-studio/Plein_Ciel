@@ -11,7 +11,7 @@ function showQuick(){
   const list=rec.length?rec:DEFAULTS;
   openList(`<div class="qt">${rec.length?'Recherches récentes':'Suggestions'}</div>`+
     list.map((r,i)=>{
-      const fav=isFav({lat:r.latitude,lon:r.longitude});
+      const fav=isFav({lat:(r.latitude??r.lat),lon:(r.longitude??r.lon)});
       return `<div class="qi ${fav?'fav':''}" data-i="${i}"><b>${r.name} <span class="star">★</span></b><span>${[r.admin1,r.country].filter(Boolean).join(' · ')}</span></div>`;
     }).join(''));
   lastResults=list;
@@ -27,7 +27,7 @@ qEl.addEventListener('input',()=>{
       lastResults=d.results||[];
       if(!lastResults.length){ openList(`<div class="qt">Aucun résultat pour « ${v} »</div>`); return; }
       openList(lastResults.map((r,i)=>{
-        const fav=isFav({lat:r.latitude,lon:r.longitude});
+        const fav=isFav({lat:(r.latitude??r.lat),lon:(r.longitude??r.lon)});
         return `<div class="qi ${fav?'fav':''}" data-i="${i}"><b>${r.name} <span class="star">★</span></b><span>${[r.admin1,r.country].filter(Boolean).join(' · ')}</span></div>`;
       }).join(''));
     }catch(e){ closeList(); }
@@ -54,7 +54,8 @@ document.addEventListener('keydown',e=>{ if(e.key==='/'&&document.activeElement!
 
 function pickCity(r){
   closeList(); qEl.value=''; qEl.blur();
-  const loc={latitude:r.latitude,longitude:r.longitude,name:r.name,sub:[r.admin1,r.country].filter(Boolean).join(' · ')};
+  const lat=r.latitude??r.lat, lon=r.longitude??r.lon;
+  const loc={lat,lon,name:r.name,sub:r.sub||[r.admin1,r.country].filter(Boolean).join(' · ')};
   const rec=store.get('pc_recent')||[];
   store.set('pc_recent',[loc,...rec.filter(x=>x.name!==loc.name)].slice(0,5));
   setLoc(loc);
