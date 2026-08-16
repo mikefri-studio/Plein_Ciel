@@ -75,7 +75,8 @@ function updateAlertBar(info){
   const city=state.loc.name;
   let msg='';
   if(info.radar){
-    msg = info.level>=3 ? `<b>CELLULE ORAGEUSE AU RADAR</b> · ${city} — fortes précipitations en cours, mettez-vous à l'abri` : `<b>PLUIE AU RADAR</b> · ${city} — précipitations détectées à proximité`;
+    const distTxt=(info.distance==null||info.distance>=99)?'à proximité':(info.distance<1?'moins de 1 km':`à ${info.distance} km`);
+    msg = info.level>=3 ? `<b>CELLULE ORAGEUSE AU RADAR</b> · ${city} — ${distTxt}, mettez-vous à l'abri` : `<b>PLUIE AU RADAR</b> · ${city} — précipitations ${distTxt}`;
   } else if(info.level===3){
     msg=`<b>ORAGE EN COURS</b> · ${city} — mettez-vous à l'abri`;
   }else{
@@ -91,7 +92,7 @@ function updateAlertBar(info){
 }
 async function radarLevelAtLoc(){
   const R=state.radar;
-  if(!R.host||!R.frames.length) return 0;
+  if(!R.host||!R.frames.length) return {level:0,distance:99};
   const frame=R.frames[Math.max(0,R.pastCount-1)];
   const z=7, n=1<<z;
   const lat=state.loc.lat, lon=state.loc.lon;
@@ -99,29 +100,35 @@ async function radarLevelAtLoc(){
   const x=Math.floor(xf), y=Math.floor(yf);
   const url=`${R.host}${frame.path}/256/${z}/${x}/${y}/2/1_1.png`;
   const blob=await fetch(url).then(r=>r.ok?r.blob():null);
-  if(!blob) return 0;
+  if(!blob) return {level:0,distance:99};
   const bmp=await createImageBitmap(blob);
   const cv=document.createElement('canvas'); cv.width=256; cv.height=256;
   const cx=cv.getContext('2d',{willReadFrequently:true});
   cx.drawImage(bmp,0,0);
   const px=Math.round((xf-x)*256), py=Math.round((yf-y)*256);
-  const x0=Math.max(0,px-2), y0=Math.max(0,py-2);
-  const d=cx.getImageData(x0,y0,5,5).data;
-  let lvl=0;
-  for(let i=0;i<d.length;i+=4){
+  const kmPerPx=(40075.017*Math.cos(lat*Math.PI/180))/(n*256);
+  const scan=31;
+  const x0=Math.max(0,Math.min(256-scan,Math.round(px-scan/2))), y0=Math.max(0,Math.min(256-scan,Math.round(py-scan/2)));
+  const d=cx.getImageData(x0,y0,scan,scan).data;
+  let lvl=0, minDist=99;
+  for(let dy=0;dy<scan;dy++)for(let dx=0;dx<scan;dx++){
+    const i=(dy*scan+dx)*4;
     if(d[i+3]<20) continue;
-    const r=d[i], g=d[i+1], b=d[i+2];
-    if((r>200&&g<180)||(r>140&&b>190)) return 3;
-    lvl=1;
+    const r=d[i],g=d[i+1],b=d[i+2];
+    const dist=Math.hypot(dx-(px-x0),dy-(py-y0))*kmPerPx;
+    if(dist>=minDist) continue;
+    minDist=dist;
+    lvl=Math.max(lvl, ((r>200&&g<180)||(r>140&&b>190))?3:1);
   }
-  return lvl;
+  return {level:lvl, distance:Math.round(minDist*10)/10};
 }
 async function checkThunderAlert(forceNotify=false){
   let info=analyzeThunder();
   if(info.level===0){
     try{
       const r=await radarLevelAtLoc();
-      if(r>0) info={level:r, radar:true, firstTime:'radar'+(state.radar.frames[Math.max(0,state.radar.pastCount-1)]||{time:0}).time};
+      const maxKm=Number(store.get('pc_rain_radius')||10);
+      if(r.level>0 && r.distance<=maxKm) info={level:r.level, distance:r.distance, radar:true, firstTime:'radar'+(state.radar.frames[Math.max(0,state.radar.pastCount-1)]||{time:0}).time};
     }catch(e){}
   }
   updateAlertBar(info);
