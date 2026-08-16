@@ -132,6 +132,17 @@ if(state&&state.overlay)state.overlay.setOpacity(1);
   back.addEventListener('click',shut);
 })();
 
+/* ================= GÉO AUTO AU LANCEMENT ================= */
+(function(){
+  const t=$('#geoAutoToggle'); if(!t)return;
+  t.checked = store.get('pc_geo_auto')!=='0';
+  t.addEventListener('change',()=>{
+    store.set('pc_geo_auto', t.checked?'1':'0');
+    if(t.checked) store.set('pc_geo_denied','0');
+    toast(t.checked?'Géolocalisation auto activée 📍':'Géolocalisation auto désactivée 🏙️');
+  });
+})();
+
 /* ================= RAYON ALERTE PLUIE ================= */
 (function(){
   const seg=$('#rainRadiusSeg'); if(!seg)return;
