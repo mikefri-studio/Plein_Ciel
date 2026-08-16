@@ -34,7 +34,7 @@ function aqURL(lat,lon){
 async function fetchMarine(lat,lon){
   const base=`https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}&current=`;
   try{
-    return await fetchJSON(base+'wave_height,wave_direction,wave_period,swell_wave_height,swell_wave_direction,swell_wave_period,sea_surface_temperature');
+    return await fetchJSON(base+'wave_height,wave_direction,wave_period,swell_wave_height,swell_wave_direction,swell_wave_period,sea_surface_temperature,wind_wave_height,wind_wave_period,wind_wave_direction');
   }catch(e){
     try{ return await fetchJSON(base+'wave_height,wave_direction,wave_period'); }
     catch(e2){ console.warn('Marine indisponible :',e2); return null; }

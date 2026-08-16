@@ -19,6 +19,10 @@ function renderMarine(){
   }
   if(c.swell_wave_height!=null) html+=cell('Houle', c.swell_wave_height.toFixed(1)+' m', c.swell_wave_direction!=null?`venant de ${cardOf(c.swell_wave_direction)}`:'');
   if(c.wave_period!=null) html+=cell('Période', Math.round(c.wave_period)+' s', 'entre deux vagues');
+  if(store.get('pc_marine_plus')==='1'){
+    if(c.swell_wave_period!=null) html+=cell('Période houle', Math.round(c.swell_wave_period)+' s', 'idéal surf si >10 s');
+    if(c.wind_wave_height!=null) html+=cell('Vague de vent', c.wind_wave_height.toFixed(1)+' m', c.wind_wave_direction!=null?'venant de '+cardOf(c.wind_wave_direction):'');
+  }
   box.innerHTML=html;
   note.textContent='Point d\u2019eau le plus proche · modèle océanique Open-Meteo';
 }
