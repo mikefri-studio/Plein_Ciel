@@ -23,8 +23,13 @@ qEl.addEventListener('input',()=>{
   if(v.length<2){ showQuick(); return; }
   debT=setTimeout(async()=>{
     try{
-      const d=await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(v)}&count=6&language=fr&format=json`).then(r=>r.json());
-      lastResults=d.results||[];
+      const variants=[...new Set([v, v.replace(/\s+/g,'-'), v.replace(/[-'']/g,' ')])].filter(q=>q.length>=2);
+      lastResults=[];
+      for(const q of variants){
+        const d=await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=6&language=fr&format=json`).then(r=>r.json());
+        lastResults=d.results||[];
+        if(lastResults.length)break;
+      }
       if(!lastResults.length){ openList(`<div class="qt">Aucun résultat pour « ${v} »</div>`); return; }
       openList(lastResults.map((r,i)=>{
         const fav=isFav({lat:(r.latitude??r.lat),lon:(r.longitude??r.lon)});
