@@ -33,7 +33,7 @@ function openVersions(){
   +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><b style="font-size:17px">📋 Historique des versions</b><button id="verClose" style="background:none;border:none;color:#eef4ff;font-size:18px;cursor:pointer">✕</button></div>'
 +versionBlock('1.7.0','16 août 2026',[
   '⚙️ Nouveau menu Paramètres (bouton flottant)',
-  '🎚️ Rayon d'alerte pluie réglable : 2 / 5 / 10 / 20 km',
+  '🎚️ Rayon d’alerte pluie réglable : 2 / 5 / 10 / 20 km',
   '📏 Alerte pluie avec distance exacte affichée',
   '🌡️ Réglage °C/°F déplacé dans le menu Paramètres',
   '🗑️ Radar à 100 % + bouton Installer retiré',
