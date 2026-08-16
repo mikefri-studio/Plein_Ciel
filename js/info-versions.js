@@ -36,6 +36,7 @@ function openVersions(){
   '🎚️ Rayon d’alerte pluie réglable : 2 / 5 / 10 / 20 km',
   '📏 Alerte pluie avec distance exacte (« précipitations à 3,2 km »)',
   '️ Opacité radar fixe à 100 %',
+  '🌡️ Réglage °C/°F déplacé dans le menu Paramètres',
 ])+versionBlock('1.6.0','12 août 2026',[
     '🕐 Détail horaire : clic sur un jour → 24h de prévisions (température, % pluie, lever/coucher soleil)',
     '🚫 Sélection de texte désactivée (effet app native)',

@@ -1,12 +1,4 @@
 "use strict";
-/* ================= UNITÉS ================= */
-$$('#units button').forEach(b=>b.addEventListener('click',()=>{
-  if(state.units===b.dataset.u)return;
-  state.units=b.dataset.u; store.set('pc_units',state.units);
-  $$('#units button').forEach(x=>x.classList.toggle('on',x===b));
-  if(state.fc)renderAll();
-}));
-$$('#units button').forEach(b=>b.classList.toggle('on',b.dataset.u===state.units));
 
 /* ================= CONTRÔLES CARTE ================= */
 $('#playBtn').addEventListener('click',togglePlay);
@@ -117,6 +109,15 @@ $('#dayDetailModal').addEventListener('click', e => {
 
 addEventListener('DOMContentLoaded',()=>{
 /* ================= OPACITÉ FIXE 100% ================= */
+/* ================= UNITÉS ================= */
+$$('#units button').forEach(b=>b.addEventListener('click',()=>{
+  if(state.units===b.dataset.u)return;
+  state.units=b.dataset.u; store.set('pc_units',state.units);
+  $$('#units button').forEach(x=>x.classList.toggle('on',x===b));
+  if(state.fc)renderAll();
+}));
+$$('#units button').forEach(b=>b.classList.toggle('on',b.dataset.u===state.units));
+
 if(state&&state.radar)state.radar.op=1;
 if(state&&state.overlay)state.overlay.setOpacity(1);
 

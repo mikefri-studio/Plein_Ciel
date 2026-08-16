@@ -67,9 +67,6 @@
     <button class="ibtn" id="geoBtn" title="Ma position" aria-label="Ma position">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8"/></svg>
     </button>
-    <div class="seg" id="units">
-      <button data-u="C" class="on">°C</button><button data-u="F">°F</button>
-    </div>
   </div>
 </header>
 
@@ -305,6 +302,11 @@
     <b>⚙️ Paramètres</b>
     <button id="settingsClose" style="border:0;background:transparent;color:#eef4ff;font-size:18px;cursor:pointer">✕</button>
   </div>
+    <div style="font-size:13px;opacity:.8;margin-bottom:6px">Unités température</div>
+  <div class="seg" id="units">
+      <button data-u="C" class="on">°C</button><button data-u="F">°F</button>
+    </div>
+  <div style="height:14px"></div>
   <div style="font-size:13px;opacity:.8;margin-bottom:6px">Rayon d'alerte pluie</div>
   <div class="seg" id="rainRadiusSeg"><button data-r="2">2 km</button><button data-r="5">5 km</button><button data-r="10">10 km</button><button data-r="20">20 km</button></div>
 </div>
