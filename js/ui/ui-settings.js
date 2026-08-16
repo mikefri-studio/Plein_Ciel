@@ -115,6 +115,7 @@ $('#dayDetailModal').addEventListener('click', e => {
   if (e.target.id === 'dayDetailModal') $('#dayDetailModal').classList.remove('open');
 });
 
+addEventListener('DOMContentLoaded',()=>{
 /* ================= OPACITÉ FIXE 100% ================= */
 if(state&&state.radar)state.radar.op=1;
 if(state&&state.overlay)state.overlay.setOpacity(1);
@@ -142,3 +143,5 @@ if(state&&state.overlay)state.overlay.setOpacity(1);
     toast('Alerte pluie si précipitations à moins de '+r+' km 🌧️');
   }));
 })();
+
+});
