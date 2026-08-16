@@ -23,7 +23,8 @@ qEl.addEventListener('input',()=>{
   if(v.length<2){ showQuick(); return; }
   debT=setTimeout(async()=>{
     try{
-      const variants=[...new Set([v, v.replace(/\s+/g,'-'), v.replace(/[-'']/g,' ')])].filter(q=>q.length>=2);
+      const exp=v.replace(/\bste[\s.-]+/gi,'sainte ').replace(/\bst[\s.-]+/gi,'saint ');
+      const variants=[...new Set([v, exp, v.replace(/\s+/g,'-'), exp.replace(/\s+/g,'-'), v.replace(/[-'']/g,' '), exp.replace(/[-'']/g,' ')])].filter(q=>q.trim().length>=2);
       lastResults=[];
       for(const q of variants){
         const d=await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=6&language=fr&format=json`).then(r=>r.json());
