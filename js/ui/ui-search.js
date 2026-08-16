@@ -54,7 +54,7 @@ document.addEventListener('keydown',e=>{ if(e.key==='/'&&document.activeElement!
 
 function pickCity(r){
   closeList(); qEl.value=''; qEl.blur();
-  const loc={lat:r.latitude,lon:r.longitude,name:r.name,sub:[r.admin1,r.country].filter(Boolean).join(' · ')};
+  const loc={latitude:r.latitude,longitude:r.longitude,name:r.name,sub:[r.admin1,r.country].filter(Boolean).join(' · ')};
   const rec=store.get('pc_recent')||[];
   store.set('pc_recent',[loc,...rec.filter(x=>x.name!==loc.name)].slice(0,5));
   setLoc(loc);
