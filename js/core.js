@@ -226,3 +226,39 @@ function computeSunEvents(lat,lng,offSec){
 }
 const fmtMin=m=>m==null?'—':`${String(Math.floor(m/60)%24).padStart(2,'0')}h${String(m%60).padStart(2,'0')}`;
 
+
+/* Calcule l'icône dominante du jour à partir des heures 8h-20h
+   Plus fidèle que le weather_code daily d'Open-Meteo (qui peut
+   donner un nuage même sur une journée majoritairement ensoleillée).
+   Règles de sécurité : orage/pluie/neige priorisés si ≥ seuil. */
+function calcDayIcon(hourlyCodes, hourlyTimes, dateStr){
+  if(!hourlyCodes||!hourlyTimes||!dateStr) return null;
+  const codes=[];
+  for(let i=0;i<hourlyTimes.length;i++){
+    const h=hourlyTimes[i], hr=h.slice(11,13), day=h.slice(0,10);
+    if(day===dateStr){
+      const hour=+hr;
+      if(hour>=8&&hour<20&&hourlyCodes[i]!=null) codes.push(hourlyCodes[i]);
+    }
+  }
+  if(codes.length===0) return null;
+  const count=(lo,hi)=>codes.filter(c=>c>=lo&&c<=hi).length;
+  const storm=count(95,99), snow=count(71,86),
+        rain=count(51,67)+count(80,82), fog=count(45,48),
+        over=codes.filter(c=>c===3).length,
+        part=codes.filter(c=>c===1||c===2).length,
+        clear=codes.filter(c=>c===0).length;
+  if(storm>=2) return 95;
+  if(rain>=3)  return 61;
+  if(snow>=3)  return 71;
+  const max=Math.max(clear,part,over,fog,rain,snow,storm);
+  if(max===0) return null;
+  if(clear===max) return 0;
+  if(part===max)  return 1;
+  if(over===max)  return 3;
+  if(fog===max)   return 45;
+  if(rain===max)  return 61;
+  if(snow===max)  return 71;
+  if(storm===max) return 95;
+  return null;
+}
