@@ -246,15 +246,15 @@ function calcDayIcon(hourlyCodes, hourlyTimes, dateStr){
   const storm=count(95,99), snow=count(71,86),
         rain=count(51,67)+count(80,82), fog=count(45,48),
         over=codes.filter(c=>c===3).length,
-        part=codes.filter(c=>c===1||c===2).length,
-        clear=codes.filter(c=>c===0).length;
+        part=codes.filter(c=>c===2).length,
+        clear=codes.filter(c=>c<=1).length;
   if(storm>=2) return 95;
   if(rain>=3)  return 61;
   if(snow>=3)  return 71;
   const max=Math.max(clear,part,over,fog,rain,snow,storm);
   if(max===0) return null;
-  if(clear===max) return 0;
-  if(part===max)  return 1;
+  if(part===max)  return 2;
+  if(clear===max) return 1;
   if(over===max)  return 3;
   if(fog===max)   return 45;
   if(rain===max)  return 61;
