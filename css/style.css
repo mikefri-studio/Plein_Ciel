@@ -218,7 +218,7 @@ body.has-alert .alert-bar{top:0}
 .hour .ht{font-size:12px;color:var(--ink-soft);font-weight:600;letter-spacing:.04em}
 .hour .wxi{width:34px;height:34px}
 .hour .htemp{font-family:'Big Shoulders Display';font-weight:700;font-size:21px}
-.hour .hp{display:flex;align-items:center;gap:3px;font-size:11px;color:var(--dropc);font-weight:700;min-height:14px}
+.hour .hp{display:flex;align-items:center;gap:3px;font-size:11px;color:var(--ink);font-weight:700;min-height:14px}
 .hour .hp svg{width:9px;height:12px;fill:var(--dropc)}
 
 .cols{display:grid;grid-template-columns:1.55fr .9fr;gap:20px;align-items:start}
@@ -229,7 +229,7 @@ body.has-alert .alert-bar{top:0}
 .day .dn{font-weight:700;font-size:15px}
 .day .dn small{display:block;font-weight:500;font-size:11.5px;color:var(--ink-soft)}
 .day .wxi{width:32px;height:32px}
-.day .dp{font-size:12px;font-weight:700;color:var(--dropc)}
+.day .dp{font-size:12px;font-weight:700;color:var(--ink)}
 .day .dmin{color:var(--ink-soft);font-weight:600;text-align:right}
 .day .dmax{font-weight:700;text-align:right}
 .dbar{position:relative;height:6px;border-radius:99px;background:var(--line)}
