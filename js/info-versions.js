@@ -33,6 +33,11 @@ function openVersions(){
   +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><b style="font-size:17px">📋 Historique des versions</b><button id="verClose" style="background:none;border:none;color:#eef4ff;font-size:18px;cursor:pointer">✕</button></div>'
 +versionBlock('1.7.3','16 août 2026',[
   '🌊 Réglage « Plus d’infos marine » (période houle + vague de vent)'
++versionBlock('1.7.5','20 août 2026',[
+  '🎨 Lisibilité améliorée : pourcentage de pluie en blanc'
+])+versionBlock('1.7.4','18 août 2026',[
+  '🎨 Icône du jour : partiellement nuageux = code 2 (correctif)'
+])
 ])+versionBlock('1.7.2','16 août 2026',[
   '📍 Réglage : géolocalisation auto au lancement (ON/OFF)'
 ])+versionBlock('1.7.0','16 août 2026',[
