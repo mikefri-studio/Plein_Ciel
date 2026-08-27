@@ -35,6 +35,16 @@ function openVersions(){
   '🌊 Réglage « Plus d’infos marine » (période houle + vague de vent)'
 +versionBlock('1.7.5','20 août 2026',[
   '🎨 Lisibilité améliorée : pourcentage de pluie en blanc'
+
++versionBlock('1.7.6','28 août 2026',[
+  '⛈️ Icône principale synchronisée avec les alertes radar',
+  '🎯 Affichage orage/pluie quand cellule détectée au radar'
+])
+
++versionBlock('1.7.6','28 août 2026',[
+  '⛈️ Icône principale synchronisée avec les alertes radar',
+  '🎯 Affichage orage/pluie quand cellule détectée au radar'
+])
 ])+versionBlock('1.7.4','18 août 2026',[
   '🎨 Icône du jour : partiellement nuageux = code 2 (correctif)'
 ])
