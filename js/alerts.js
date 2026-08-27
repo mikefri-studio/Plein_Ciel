@@ -65,7 +65,7 @@ function syncAlertHeight(){
   if(h) document.documentElement.style.setProperty('--alert-h',h+'px');
 }
 addEventListener('resize',syncAlertHeight);
-function updateAlertBar(info){updateAlertState(info);
+function updateAlertBar(info){updateAlertState(info);updateAlertState(info);
   const bar=$('#alertBar'), txt=$('#alertText');
   if(!info||info.level===0){
     bar.classList.remove('on');
