@@ -127,11 +127,9 @@ if(state&&state.overlay)state.overlay.setOpacity(1);
   const open=()=>{panel.style.display='block';back.style.display='block';};
   const shut=()=>{panel.style.display='none';back.style.display='none';};
   
-  // Écouter tous les boutons de paramètres possibles (compatibilité)
-  const btn1=$('#settingsBtn'), btn2=$('#settingsFabTop'), btn3=$('#settingsFab');
-  if(btn1) btn1.addEventListener('click',open);
-  if(btn2) btn2.addEventListener('click',open);
-  if(btn3) btn3.addEventListener('click',open);
+  // Bouton principal dans le header
+  const btn=$('#settingsBtn');
+  if(btn) btn.addEventListener('click',open);
   
   if(close) close.addEventListener('click',shut);
   if(back) back.addEventListener('click',shut);
