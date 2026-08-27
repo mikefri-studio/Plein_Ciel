@@ -127,6 +127,8 @@ if(state&&state.overlay)state.overlay.setOpacity(1);
   const open=()=>{panel.style.display='block';back.style.display='block';};
   const shut=()=>{panel.style.display='none';back.style.display='none';};
   fab.addEventListener('click',open);
+  const fabTop=$('#settingsFabTop');
+  if(fabTop) fabTop.addEventListener('click',open);
   close.addEventListener('click',shut);
   back.addEventListener('click',shut);
 })();
