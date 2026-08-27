@@ -65,7 +65,7 @@ function syncAlertHeight(){
   if(h) document.documentElement.style.setProperty('--alert-h',h+'px');
 }
 addEventListener('resize',syncAlertHeight);
-function updateAlertBar(info){
+function updateAlertBar(info){updateAlertState(info);
   const bar=$('#alertBar'), txt=$('#alertText');
   if(!info||info.level===0){
     bar.classList.remove('on');
@@ -175,3 +175,5 @@ $('#setSound').addEventListener('change',e=>{
 syncAlertPrefs();
 setInterval(()=>{ if(state.fc) checkThunderAlert(); }, 10*60*1000);
 
+
+function updateAlertState(info){state.alert.current=info;}

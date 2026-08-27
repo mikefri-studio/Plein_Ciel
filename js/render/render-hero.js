@@ -1,9 +1,10 @@
 "use strict";
 const safe=(name,f)=>{ try{ f(); }catch(err){ console.error('Erreur de rendu ['+name+'] :',err); } };
+function getAlertIcon(){const a=state.alert&&state.alert.current;if(!a||a.level===0)return null;if(a.radar)return a.level>=3?'thunder':'rain';if(a.level===3)return'thunder';return null;}
 function renderAll(){
   const fc=state.fc, c=fc.current, day=fc.daily, isDay=c.is_day==1, code=c.weather_code;
   const grp=condGroup(code);
-  let th = grp==='clear' ? (isDay?'clear-day':'clear-night')
+  const ai=getAlertIcon();let th=ai==='thunder'?'thunder':ai==='rain'?(isDay?'rain-day':'rain-night'):grp==='clear' ? (isDay?'clear-day':'clear-night')
         : (grp==='partly'||grp==='cloud') ? (isDay?'cloudy-day':'cloudy-night')
         : grp==='fog' ? (isDay?'fog-day':'fog-night')
         : grp==='drizzle'||grp==='rain' ? (isDay?'rain-day':'rain-night')
@@ -18,7 +19,7 @@ function renderAll(){
   $('#bigUnit').textContent=unitT();
   $('#condTxt').textContent=WMO[code]||'—';
   $('#feels').textContent=`Ressenti ${fmtT(c.apparent_temperature)}${unitT()}`;
-  $('#heroIcon').innerHTML=icon(code,isDay);
+  const ai2=getAlertIcon();$('#heroIcon').innerHTML=ai2==='thunder'?icon(95,isDay):ai2==='rain'?icon(61,isDay):icon(code,isDay);
   $('#updated').textContent=`Mis à jour à ${hm(c.time)}`;
   $('#updated').classList.remove('updated-stale');
   const la=state.loc.lat.toFixed(2), lo=state.loc.lon.toFixed(2);
