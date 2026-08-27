@@ -122,15 +122,19 @@ if(state&&state.overlay)state.overlay.setOpacity(1);
 
 /* ================= PANNEAU PARAMÈTRES ================= */
 (function(){
-  const fab=$('#settingsFab'), panel=$('#settingsPanel'), back=$('#settingsBackdrop'), close=$('#settingsClose');
-  if(!fab||!panel)return;
+  const panel=$('#settingsPanel'), back=$('#settingsBackdrop'), close=$('#settingsClose');
+  if(!panel) return;
   const open=()=>{panel.style.display='block';back.style.display='block';};
   const shut=()=>{panel.style.display='none';back.style.display='none';};
-  fab.addEventListener('click',open);
-  const fabTop=$('#settingsFabTop');
-  if(fabTop) fabTop.addEventListener('click',open);
-  close.addEventListener('click',shut);
-  back.addEventListener('click',shut);
+  
+  // Écouter tous les boutons de paramètres possibles (compatibilité)
+  const btn1=$('#settingsBtn'), btn2=$('#settingsFabTop'), btn3=$('#settingsFab');
+  if(btn1) btn1.addEventListener('click',open);
+  if(btn2) btn2.addEventListener('click',open);
+  if(btn3) btn3.addEventListener('click',open);
+  
+  if(close) close.addEventListener('click',shut);
+  if(back) back.addEventListener('click',shut);
 })();
 
 /* ================= GÉO AUTO AU LANCEMENT ================= */
