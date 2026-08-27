@@ -122,17 +122,26 @@ if(state&&state.overlay)state.overlay.setOpacity(1);
 
 /* ================= PANNEAU PARAMÈTRES ================= */
 (function(){
-  const panel=$('#settingsPanel'), back=$('#settingsBackdrop'), close=$('#settingsClose');
+  const panel = $('#settingsPanel');
+  const back = $('#settingsBackdrop');
+  const close = $('#settingsClose');
+  const btn = $('#settingsBtn'); // Le bouton dans le header
+  
   if(!panel) return;
-  const open=()=>{panel.style.display='block';back.style.display='block';};
-  const shut=()=>{panel.style.display='none';back.style.display='none';};
   
-  // Bouton principal dans le header
-  const btn=$('#settingsBtn');
-  if(btn) btn.addEventListener('click',open);
+  const open = () => {
+    if(panel) panel.style.display = 'block';
+    if(back) back.style.display = 'block';
+  };
   
-  if(close) close.addEventListener('click',shut);
-  if(back) back.addEventListener('click',shut);
+  const shut = () => {
+    if(panel) panel.style.display = 'none';
+    if(back) back.style.display = 'none';
+  };
+  
+  if(btn) btn.addEventListener('click', open);
+  if(close) close.addEventListener('click', shut);
+  if(back) back.addEventListener('click', shut);
 })();
 
 /* ================= GÉO AUTO AU LANCEMENT ================= */
