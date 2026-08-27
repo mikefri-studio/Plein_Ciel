@@ -144,3 +144,77 @@ const APK_URL='';
   sp.style.flexShrink='0';
   document.body.appendChild(sp);
 })();
+
+/* ================= PULL-TO-REFRESH ================= */
+(function initPullToRefresh(){
+  let startY=0, currentY=0, isPulling=false, threshold=100;
+  const ptr=document.createElement('div');
+  ptr.id='pullToRefresh';
+  ptr.innerHTML='<div class="ptr-content"><span class="ptr-icon">️</span><span class="ptr-text">Tirez pour rafraîchir</span></div>';
+  ptr.style.cssText='position:fixed;top:0;left:0;right:0;height:0;overflow:hidden;z-index:9999;transition:height .2s';
+  ptr.querySelector('.ptr-content').style.cssText='display:flex;align-items:center;justify-content:center;padding:12px;background:linear-gradient(180deg,rgba(90,180,255,.15),transparent);color:#eef4ff;font-size:14px';
+  document.body.appendChild(ptr);
+  
+  const ptrIcon=ptr.querySelector('.ptr-icon');
+  const ptrText=ptr.querySelector('.ptr-text');
+  
+  function onStart(e){
+    if(window.scrollY===0){
+      isPulling=true;
+      startY=e.type==='touchstart'?e.touches[0].pageY:e.pageY;
+      ptr.style.transition='none';
+    }
+  }
+  
+  function onMove(e){
+    if(!isPulling)return;
+    currentY=(e.type==='touchmove'?e.touches[0].pageY:e.pageY)-startY;
+    if(currentY>0){
+      e.preventDefault();
+      const height=Math.min(currentY*0.6,150);
+      ptr.style.height=height+'px';
+      const progress=height/threshold;
+      if(progress>=1){
+        ptrIcon.textContent='🔄';
+        ptrText.textContent='Relâchez pour rafraîchir';
+      }else{
+        ptrIcon.textContent='⬇️';
+        ptrText.textContent='Tirez pour rafraîchir';
+      }
+    }
+  }
+  
+  async function onEnd(){
+    if(!isPulling)return;
+    isPulling=false;
+    const height=parseFloat(ptr.style.height)||0;
+    if(height>=threshold){
+      ptrIcon.textContent='⏳';
+      ptrText.textContent='Rafraîchissement...';
+      try{
+        await fetchData();
+        renderAll();
+        checkThunderAlert();
+        ptrIcon.textContent='✅';
+        ptrText.textContent='Actualisé !';
+        setTimeout(()=>{ ptr.style.height='0px'; ptrIcon.textContent='️'; ptrText.textContent='Tirez pour rafraîchir'; }, 800);
+      }catch(e){
+        ptrIcon.textContent='❌';
+        ptrText.textContent='Échec du rafraîchissement';
+        setTimeout(()=>{ ptr.style.height='0px'; ptrIcon.textContent='⬇️'; ptrText.textContent='Tirez pour rafraîchir'; }, 1000);
+      }
+    }else{
+      ptr.style.height='0px';
+      ptrIcon.textContent='️';
+      ptrText.textContent='Tirez pour rafraîchir';
+    }
+    ptr.style.transition='height .2s';
+  }
+  
+  document.addEventListener('touchstart', onStart, {passive:true});
+  document.addEventListener('touchmove', onMove, {passive:false});
+  document.addEventListener('touchend', onEnd);
+  document.addEventListener('mousedown', onStart);
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onEnd);
+})();
