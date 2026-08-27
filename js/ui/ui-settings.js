@@ -120,28 +120,31 @@ $$('#units button').forEach(b=>b.classList.toggle('on',b.dataset.u===state.units
 if(state&&state.radar)state.radar.op=1;
 if(state&&state.overlay)state.overlay.setOpacity(1);
 
-/* ================= PANNEAU PARAMÈTRES ================= */
+/* ================= MODALE PARAMÈTRES ================= */
 (function(){
-  const panel = $('#settingsPanel');
-  const back = $('#settingsBackdrop');
-  const close = $('#settingsClose');
-  const btn = $('#settingsBtn'); // Le bouton dans le header
+  const modal = $('#settingsModal');
+  const close = $('#setClose');
+  const btn = $('#settingsBtn');
+  const done = $('#widgetDone');
+  const reset = $('#widgetReset');
   
-  if(!panel) return;
+  if(!modal) return;
   
-  const open = () => {
-    if(panel) panel.style.display = 'block';
-    if(back) back.style.display = 'block';
-  };
-  
-  const shut = () => {
-    if(panel) panel.style.display = 'none';
-    if(back) back.style.display = 'none';
-  };
+  const open = () => { modal.classList.add('open'); };
+  const shut = () => { modal.classList.remove('open'); };
   
   if(btn) btn.addEventListener('click', open);
   if(close) close.addEventListener('click', shut);
-  if(back) back.addEventListener('click', shut);
+  if(done) done.addEventListener('click', shut);
+  if(reset) reset.addEventListener('click', () => {
+    document.querySelectorAll('#widgetList input[type=checkbox]').forEach(cb => cb.checked = true);
+    toast('Tous les widgets réaffichés');
+  });
+  
+  // Fermer en cliquant à l'extérieur
+  modal.addEventListener('click', e => {
+    if(e.target === modal || e.target.closest('.im-box') === null) shut();
+  });
 })();
 
 /* ================= GÉO AUTO AU LANCEMENT ================= */

@@ -245,24 +245,51 @@
     <div class="day-detail-hours" id="dayDetailHours"></div>
   </div>
 </div>
-<!-- ===== Modale « Réglages d'affichage » ===== -->
+<!-- ===== Modale « Paramètres » (fusionnée) ===== -->
 <div id="settingsModal" role="dialog" aria-modal="true">
   <div class="im-box">
     <button class="imClose" id="setClose" aria-label="Fermer">✕</button>
-    <h4>⚙️ Personnaliser l'affichage</h4>
-    <p class="sub" style="margin-bottom:12px">Cochez les widgets à afficher. Votre choix est enregistré sur cet appareil.</p>
-    <div class="lbl" style="margin:4px 0 6px">Alertes orage</div>
-    <label class="wrow"><input type="checkbox" id="setNotif"><span class="we">🔔</span><span class="wl">Notifications d'orage</span></label>
+    <h4>⚙️ Paramètres</h4>
+    
+    <div class="lbl" style="margin:14px 0 6px">Unités de température</div>
+    <div class="seg" id="units">
+      <button data-u="C" class="on">°C</button><button data-u="F">°F</button>
+    </div>
+    
+    <div class="lbl" style="margin:14px 0 6px">Rayon d'alerte pluie</div>
+    <div class="seg" id="rainRadiusSeg">
+      <button data-r="2">2 km</button><button data-r="5">5 km</button>
+      <button data-r="10">10 km</button><button data-r="20">20 km</button>
+    </div>
+    
+    <div style="height:14px"></div>
+    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px">
+      <input type="checkbox" id="geoAutoToggle">
+      <span>Géolocalisation auto au lancement</span>
+    </label>
+    
+    <div style="height:10px"></div>
+    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px">
+      <input type="checkbox" id="marinePlusToggle">
+      <span>Plus d'infos marine (houle détaillée)</span>
+    </label>
+    
+    <div class="lbl" style="margin:14px 0 6px">Alertes orage</div>
+    <label class="wrow"><input type="checkbox" id="setNotif"><span class="we"></span><span class="wl">Notifications d'orage</span></label>
     <label class="wrow"><input type="checkbox" id="setSound"><span class="we">🔊</span><span class="wl">Bip sonore en cas d'alerte</span></label>
+    
     <div class="lbl" style="margin:14px 0 6px">Widgets affichés</div>
     <div id="widgetList"></div>
+    
     <div class="set-actions">
       <button class="ga-btn ghost" id="widgetReset">Tout réafficher</button>
       <button class="ga-btn" id="widgetDone">Terminé</button>
+    </div>
+    
     <div class="lbl" style="margin:14px 0 6px">Test</div>
     <button class="ga-btn" id="testNotifBtn" style="width:100%">🔔 Tester les notifications</button>
-    </div>
   </div>
+</div>
 </div>
 
 <div id="toast"></div>
@@ -293,12 +320,7 @@
 <script src="js/main.js"></script>
 
 
-<div id="settingsBackdrop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1290"></div>
-<div id="settingsPanel" style="display:none;position:fixed;right:12px;bottom:150px;z-index:1300;width:min(320px,90vw);background:rgba(13,25,48,.97);border:1px solid rgba(255,255,255,.16);border-radius:18px;padding:18px;color:#eef4ff;box-shadow:0 24px 70px rgba(0,0,0,.55)">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-    <b>⚙️ Paramètres</b>
-    <button id="settingsClose" style="border:0;background:transparent;color:#eef4ff;font-size:18px;cursor:pointer">✕</button>
-  </div>
+
     <div style="font-size:13px;opacity:.8;margin-bottom:6px">Unités température</div>
   <div class="seg" id="units">
       <button data-u="C" class="on">°C</button><button data-u="F">°F</button>
