@@ -52,9 +52,7 @@
     <div id="qlist"></div>
   </div>
   <div class="hbtns">
-    <button class="ibtn" id="settingsBtn" title="Personnaliser l'affichage" aria-label="Réglages">
-      <svg viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
-    </button>
+    
     <button class="ibtn" id="favBtn" title="Ajouter aux favoris" aria-label="Favori">
       <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.9L22 10l-5.5 4.8L18 22l-6-3.5L6 22l1.5-7.2L2 10l7.1-1.1z"/></svg>
     </button>
@@ -62,6 +60,7 @@
       <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>
     </button>
     <button class="ibtn" id="geoBtn" title="Ma position" aria-label="Ma position">
+    <button class="ibtn" id="settingsFab" title="Paramètres" aria-label="Paramètres">⚙️</button>
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8"/></svg>
     </button>
   </div>
@@ -292,7 +291,7 @@
 <script src="js/info-versions.js"></script>
 <script src="js/main.js"></script>
 
-<button id="settingsFab" aria-label="Paramètres" style="position:fixed;right:16px;bottom:86px;z-index:1200;width:52px;height:52px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(13,25,48,.9);color:#fff;font-size:22px;box-shadow:0 8px 24px rgba(0,0,0,.4);backdrop-filter:blur(6px)">⚙️</button>
+
 <div id="settingsBackdrop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1290"></div>
 <div id="settingsPanel" style="display:none;position:fixed;right:12px;bottom:150px;z-index:1300;width:min(320px,90vw);background:rgba(13,25,48,.97);border:1px solid rgba(255,255,255,.16);border-radius:18px;padding:18px;color:#eef4ff;box-shadow:0 24px 70px rgba(0,0,0,.55)">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
