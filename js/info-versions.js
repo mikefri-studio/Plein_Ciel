@@ -1,23 +1,3 @@
-"use strict";
-(function(){
-  const st=document.createElement('style');
-  st.textContent='.footer-version{cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px}.footer-version:hover{color:var(--accent,#ffd166)}';
-  document.head.appendChild(st);
-})();
-
-/* Rend le numéro de version cliquable (injecté par main.js dans #appVersion) */
-(function(){
-  function bind(){
-    const el=document.getElementById('appVersion');
-    if(el && !el.classList.contains('footer-version')){
-      el.classList.add('footer-version');
-      el.title='Historique des versions';
-    }
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bind);
-  else bind();
-})();
-
 function versionBlock(num,date,items){
   return '<div style="margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.12)">'
    +'<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-weight:700;color:#ffd166">v'+num+'</span><span style="opacity:.6;font-size:12px">'+date+'</span></div>'
@@ -31,93 +11,71 @@ function openVersions(){
   ov.style.cssText='position:fixed;inset:0;background:rgba(4,10,25,.6);backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
   ov.innerHTML='<div style="max-width:600px;width:100%;max-height:82vh;overflow-y:auto;background:rgba(13,25,48,.97);border:1px solid rgba(255,255,255,.16);border-radius:18px;padding:20px 22px;color:#eef4ff;box-shadow:0 24px 70px rgba(0,0,0,.55);font-size:14px;line-height:1.55">'
   +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><b style="font-size:17px">📋 Historique des versions</b><button id="verClose" style="background:none;border:none;color:#eef4ff;font-size:18px;cursor:pointer">✕</button></div>'
-+versionBlock('1.7.3','16 août 2026',[
-  '🌊 Réglage « Plus d’infos marine » (période houle + vague de vent)'
-+versionBlock('1.7.5','20 août 2026',[
++versionBlock('1.7.6','28 août 2026',[
+  '⛈️ Icône principale synchronisée avec les alertes radar',
+  '🎯 Affichage orage/pluie quand cellule détectée au radar'
+])+versionBlock('1.7.5','20 août 2026',[
   '🎨 Lisibilité améliorée : pourcentage de pluie en blanc'
-
-+versionBlock('1.7.6','28 août 2026',[
-  '⛈️ Icône principale synchronisée avec les alertes radar',
-  '🎯 Affichage orage/pluie quand cellule détectée au radar'
-])
-
-+versionBlock('1.7.6','28 août 2026',[
-  '⛈️ Icône principale synchronisée avec les alertes radar',
-  '🎯 Affichage orage/pluie quand cellule détectée au radar'
-])
 ])+versionBlock('1.7.4','18 août 2026',[
   '🎨 Icône du jour : partiellement nuageux = code 2 (correctif)'
-])
+])+versionBlock('1.7.3','16 août 2026',[
+  '🌊 Réglage « Plus d'infos marine » (période houle + vague de vent)'
 ])+versionBlock('1.7.2','16 août 2026',[
   '📍 Réglage : géolocalisation auto au lancement (ON/OFF)'
 ])+versionBlock('1.7.0','16 août 2026',[
   '⚙️ Nouveau menu Paramètres (bouton flottant)',
-  '🎚️ Rayon d’alerte pluie réglable : 2 / 5 / 10 / 20 km',
+  '️ Rayon d'alerte pluie réglable : 2 / 5 / 10 / 20 km',
   '📏 Alerte pluie avec distance exacte affichée',
   '🌡️ Réglage °C/°F déplacé dans le menu Paramètres',
-  '🗑️ Radar à 100 % + bouton Installer retiré',
+  '️ Radar à 100 % + bouton Installer retiré',
   '🔍 Recherche tolérante : « saint saulge » trouve Saint-Saulge',
   '✍️ « St » et « Ste » compris comme Saint / Sainte',
   '🔧 Villes récentes corrigées (erreur HTTP 400)',
   '🛠️ Réparation auto de la position mémorisée au démarrage'
 ])+versionBlock('1.6.0','12 août 2026',[
-    '🕐 Détail horaire : clic sur un jour → 24h de prévisions (température, % pluie, lever/coucher soleil)',
-    '🚫 Sélection de texte désactivée (effet app native)',
-    '🔔 Bouton "Tester les notifications" dans les paramètres',
-    '🎨 Scrollbars fines et discrètes sur toutes les modales',
-    '📏 Toasts élargis pour éviter les retours à la ligne'
-  ])
-+versionBlock('1.5.3','11 août 2026',[
-    '🔔 Vraies notifications Android (même appli fermée)',
-    '⏰ Vérification météo toutes les 15 min en arrière-plan'
-  ])
-+versionBlock('1.5.2','11 août 2026',[
-    '🔔 Toast de confirmation affiché au-dessus des fenêtres'
-  ])
-+versionBlock('1.5.1','11 août 2026',[
-    '🔔 Alerte orage activable dans l’appli : bannière + son + vibration'
-  ])
-+versionBlock('1.5.0','11 août 2026',[
-    '🖼️ Carte de partage : image météo + QR code via le bouton partage'
-  ])
-+versionBlock('1.4.2','11 août 2026',[
-    '📱 Appli Android : pied de page au-dessus des boutons de navigation'
-  ])
-+versionBlock('1.4.1','11 août 2026',[
-    '📱 Safe areas : site hors barres système Android/iOS',
-    '🤖 Appli : widget 24 h avec titre PLEIN CIEL + heure de MAJ'
-  ])
-+versionBlock('1.4.0','10 août 2026',[
-    '⚡ Détection radar des orages : alerte même si le modèle ne prévoit rien',
-    '🌬️ Sélecteur vent sol / vent 3 km',
-    '⚙️ Réglages d\'alerte déplacés dans ⚙️',
-    '🏗️ Code découpé en ~20 modules',
-    '📖 README + historique des versions'
-  ])
-  +versionBlock('1.3.0','10 août 2026',[
-    '🏙️ Nom de ville automatique à la géolocalisation',
-    '🗺️ Fond plan corrigé (CARTO)',
-    '💨 Vent visible sur tous les fonds',
-    'ℹ️ Indicateurs cliquables avec explications'
-  ])
-  +versionBlock('1.2.0','9 août 2026',[
-    '⛈️ Bannière d\'alerte orage 3 niveaux',
-    '🔔 Notifications + bip sonore optionnels',
-    '🌼 Pollen mis en cache'
-  ])
-  +versionBlock('1.0.0','8 août 2026',[
-    '🌡️ Météo + 16 jours + pluie minute',
-    '🗺️ Radar animé + particules de vent',
-    '🌼☀️🌙 Pollen, marine, soleil, lune',
-    '🧥 Conseils tenue + activités',
-    '📱 PWA installable hors-ligne'
-  ])
+  '🕐 Détail horaire : clic sur un jour → 24h de prévisions (température, % pluie, lever/coucher soleil)',
+  '🚫 Sélection de texte désactivée (effet app native)',
+  '🔔 Bouton "Tester les notifications" dans les paramètres',
+  '🎨 Scrollbars fines et discrètes sur toutes les modales',
+  '📏 Toasts élargis pour éviter les retours à la ligne'
+])+versionBlock('1.5.3','11 août 2026',[
+  ' Vraies notifications Android (même appli fermée)',
+  '⏰ Vérification météo toutes les 15 min en arrière-plan'
+])+versionBlock('1.5.2','11 août 2026',[
+  '🔔 Toast de confirmation affiché au-dessus des fenêtres'
+])+versionBlock('1.5.1','11 août 2026',[
+  '🔔 Alerte orage activable dans l'appli : bannière + son + vibration'
+])+versionBlock('1.5.0','11 août 2026',[
+  '🖼️ Carte de partage : image météo + QR code via le bouton partage'
+])+versionBlock('1.4.2','11 août 2026',[
+  '📱 Appli Android : pied de page au-dessus des boutons de navigation'
+])+versionBlock('1.4.1','11 août 2026',[
+  '📱 Safe areas : site hors barres système Android/iOS',
+  '🤖 Appli : widget 24 h avec titre PLEIN CIEL + heure de MAJ'
+])+versionBlock('1.4.0','10 août 2026',[
+  '⚡ Détection radar des orages : alerte même si le modèle ne prévoit rien',
+  '🌬️ Sélecteur vent sol / vent 3 km',
+  '⚙️ Réglages d'alerte déplacés dans ️',
+  '🏗️ Code découpé en ~20 modules',
+  '📖 README + historique des versions'
+])+versionBlock('1.3.0','10 août 2026',[
+  '️ Nom de ville automatique à la géolocalisation',
+  '🗺️ Fond plan corrigé (CARTO)',
+  ' Vent visible sur tous les fonds',
+  'ℹ️ Indicateurs cliquables avec explications'
+])+versionBlock('1.2.0','9 août 2026',[
+  '⛈️ Bannière d'alerte orage 3 niveaux',
+  '🔔 Notifications + bip sonore optionnels',
+  '🌼 Pollen mis en cache'
+])+versionBlock('1.0.0','8 août 2026',[
+  '🌡️ Météo + 16 jours + pluie minute',
+  '🗺️ Radar animé + particules de vent',
+  '🌼☀️ Pollen, marine, soleil, lune',
+  '🧥 Conseils tenue + activités',
+  '📱 PWA installable hors-ligne'
+])
   +'</div>';
   document.body.appendChild(ov);
   ov.querySelector('#verClose').addEventListener('click',()=>ov.remove());
   ov.addEventListener('click',e=>{if(e.target===ov)ov.remove();});
 }
-
-document.addEventListener('click',e=>{
-  if(e.target.closest && e.target.closest('.footer-version')) openVersions();
-});
