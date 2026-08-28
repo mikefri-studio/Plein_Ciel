@@ -519,3 +519,13 @@ input, textarea {
   background: rgba(255,255,255,.25);
   border-radius: 3px;
 }
+
+/* ===== Header : titre + boutons alignés sur une ligne ===== */
+header{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+header .brand{order:1;flex:1 1 auto;min-width:0}
+header .hbtns{order:2;display:flex;align-items:center;gap:8px;flex:0 0 auto;margin-left:auto}
+header .search{order:3;flex:1 1 100%}
+@media(max-width:520px){
+  header .ibtn{width:38px;height:38px}
+  header .ibtn svg{width:17px;height:17px}
+}
