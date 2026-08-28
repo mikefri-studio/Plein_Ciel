@@ -149,6 +149,8 @@ async function checkThunderAlert(forceNotify=false){
 $('#alertCloseBtn').addEventListener('click',()=>{
   $('#alertBar').classList.remove('on');
   document.body.classList.remove('has-alert');
+  state.alert.current={level:0};
+  if(typeof renderAll==='function'){ try{renderAll();}catch(e){} }
 });
 function syncAlertPrefs(){
   const n=$('#setNotif'), s=$('#setSound');
@@ -176,4 +178,9 @@ syncAlertPrefs();
 setInterval(()=>{ if(state.fc) checkThunderAlert(); }, 10*60*1000);
 
 
-function updateAlertState(info){state.alert.current=info;}
+function updateAlertState(info){
+  const prev=(state.alert.current&&state.alert.current.level)||0;
+  state.alert.current=info||{level:0};
+  const now=(info&&info.level)||0;
+  if(prev!==now && typeof renderAll==='function'){ setTimeout(()=>{ try{renderAll();}catch(e){} },50); }
+}

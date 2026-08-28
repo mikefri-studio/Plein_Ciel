@@ -1,6 +1,6 @@
 "use strict";
-const safe=(name,f)=>{ try{ f(); }catch(err){ console.error('Erreur de rendu ['+name+'] :',err); } };function getAlertIcon(){const a=state.alert&&state.alert.current;if(!a||a.level===0)return null;if(a.radar)return a.level>=3?'thunder':'rain';if(a.level===3)return'thunder';return null;}
-function getAlertIcon(){const a=state.alert&&state.alert.current;if(!a||a.level===0)return null;if(a.radar)return a.level>=3?'thunder':'rain';if(a.level===3)return'thunder';return null;}
+const safe=(name,f)=>{ try{ f(); }catch(err){ console.error('Erreur de rendu ['+name+'] :',err); } };function getAlertIcon(){const bar=document.getElementById('alertBar');if(!bar||!bar.classList.contains('on'))return null;const a=state.alert&&state.alert.current;if(!a||a.level===0)return null;if(a.radar)return a.level>=3?'thunder':'rain';return a.level>=2?'thunder':null;}
+function getAlertIcon(){const bar=document.getElementById('alertBar');if(!bar||!bar.classList.contains('on'))return null;const a=state.alert&&state.alert.current;if(!a||a.level===0)return null;if(a.radar)return a.level>=3?'thunder':'rain';return a.level>=2?'thunder':null;}
 function renderAll(){
   const fc=state.fc, c=fc.current, day=fc.daily, isDay=c.is_day==1, code=c.weather_code;
   const grp=condGroup(code);
