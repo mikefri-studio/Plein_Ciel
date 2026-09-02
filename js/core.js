@@ -84,7 +84,7 @@ function applyWidgets(){
 function buildWidgetList(){
   const p=store.get('pc_widgets')||{};
   const savedOrder = store.get('pc_widget_order') || [];
-  
+
   const sortedWidgets = [...WIDGETS].sort((a, b) => {
     const idxA = savedOrder.indexOf(a[0]);
     const idxB = savedOrder.indexOf(b[0]);
@@ -94,52 +94,24 @@ function buildWidgetList(){
     return idxA - idxB;
   });
 
-  #widgetList.innerHTML=sortedWidgets.map(([id,em,label])=>
+  $('#widgetList').innerHTML=sortedWidgets.map(([id,em,label])=>
     `<div class="wrow" draggable="true" data-w="${id}">
-       <span class="sort-grip" title="Glisser pour réorganiser"></span>
-       <input type="checkbox" data-w="${id}" ${p[id]!==false?'checked':''}>
-       <span class="we"></span>
-       <span class="wl"></span>
-     </div>`
-  ).join('');
-  
-  setTimeout(() => {
-    if(typeof initSortableCSS === 'function') initSortableCSS();
-    if(typeof makeSortable === 'function') {
-      makeSortable(#widgetList, () => {
-        const newOrder = Array.from(#widgetList.children).map(el => el.dataset.w);
-        store.set('pc_widget_order', newOrder);
-      });
-    }
-  }, 100);
-};
-  const savedOrder = store.get('pc_widget_order') || [];
-  
-  const sortedWidgets = [...WIDGETS].sort((a, b) => {
-    const idxA = savedOrder.indexOf(a[0]);
-    const idxB = savedOrder.indexOf(b[0]);
-    if (idxA === -1 && idxB === -1) return 0;
-    if (idxA === -1) return 1;
-    if (idxB === -1) return -1;
-    return idxA - idxB;
-  });
-
-  $('#widgetList').innerHTML = sortedsortedWidgets.map(([id,em,label])=>
-    `<div class="wrow" draggable="true" data-w="${id}">
-       <span class="sort-grip" title="Glisser pour réorganiser">⋮⋮</span>
+       <span class="sort-grip" title="Glisser pour réorganiser">⋮</span>
        <input type="checkbox" data-w="${id}" ${p[id]!==false?'checked':''}>
        <span class="we">${em}</span>
        <span class="wl">${label}</span>
      </div>`
   ).join('');
 
-  if(typeof initSortableCSS === 'function') initSortableCSS();
-  if(typeof makeSortable === 'function') {
-    makeSortable($('#widgetList'), () => {
-      const newOrder = Array.from($('#widgetList').children).map(el => el.dataset.w);
-      store.set('pc_widget_order', newOrder);
-    });
-  }
+  setTimeout(() => {
+    if(typeof initSortableCSS === 'function') initSortableCSS();
+    if(typeof makeSortable === 'function') {
+      makeSortable($('#widgetList'), () => {
+        const newOrder = Array.from($('#widgetList').children).map(el => el.dataset.w);
+        store.set('pc_widget_order', newOrder);
+      });
+    }
+  }, 100);
 }
 $('#settingsBtn').addEventListener('click',()=>{ buildWidgetList(); $('#settingsModal').classList.add('open'); });
 $('#setClose').addEventListener('click',()=>$('#settingsModal').classList.remove('open'));
