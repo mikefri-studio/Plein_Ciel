@@ -99,7 +99,7 @@ function buildWidgetList(){
        <span class="sort-grip" title="Glisser pour réorganiser">⋮</span>
        <input type="checkbox" data-w="${id}" ${p[id]!==false?'checked':''}>
        <span class="we">${em}</span>
-       <span class="wl">${label}</span>${['sun','climate','photo','moon','air','pollen','marine'].includes(id)?'<span class="wzone">colonne</span>:''}
+       <span class="wl">${label}</span>${['sun','climate','photo','moon','air','pollen','marine'].includes(id)?"<span class='wzone'>colonne</span>":""}
      </div>`
   ).join('');
 
