@@ -1,4 +1,4 @@
-"use strict";
+﻿"use strict";
 /* ================= FAVORIS ================= */
 function getFavs(){ return store.get('pc_favs')||[]; }
 function saveFavs(list){ store.set('pc_favs',list); }
@@ -13,7 +13,7 @@ function renderFavs(){
   if(!list.length){ wrap.innerHTML=''; return; }
   wrap.innerHTML=list.map((f,i)=>{
     const active=(Math.abs(f.lat-state.loc.lat)<0.01&&Math.abs(f.lon-state.loc.lon)<0.01);
-    return `<div class="fav-chip ${active?'active':''}" data-i="${i}"><span class="name">${esc(f.name)}</span><span class="x" data-del="${i}" title="Retirer">×</span></div>`;
+    return `<div class="fav-chip ${active?'active':''}" data-i="${i}"><span class="name">${esc(f.name)}</span></div>`;
   }).join('');
   wrap.querySelectorAll('.fav-chip').forEach(el=>{
     el.addEventListener('click',e=>{
