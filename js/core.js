@@ -94,12 +94,12 @@ function buildWidgetList(){
     return idxA - idxB;
   });
 
-  $('#widgetList').innerHTML=sortedWidgets.map(([id,em,label])=>
+  $('#widgetList').innerHTML='<div class="wzone-hint">💡 Glissez les lignes pour réorganiser. Les widgets marqués « colonne » se rangent dans la colonne de droite du bloc 16 jours.</div>'+sortedWidgets.map(([id,em,label])=>
     `<div class="wrow" draggable="true" data-w="${id}">
        <span class="sort-grip" title="Glisser pour réorganiser">⋮</span>
        <input type="checkbox" data-w="${id}" ${p[id]!==false?'checked':''}>
        <span class="we">${em}</span>
-       <span class="wl">${label}</span>
+       <span class="wl">${label}</span>${['sun','climate','photo','moon','air','pollen','marine'].includes(id)?'<span class="wzone">colonne</span>':'}
      </div>`
   ).join('');
 

@@ -73,7 +73,7 @@ function initSortableCSS() {
     .sort-grip { cursor: grab; padding: 0 8px; color: var(--ink-soft); font-size: 18px; user-select: none; touch-action: none; }
     .sort-grip:active { cursor: grabbing; }
     .wrow.dragging { opacity: 0.4; background: var(--card); }
-    .wrow input[type="checkbox"] { margin-left: 4px; accent-color: var(--accent); }
+    .wrow input[type="checkbox"] { margin-left: 4px; accent-color: var(--accent); } .wzone { margin-left:auto; font-size:10px; text-transform:uppercase; letter-spacing:.4px; color:var(--ink-soft); border:1px solid var(--line); border-radius:999px; padding:2px 8px; } .wzone-hint { font-size:11.5px; color:var(--ink-soft); padding:6px 2px 10px; line-height:1.45; }
   `;
   document.head.appendChild(style);
 }
