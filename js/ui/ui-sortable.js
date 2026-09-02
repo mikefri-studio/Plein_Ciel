@@ -7,7 +7,7 @@ function makeSortable(listElement, onSave) {
   // --- Souris (Desktop) ---
   listElement.addEventListener('dragstart', (e) => {
     const row = e.target.closest('.wrow');
-    if (row && e.target.closest('.sort-grip')) {
+    if (row && !e.target.closest('input')) {
       draggedItem = row;
       draggedItem.classList.add('dragging');
       e.dataTransfer.effectAllowed = 'move';
