@@ -108,7 +108,7 @@ function buildWidgetList(){
     if(typeof makeSortable === 'function') {
       makeSortable($('#widgetList'), () => {
         const newOrder = Array.from($('#widgetList').children).map(el => el.dataset.w);
-        store.set('pc_widget_order', newOrder);
+        store.set('pc_widget_order', newOrder); if(typeof applyWidgetOrder==='function') applyWidgetOrder();
       });
     }
   }, 100);
@@ -287,4 +287,51 @@ function calcDayIcon(hourlyCodes, hourlyTimes, dateStr){
   if(snow===max)  return 71;
   if(storm===max) return 95;
   return null;
+}
+
+/* ================= ORDRE PERSONNALISÉ DES WIDGETS (VUE MÉTÉO) ================= */
+function applyWidgetOrder(){
+  const order = store.get('pc_widget_order');
+  if(!order || !order.length) return;
+  const rank = id => { const i = order.indexOf(id); return i===-1 ? 999 : i; };
+  const minRank = ids => Math.min(...ids.map(rank));
+  const move = (parent, pairs) => {
+    if(!parent) return;
+    pairs.sort((a,b)=>a[1]-b[1]).forEach(([el])=>{ if(el) parent.appendChild(el); });
+  };
+
+  // Blocs de la 1ère section : pluie / conseils / stats (le hero et les favoris restent en haut)
+  const rain = $('#rainNowCard');
+  const wrap1 = rain ? rain.parentElement : null;
+  const advice = $('#adviceGrid'), statsW = $('#statsWrap');
+  move(wrap1, [
+    [rain, rank('rain')],
+    [advice, minRank(['outfit','activities'])],
+    [statsW, rank('stats')]
+  ]);
+
+  // Les deux conseils entre eux
+  if(advice) move(advice, [ [$('#wOutfit'), rank('outfit')], [$('#wActivities'), rank('activities')] ]);
+
+  // Grandes sections : accueil / 24h / 16 jours / carte
+  const mainEl = document.querySelector('main');
+  const footer = document.querySelector('footer');
+  move(mainEl, [
+    [wrap1, minRank(['rain','outfit','activities','stats'])],
+    [$('#secHours'), rank('hours')],
+    [$('#secDays'), minRank(['days','sun','climate','photo','moon','air','pollen','marine'])],
+    [$('#secMap'), rank('map')]
+  ]);
+  if(footer) mainEl.appendChild(footer);
+
+  // Cartes de la colonne latérale (soleil, climat, photo, lune, air, pollen, marine)
+  const sun = $('#wSun');
+  const side = sun ? sun.parentElement : null;
+  if(side) move(side, [
+    [sun, rank('sun')], [$('#wClimate'), rank('climate')], [$('#wPhoto'), rank('photo')],
+    [$('#wMoon'), rank('moon')], [$('#wAir'), rank('air')], [$('#wPollen'), rank('pollen')], [$('#wMarine'), rank('marine')]
+  ]);
+
+  // La carte Leaflet a parfois besoin d'un rafraîchissement après déplacement
+  setTimeout(()=>{ if(state.map) state.map.invalidateSize(); }, 200);
 }

@@ -1,4 +1,4 @@
-"use strict";
+﻿"use strict";
 /* ================= DÉMARRAGE ================= */
 const APP_VERSION='1.7.6';
 console.log(`%c☁️ Plein Ciel v${APP_VERSION}`, 'color:#ffd166;font-size:18px;font-weight:bold');
@@ -9,6 +9,7 @@ $('#appVersion').textContent=APP_VERSION;
 if(state.loc&&state.loc.lat==null&&state.loc.latitude!=null){state.loc.lat=state.loc.latitude;state.loc.lon=state.loc.longitude;store.set('pc_loc',state.loc);}
 writeURL(state.loc);
 applyWidgets();
+if(typeof applyWidgetOrder==='function') applyWidgetOrder();
 load();
   /* ================= GÉOLOCALISATION AU DÉMARRAGE ================= */
   /* v1.4.1 : ne casse plus les liens partagés, et évite le double chargement */
