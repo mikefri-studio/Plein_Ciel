@@ -10,6 +10,13 @@ if(state.loc&&state.loc.lat==null&&state.loc.latitude!=null){state.loc.lat=state
 writeURL(state.loc);
 applyWidgets();
 if(typeof applyWidgetOrder==='function') applyWidgetOrder();
+
+/* Nouveautés affichées automatiquement après une mise à jour */
+setTimeout(() => {
+  const vue = store.get('pc_vue_version');
+  if (vue && vue !== APP_VERSION && typeof openVersions === 'function') openVersions();
+  store.set('pc_vue_version', APP_VERSION);
+}, 1200);
 load();
   /* ================= GÉOLOCALISATION AU DÉMARRAGE ================= */
   /* v1.4.1 : ne casse plus les liens partagés, et évite le double chargement */
