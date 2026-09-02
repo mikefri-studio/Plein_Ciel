@@ -1,4 +1,4 @@
-"use strict";
+﻿"use strict";
 const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
 /* v1.4.1 : store.set sécurisé (navigation privée Safari, quota, etc.) */
 const store={get:k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
@@ -83,9 +83,33 @@ function applyWidgets(){
 }
 function buildWidgetList(){
   const p=store.get('pc_widgets')||{};
-  $('#widgetList').innerHTML=WIDGETS.map(([id,em,label])=>
-    `<label class="wrow"><input type="checkbox" data-w="${id}" ${p[id]!==false?'checked':''}><span class="we">${em}</span><span class="wl">${label}</span></label>`
+  const savedOrder = store.get('pc_widget_order') || [];
+  
+  const sortedWidgets = [...WIDGETS].sort((a, b) => {
+    const idxA = savedOrder.indexOf(a[0]);
+    const idxB = savedOrder.indexOf(b[0]);
+    if (idxA === -1 && idxB === -1) return 0;
+    if (idxA === -1) return 1;
+    if (idxB === -1) return -1;
+    return idxA - idxB;
+  });
+
+  $('#widgetList').innerHTML = sortedWidgets.map(([id,em,label])=>
+    `<div class="wrow" draggable="true" data-w="${id}">
+       <span class="sort-grip" title="Glisser pour réorganiser">⋮⋮</span>
+       <input type="checkbox" data-w="${id}" ${p[id]!==false?'checked':''}>
+       <span class="we">${em}</span>
+       <span class="wl">${label}</span>
+     </div>`
   ).join('');
+
+  if(typeof initSortableCSS === 'function') initSortableCSS();
+  if(typeof makeSortable === 'function') {
+    makeSortable($('#widgetList'), () => {
+      const newOrder = Array.from($('#widgetList').children).map(el => el.dataset.w);
+      store.set('pc_widget_order', newOrder);
+    });
+  }
 }
 $('#settingsBtn').addEventListener('click',()=>{ buildWidgetList(); $('#settingsModal').classList.add('open'); });
 $('#setClose').addEventListener('click',()=>$('#settingsModal').classList.remove('open'));
