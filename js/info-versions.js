@@ -1,4 +1,4 @@
-function versionBlock(num,date,items){
+﻿function versionBlock(num,date,items){
   return '<div style="margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.12)">'
    +'<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-weight:700;color:#ffd166">v'+num+'</span><span style="opacity:.6;font-size:12px">'+date+'</span></div>'
    +'<ul style="margin:0;padding-left:18px">'+items.map(i=>'<li style="margin-bottom:5px">'+i+'</li>').join('')+'</ul></div>';
@@ -11,6 +11,12 @@ function openVersions(){
   ov.style.cssText='position:fixed;inset:0;background:rgba(4,10,25,.6);backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
   ov.innerHTML='<div style="max-width:600px;width:100%;max-height:82vh;overflow-y:auto;background:rgba(13,25,48,.97);border:1px solid rgba(255,255,255,.16);border-radius:18px;padding:20px 22px;color:#eef4ff;box-shadow:0 24px 70px rgba(0,0,0,.55);font-size:14px;line-height:1.55">'
   +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><b style="font-size:17px">📋 Historique des versions</b><button id="verClose" style="background:none;border:none;color:#eef4ff;font-size:18px;cursor:pointer">✕</button></div>'
++versionBlock('1.8.0','3 septembre 2026',[
+  "🗑️ Suppression de la croix de suppression des villes favorites",
+  "✨ Réorganisation des widgets par glisser-déposer (Paramètres)",
+  "🏷️ Badge « colonne » + astuce pour comprendre le tri",
+  "🖱️ Numéro de version cliquable : historique des versions"
+])
 +versionBlock('1.7.6','28 août 2026',[
   "⛈️ Icône principale synchronisée avec les alertes radar",
   "🎯 Affichage orage/pluie quand cellule détectée au radar"
@@ -78,3 +84,14 @@ function openVersions(){
   ov.querySelector('#verClose').addEventListener('click',()=>ov.remove());
   ov.addEventListener('click',e=>{if(e.target===ov)ov.remove();});
 }
+
+/* Version cliquable dans le pied de page */
+(function(){
+  const el = $('#appVersion');
+  if(!el) return;
+  el.style.cursor = 'pointer';
+  el.style.textDecoration = 'underline';
+  el.style.textDecorationStyle = 'dotted';
+  el.title = "Voir l'historique des versions";
+  el.addEventListener('click', openVersions);
+})();
